@@ -1,0 +1,8 @@
+###< if (data.basicData.languages.find(lang => lang=='es') && feature.MV_LM_BaseLayerSelector) { >###
+{
+"changeBaseLayer":{
+"changeBaseLayerTitle": "Cambiar capa base",
+"selectBaseLayer": "Seleccione una nueva capa base"
+}
+}
+###< } >###

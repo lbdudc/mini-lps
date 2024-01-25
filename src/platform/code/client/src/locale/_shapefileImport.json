@@ -1,0 +1,30 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/shapefileImport.json',
+        context: lang
+      };
+    });
+>###
+###< if (feature.DM_DI_DF_Shapefile) { >###
+{
+  "shapefile-importer": {
+    "shapefile-importer": "ShapeFile Importer",
+    "table-headers": {
+      "column": "Column",
+      "read-value": "Read value",
+      "field": "Field",
+      "type": "Type"
+    },
+    "actions": {
+      "import-data": "Import data",
+      "submit-file": "Submit file"
+    },
+    "encoding": "Encoding",
+    "entities": "Entities",
+    "no-entities": "There are not entities",
+    "import-success": "Data Imported"
+}
+}
+###< } >###

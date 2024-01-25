@@ -1,0 +1,87 @@
+/*%@ return data.mapViewer && data.mapViewer.styles
+      ? data.mapViewer.styles.filter((style) => style.cached && style.type === "WMSLayerSLDStyle" && !style.sld)
+          .map((st) => {
+            return {
+              fileName: normalize(st.name, true) + '.sld',
+              context: st
+            };
+          })
+		  : [] %*/
+<StyledLayerDescriptor version="1.0.0"
+    xsi:schemaLocation="http://www.opengis.net/sld StyledLayerDescriptor.xsd"
+	xmlns="http://www.opengis.net/sld"
+	xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<NamedLayer>
+		<Name>/*%= context.name %*/</Name>
+		<UserStyle>
+			<IsDefault>1</IsDefault>
+			<FeatureTypeStyle>
+				/*% context.availableGeometries.forEach((ag) => { %*/
+				/*% if (ag.type === 'POINT') { %*/
+					<Rule>
+						/*% if (context.availableGeometries.length > 1) { %*/
+						<MinScaleDenominator>10000</MinScaleDenominator>
+						/*% } %*/
+						<PointSymbolizer>
+						/*% if (ag.property) { %*/
+							<Geometry>
+								<ogc:PropertyName>/*%= ag.property %*/</ogc:PropertyName>
+							</Geometry>
+						/*% } %*/
+							<Graphic>
+								<Mark>
+									<WellKnownName>circle</WellKnownName>
+									<Fill>
+										<CssParameter name="fill">#ff641a</CssParameter>
+										<CssParameter name="fill-opacity">0.7</CssParameter>
+									</Fill>
+									<Stroke>
+										<CssParameter name="stroke">#0079C2</CssParameter>
+										<CssParameter name="stroke-opacity">1</CssParameter>
+									</Stroke>
+								</Mark>
+							</Graphic>
+						</PointSymbolizer>
+					</Rule>
+					/*% } else if (ag.type === 'POLYGON') { %*/
+					<Rule>
+						/*% if (context.availableGeometries.length > 1) { %*/
+						<MaxScaleDenominator>10000</MaxScaleDenominator>
+						/*% } %*/
+						<PolygonSymbolizer>
+						/*% if (ag.property) { %*/
+							<Geometry>
+								<ogc:PropertyName>/*%= ag.property %*/</ogc:PropertyName>
+							</Geometry>
+						/*% } %*/
+							<Fill>
+								<CssParameter name="fill">#ff641a</CssParameter>
+								<CssParameter name="fill-opacity">0.7</CssParameter>
+							</Fill>
+							<Stroke>
+								<CssParameter name="stroke">#0079C2</CssParameter>
+								<CssParameter name="stroke-opacity">1</CssParameter>
+							</Stroke>
+						</PolygonSymbolizer>
+					</Rule>
+					/*% } else if (ag.type === 'LINE') { %*/
+					<Rule>
+						<LineSymbolizer>
+						/*% if (ag.property) { %*/
+							<Geometry>
+								<ogc:PropertyName>/*%= ag.property %*/</ogc:PropertyName>
+							</Geometry>
+						/*% } %*/
+							<Stroke>
+								<CssParameter name="stroke">#0079C2</CssParameter>
+								<CssParameter name="stroke-opacity">1</CssParameter>
+							</Stroke>
+						</LineSymbolizer>
+					</Rule>
+					/*% }}); %*/
+			</FeatureTypeStyle>
+		</UserStyle>
+	</NamedLayer>
+</StyledLayerDescriptor>

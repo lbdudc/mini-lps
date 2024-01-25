@@ -1,0 +1,10 @@
+/*%@ return data.mapViewer && data.mapViewer.styles
+      ? data.mapViewer.styles.filter((style) => style.cached && style.sld)
+          .map((st) => {
+            return {
+              fileName: normalize(st.name, true) + '.sld',
+              context: st
+            };
+          })
+		  : [] %*/
+/*%= context.sld %*/

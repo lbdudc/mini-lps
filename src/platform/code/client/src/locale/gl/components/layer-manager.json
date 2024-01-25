@@ -1,0 +1,33 @@
+###< if (data.basicData.languages.find(lang => lang=='gl') && feature.MV_LayerManagement) { >###
+{
+  "layerManager": {
+    "title": "Organizador de capas",
+    "name": "Nome",
+    "center": "Centrar",
+    "legend": "Lenda",
+    "order": "Ordear",
+    "opacity": "Opacidade",
+    "download": "Descargar",
+    "layerNotAvailable": "Capa non dispoñible para descarga",
+    ###< if (feature.MV_LM_Style) { >###
+    "style": "Estilo",
+    "wms-style": {
+      "newStyle": "Novo estilo",
+      "styleName": "Nome do estilo",
+      "fillColor": "Cor de recheo",
+      "color": "Cor",
+      "fill": "Recheo",
+      "stroke": "Trazo",
+      "transparent": "Transparente",
+      "strokeColor": "Cor do trazo",
+      "form-error": "Este estilo non se pode gardar debido a erros de formulario.",
+      "apply": "Aplicar"
+    },
+    ###< } >###
+    "edit": "Editar a capa exterior",
+    "delete": "Eliminar a capa exterior",
+    "nameRequired": "É obrigatorio indicar un nome",
+    "editLayer": "Editar nome"
+  }
+}
+###< } >###

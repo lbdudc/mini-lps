@@ -1,0 +1,77 @@
+###< if (feature.MapViewer) { >###
+{
+  "maps": [
+  ###< if (feature.MV_MM_MultipleMapViewer) { >###
+    ###< data.mapViewer.maps?.forEach(function(map, index) { >###
+    {
+      "name": "###<= map.name >###",
+      "sortable": "###<= map.sortable >###",
+      "center": ###<= JSON.stringify(map.center) || JSON.stringify([[41.508742458803326, -4.087890625], [44.508742458803326, -12.08789063]]) >###,
+      "layers": ###<= JSON.stringify(map.layers) >### ###< if (map.mapOptions) { >###,
+      "mapOptions": ###<= JSON.stringify(map.mapOptions) >###
+      ###< } >###
+    }###< if (data.mapViewer.maps.length -1 != index) { >###,###< } >###
+  ###< }); >###
+  ###< } else { >###
+  ###< var order = 0; >###
+  ###<
+      var geographicEntities = data.dataModel.entities.filter(function(entity) {
+          return checkEntityContainsPropertiesOfTypes(entity, geoTypes);
+      });
+  >###
+    {
+      "name": "default",
+      "sortable": false,
+      ###< if (feature.MV_MM_UMV_MapCenter) { >###
+          ###< if (feature.MV_MM_UMV_MC_BBox) { >###
+          "center": [[41.508742458803326, -4.087890625], [44.508742458803326, -12.087890625]],
+          ###< } else if (feature.MV_MM_UMV_MC_Coordinates) { >###
+          "center": {
+          "lat": 40.416775,
+          "lng": -3.703790,
+          "zoom": 4
+          },
+          ###< } else if (feature.MV_MM_UMV_MC_UserPosition) { >###
+          "center": null,
+          ###< } >###
+      ###< } >###
+      "layers": [
+        {
+          "name": "Stamen.Terrain",
+          "baseLayer": true,
+          "order": 1
+        },
+        {
+          "name": "Stamen.TonerLite",
+          "baseLayer": true,
+          "order": 2
+        },
+        {
+          "name": "OpenStreetMap.Mapnik",
+          "baseLayer": true,
+          "order": 3
+        },
+        {
+          "name": "Esri.WorldStreetMap",
+          "baseLayer": true,
+          "order": 4
+        }
+        ###< geographicEntities.forEach(function(entity, index) {
+              var geographicPropertyNames = getEntityPropertyNamesOfGeographicTypes(entity);
+              geographicPropertyNames.forEach(function(geoPropertyName, indexPropertyNames) {
+          >###
+        ,
+        {
+          "name": "###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###",
+          "order": ###<= order+=1 >###
+        }
+        ###<
+              });
+            });
+        >###
+      ]
+    }
+  ###< } >###
+  ]
+}
+###< } >###

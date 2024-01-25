@@ -1,0 +1,29 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/add-new-layer.json',
+        context: lang
+      };
+    });
+>###
+###< if (feature.MV_LM_ExternalLayer) { >###
+{
+  "addNewLayer": {
+    "addNewLayerTitle": "Add layer",
+    "selectLayer": "Choose the layer that you want to add to the map",
+    "addUrlLayer": "Add new layer",
+    "addExistentLayer": "Add existent layer",
+    "url": "URL",
+    "layerName": "Layer name",
+    "add": "Add",
+    "layerRequired": "A layer should be selected",
+    "urlRequired": "The layer URL is required",
+    "layerNameRequired": "A layer name must be provided",
+    "search": "Search",
+    "close": "Close",
+    "noLayers": "There are no layers available",
+    "invalidUrl": "Invalid URL"
+  }
+}
+###< } >###

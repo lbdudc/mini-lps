@@ -1,0 +1,49 @@
+###<@ return data.dataModel.entities.map(function(en) {
+    return {
+        fileName: normalize(en.name) + '.json',
+        context: en
+  }
+}) >###
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+{
+  "t_###<= normalize(context.name) >###": {
+    "name": "###<= context.name >###",
+    "prop": {
+        ###< if (context.traceable) { >###"owner": "propietario",###<
+      } >###
+        ###<= context.properties.map(function(prop) {
+          if (prop.class == 'Point') {
+            return
+              '"' + normalize(prop.name) + '": "' + normalize(prop.name) + '",\n        ' +
+              '"' + normalize(prop.name) + 'Custom.x": "' + normalize(prop.name) + ' X",\n        ' +
+              '"' + normalize(prop.name) + 'Custom.y": "' + normalize(prop.name) + ' Y"';
+        }
+          return '"' + normalize(prop.name) + '": "' + normalize(prop.name) + '"';
+      }).join(',\n        ') >###
+    },
+    "messages": {
+      "create.success": "###<= normalize(context.name, true) >### creado.",
+      "update.success": "###<= normalize(context.name, true) >### actualizado.",
+      "delete.success": "###<= normalize(context.name, true) >### eliminado."
+    },
+    "error": {
+      "id-exists": "Un novo ###<= normalize(context.name) >### non pode ter un ###<= normalize(getEntityProperty(context, 'id').name) >###",
+      "id-not-exists": "Actualizando ###<= normalize(context.name) >### sen ###<= normalize(getEntityProperty(context, 'id').name) >###",
+      "form-errors": "Este ###<= normalize(context.name) >### non se pode gardar debido a erros no formulario."
+    },
+    "headers": {
+      ###<
+      var lists = data.lists.filter(function(list) { return list.entity == context.name});
+      var forms = data.forms.filter(function(form) { return form.entity == context.name});
+      >###
+      ###< lists.forEach(function(theList, index) { >###
+      "###<= normalize(theList.id) >###": "###<= theList.id >###" ###< if (lists.length > index + 1 || forms.length > 0) { >###,###< } >###
+      ###< }); >###
+      ###< forms.forEach(function(theForm, index) { >###
+      "###<= normalize(theForm.id) >###Detail": "###<= theForm.id >### Detail",
+      "###<= normalize(theForm.id) >###": "###<= theForm.id >###" ###< if (forms.length > index + 1) { >###,###< } >###
+      ###< }); >###
+    }
+  }
+}
+###< } >###

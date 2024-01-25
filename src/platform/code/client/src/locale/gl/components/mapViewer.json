@@ -1,0 +1,112 @@
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+###< if (feature.MapViewer) { >###
+{
+  "mapViewer": {
+    "mapViewer": "Visor de Mapa",
+    "cancel": "Cancelar",
+    "close": "Pechar",
+    "downloadFormat": "Formato de descarga",
+    "export": "Exportar",
+    "exportManager": "Xestor de exportacións",
+    "listLayerElements": "Listar elementos da capa",
+    "margin": "Marxe",
+    "portrait": "Retrato",
+    "scale": "Escala",
+    "searchInMap": "Buscar no mapa...",
+    "urlToShare": "URL para compartir",
+     ###< if(feature.MV_T_E_F_URL) { >###
+    "successCopyURL": "A URL foi copiada no portapapeis",
+    "errorCopyURL": "Produciuse un erro cando se copiou a URL no portapapeis",
+     ###< } >###
+###< if(feature.MV_T_InformationMode) { >###
+    "wmsDetail": {
+      "title":  "Información da selección",
+      "layers": "Capas",
+      "layer-items": "Elementos da capa",
+      "layer-item-detail": "Detalle do elemento",
+      "no-data": "Non hai datos",
+      "no-property-data": "Sen datos",
+      "form-tooltip": "Ir ó formulario de detalle do elemento"
+    },
+      ###< } >###
+    "routeCompletationError": "Por favor, completa ou cancela a ruta antes de continuar",
+    "chooseEntity": "Escolla a entidade que desexa listar",
+###< if(feature.MV_LM_StylePreview) { >###
+    "wmsLegend": {
+      "title": "Lenda Capa WMS",
+      "no-data": "Non hai datos dispoñibles"
+    },
+###< } >###
+    "mustSelectAnExportOption": "Debe escoller polo menos un dos formatos de exportación",
+    "addALayer": "Non hai capas engadidas. Engade unha ",
+    "addALayer-link": "aquí",
+    "map": "Mapa",
+    "layer-label": {
+      ###< if (feature.MV_MM_MultipleMapViewer && checkAnyLayer(data.mapViewer)) { >###
+        ###< data.mapViewer.layers.forEach(function(layer, indexLayers) {
+        var label = layer.label ? layer.label : layer.name; >###
+        "###<= layer.name.replace('.', '-') >###": "###<= label >###"###< if (data.mapViewer.layers.length != indexLayers + 1) { >###,
+        ###< } >###
+        ###< }); >###
+      ###< } else { >###
+        "OpenStreetMap-Mapnik": "OpenStreetMap.Mapnik",
+        "Esri-WorldStreetMap": "Esri.WorldStreetMap",
+        "Stamen-Terrain": "Stamen.Terrain",
+        "Stamen-TonerLite": "Stamen.TonerLite"
+        ###< if (feature.MV_MS_GeoJSON || feature.MV_MS_GeoServer) { >###
+          ###<
+            var geographicEntities = data.dataModel.entities.filter(function(entity) {
+                return checkEntityContainsPropertiesOfTypes(entity, geoTypes);
+            });
+          >###
+          ###< geographicEntities.forEach(function(entity, index) {
+                var geographicPropertyNames = getEntityPropertyNamesOfGeographicTypes(entity);
+                geographicPropertyNames.forEach(function(geoPropertyName, indexPropertyNames) { >###
+        ,"###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###": "###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###"
+                ###< }); >###
+      ###<    });
+            }
+      } >###
+    },
+    "style-legend-label": {
+      ###< if (feature.MV_MM_MultipleMapViewer) { >###
+        ###<
+        var tags = [];
+        data.mapViewer.styles?.forEach(function(style, indexStyles) {
+           if (style.type == 'WMSLayerStyle' && style.legendLabel) {
+              if (!tags.includes(style.legendLabel)) {
+                 tags.push(style.legendLabel); >###
+                 "###<= style.legendLabel >###": "###<= style.legendLabel >###"###< if (data.mapViewer.styles.length != indexStyles + 1) { >###,
+                  ###< } >###
+        ###< }
+          } else if (style.type == 'CategorizedStyle') {
+              Object.keys(style.values).forEach(function(value) {
+                if (!tags.includes(value)) {
+                  tags.push(value); >###
+                  "###<= value >###": "###<= value >###"###< if (data.mapViewer.styles.length != indexStyles + 1) { >###,
+                   ###< } >###
+         ###< }
+              });
+          }
+        });
+        >###
+
+      ###< } >###
+    },
+    "map-label": {
+      ###< if (feature.MV_MM_MultipleMapViewer && checkAnyMap(data.mapViewer)) { >###
+        ###< data.mapViewer.maps?.forEach(function(map, indexMaps) {
+        var label = map.label ? map.label : map.name; >###
+        "###<= map.name.replace('.', '-') >###": "###<= label >###"###< if (data.mapViewer.maps.length != indexMaps + 1) { >###,
+        ###< } >###
+        ###< }); >###
+      ###< } else { >###
+      "default": "Mapa por defecto"
+      ###< } >###
+    }###< if (feature.MV_MM_MMV_MapSelectorInMapViewer) { >###,
+    "mapSelector": "Selector de mapas"
+    ###< } >###
+  }
+}
+###< } >###
+###< } >###

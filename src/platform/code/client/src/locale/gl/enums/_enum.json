@@ -1,0 +1,15 @@
+###<@ return data.dataModel.enums.map(function(en) {
+  return {
+      fileName: normalize(en.name.toLowerCase()) + '.json',
+      context: en
+}
+}) >###
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+{
+  "###<= normalize(context.name.toLowerCase()) >###": {
+    ###< context.values.forEach(function(val, index) { >###
+    "###<= normalize(val, true) >###": "###<= normalize(val.toLowerCase(), true) >###"###< if(index < context.values.length - 1) { >###,###< } >###
+    ###< }); >###
+  }
+}
+###< } >###

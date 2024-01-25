@@ -1,0 +1,20 @@
+###< if (data.basicData.languages.find(lang => lang=='gl') && feature.MV_LM_ExternalLayer) { >###
+{
+  "addNewLayer": {
+    "addNewLayerTitle": "Engadir capa",
+    "selectLayer": "Seleccione a capa que desexa angadir ao mapa",
+    "addUrlLayer": "Engadir nova capa",
+    "addExistentLayer": "Engadir capa existente",
+    "url": "URL",
+    "layerName": "Nome da capa",
+    "add": "Engadir",
+    "layerRequired": "É obrigatorio seleccionar unha capa",
+    "urlRequired": "A URL da capa é obrigatoria",
+    "layerNameRequired": "É obrigatorio indicar un nome",
+    "search": "Buscar",
+    "close": "Cerrar",
+    "noLayers": "Non hai capas dispoñibles",
+    "invalidUrl": "URL inválida"
+  }
+}
+###< } >###

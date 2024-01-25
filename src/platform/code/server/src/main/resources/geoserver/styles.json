@@ -1,0 +1,9 @@
+###< if (feature.MapViewer) { >###
+{
+  ###< if (feature.MV_MM_MultipleMapViewer && typeof data.mapViewer.styles !== "undefined") { >###
+  "styles": ###<= JSON.stringify(data.mapViewer.styles) >###
+  ###< } else { >###
+  "styles": []
+  ###< } >###
+}
+###< } >###
