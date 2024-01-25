@@ -1,0 +1,15 @@
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+{
+  "calendar": {
+    "accept": "Aceptar",
+    "cancel": "Cancelar",
+    "date": "Data",
+    "endTime": "Hora fin",
+    "initTime": "Hora inicio",
+    "dateFormat": "Formato DD/MM/AAAA",
+    "timeFormat": "Formato HH:MM",
+    "endTimeValidationError": "A hora de fin debe ser posterior á hora de inicio",
+    "timeNotNull": "Debe especificar unha hora",
+    "dateNotNull": "Debe especificar unha data"
+  }
+}###< } >###

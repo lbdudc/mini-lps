@@ -1,0 +1,53 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+        return data.dataModel.entities.map(function(en) {
+            return {
+                fileName: lang + '/entities/' + normalize(en.name) +'.json',
+                context: en
+            };
+        });
+  }).flat();
+>###
+
+{
+  "t_###<= normalize(context.name) >###": {
+    "name": "###<= context.name >###",
+    "prop": {
+        ###< if (context.traceable) { >###"owner": "owner",###<
+      } >###
+        ###<= context.properties.map(function(prop) {
+          if (prop.class == 'Point') {
+            return
+              '"' + normalize(prop.name) + '": "' + normalize(prop.name) + '",\n        ' +
+              '"' + normalize(prop.name) + 'Custom.x": "' + normalize(prop.name) + ' X",\n        ' +
+              '"' + normalize(prop.name) + 'Custom.y": "' + normalize(prop.name) + ' Y"';
+        }
+          return '"' + normalize(prop.name) + '": "' + normalize(prop.name) + '"';
+      }).join(',\n        ') >###
+    },
+    "messages": {
+      "create.success": "###<= normalize(context.name, true) >### created.",
+      "update.success": "###<= normalize(context.name, true) >### updated.",
+      "delete.success": "###<= normalize(context.name, true) >### deleted."
+    },
+    "error": {
+      "id-exists": "A new ###<= normalize(context.name) >### cannot already have a ###<= normalize(getEntityProperty(context, 'id').name) >###",
+      "id-not-exists": "Updating a ###<= normalize(context.name) >### without a ###<= normalize(getEntityProperty(context, 'id').name) >###",
+      "form-errors": "This ###<= normalize(context.name) >### cannot be saved due to form errors."
+    },
+    "headers": {
+      ###<
+      const lists = data.lists.filter(function(list) { return list.entity == context.name });
+      const forms = data.forms.filter(function(form) { return form.entity == context.name });
+      >###
+      ###< lists.forEach(function(theList, index) { >###
+      "###<= normalize(theList.id) >###": "###<= theList.id >###" ###< if (lists.length > index + 1 || forms.length > 0) { >###,###< } >###
+      ###< }); >###
+      ###< forms.forEach(function(theForm, index) { >###
+      "###<= normalize(theForm.id) >###Detail": "###<= theForm.id >### Detail",
+      "###<= normalize(theForm.id) >###": "###<= theForm.id >###" ###< if (forms.length > index + 1) { >###,###< } >###
+      ###< }); >###
+    }
+  }
+}

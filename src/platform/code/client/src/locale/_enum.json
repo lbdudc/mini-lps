@@ -1,0 +1,20 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+        return data.dataModel.enums.map(function(en)  {
+            return {
+              fileName: lang + '/enums/' + normalize(en.name.toLowerCase()) + '.json',
+              context: en
+            };
+        });
+    }).flat();
+>###
+###< if (data.basicData.languages.find((lang) => lang !== 'es')) { >###
+{
+  "###<= normalize(context.name.toLowerCase()) >###": {
+    ###< context.values.forEach(function(val, index) { >###
+    "###<= normalize(val, true) >###": "###<= normalize(val.toLowerCase(), true) >###"###< if(index < context.values.length - 1) { >###,###< } >###
+    ###< }); >###
+  }
+}
+###< } >###

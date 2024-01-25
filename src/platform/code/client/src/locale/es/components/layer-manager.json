@@ -1,0 +1,33 @@
+###< if (data.basicData.languages.find(lang => lang=='es') && feature.MV_LayerManagement) { >###
+{
+  "layerManager": {
+    "title": "Organizador de capas",
+    "name": "Nombre",
+    "center": "Centrar",
+    "legend": "Leyenda",
+    "order": "Ordenar",
+    "opacity": "Opacidad",
+    "download": "Descargar",
+    "layerNotAvailable": "Capa no disponible para descarga",
+    ###< if (feature.MV_LM_Style) { >###
+    "style": "Estilo",
+    "wms-style": {
+      "newStyle": "Nuevo estilo",
+      "styleName": "Nombre de estilo",
+      "fillColor": "Color de relleno",
+      "color": "Color",
+      "fill": "Relleno",
+      "stroke": "Trazo",
+      "transparent": "Transparente",
+      "strokeColor": "Color del trazo",
+      "form-error": "Este estilo no se puede guardar debido a errores del formulario.",
+      "apply": "Aplicar"
+    },
+    ###< } >###
+    "edit": "Editar capa externa",
+    "delete": "Eliminar capa externa",
+    "nameRequired": "Es obligatorio indicar un nombre",
+    "editLayer": "Editar nombre"
+  }
+}
+###< } >###

@@ -1,0 +1,17 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/numberField.json',
+        context: lang
+      };
+    });
+>###
+{
+  "numberField": {
+    "validation": {
+      "decimal": "Input must be any number separating decimal part with a dot '.'",
+      "integer": "Input must be an integer number"
+    }
+  }
+}

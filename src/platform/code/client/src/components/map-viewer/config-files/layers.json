@@ -1,0 +1,197 @@
+###< if (feature.MapViewer) { >###
+{
+  "layers": [
+  ###< if (feature.MV_MM_UniqueMapViewer || (!checkAnyLayer(data.mapViewer))) { >###
+    ###<
+      var geographicEntities = data.dataModel.entities.filter(function(entity) {
+          return checkEntityContainsPropertiesOfTypes(entity, geoTypes);
+      });
+    >###
+    {
+      "layerType": "tilelayer",
+      "name": "OpenStreetMap.Mapnik",
+      "options": {
+        "params": {
+          "attribution": "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+        }
+      },
+      "url": "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    },
+    {
+      "layerType": "tilelayer",
+      "name": "Esri.WorldStreetMap",
+      "options": {
+        "params": {
+          "attribution": "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+        }
+      },
+      "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+    },
+    {
+      "layerType": "tilelayer",
+      "name": "Stamen.Terrain",
+      "options": {
+        "params": {
+          "attribution": "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
+        },
+        "ext": "png",
+        "maxZoom": 18,
+        "minZoom": 0,
+        "subdomains": "abcd"
+      },
+      "url": "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}"
+    },
+    {
+      "layerType": "tilelayer",
+      "name": "Stamen.TonerLite",
+      "options": {
+        "params": {
+          "attribution": "Map tiles by <a href='http://stamen.com'>Stamen Design</a>, <a href='http://creativecommons.org/licenses/by/3.0'>CC BY 3.0</a> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
+        },
+        "ext": "png",
+        "maxZoom": 20,
+        "minZoom": 0,
+        "subdomains": "abcd"
+      },
+      "url": "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}"
+    }
+      ###< if (feature.MV_MS_GeoJSON) { >###
+        ###< geographicEntities.forEach(function(entity, index) {
+              var geographicPropertyNames = getEntityPropertyNamesOfGeographicTypes(entity);
+              var lengthProperties = geographicPropertyNames.length;
+              var theForm = data.forms.find(function(form) {
+                return form.entity === entity.name;
+              });
+              var theList = data.lists.find(function(list) {
+                return list.entity == entity.name;
+              });
+              geographicPropertyNames.forEach(function(geoPropertyName, indexPropertyNames) {
+              const entityClass = getEntityProperty(entity, geoPropertyName).class;
+              if (!feature.MV_MS_GeoServer || entityClass.includes("Point")) {
+        >###
+        ,
+        {
+          "layerType": "geojson",
+          "name": "###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###",
+          ###< if (feature.MV_T_ViewMapAsList) { >###
+          "list": "###<= theList.id >###",
+          ###< } >###
+          ###< if (feature.MV_DetailOnClick) { >###
+          "form": "###<= theForm.id >###",
+          ###< } >###
+          "availableStyles": [],
+          "url": "entities/###<= normalize(entity.name) >###s/geom/###<= normalize(geoPropertyName) >###"
+        }
+        ###< } >###
+        ###<
+              });
+            });
+        >###
+      ###< } >###
+      ###< if (feature.MV_MS_GeoServer) { >###
+        ###< geographicEntities.forEach(function(entity, index) {
+              var geographicPropertyNames = getEntityPropertyNamesOfGeographicTypes(entity);
+              var theList = data.lists.find(function(list) {
+                return list.entity == entity.name;
+              });
+              geographicPropertyNames.forEach(function(geoPropertyName, indexPropertyNames) {
+              const entityClass = getEntityProperty(entity, geoPropertyName).class;
+              if (!feature.MV_MS_GeoJSON || !entityClass.includes("Point")) {
+        >###
+        ,{
+          "layerType": "wms",
+          "name": "###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###",
+          ###< if (feature.MV_T_ViewMapAsList) { >###
+          "list": "###<= theList.id >###",
+          ###< } >###
+          "options": {
+            "layers": [
+              "###<= normalize(data.basicData.packageInfo.artifact) >###:t_###<= camelToSnakeCase(entity.name) >###"
+            ],
+            "format": "image/png",
+            "transparent": true
+          }
+        }
+        ###< } >###
+        ###<
+              });
+            });
+        >###
+      ###< } >###
+  ###< } else { >###
+    ###< const geojsonLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "geojson"});
+        const wmsLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "wms"});
+        const tileLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "tilelayer"});
+        geojsonLayers?.forEach(function(layer, index) {
+            var entity = data.dataModel.entities.find(function(entity){ return entity.name == normalize(layer.entityName.split("-")[0], true); });
+            var geographicPropertyNames = getEntityPropertyNamesOfGeographicTypes(entity);
+            geographicPropertyNames.forEach(function(geoPropertyName, indexPropertyNames) {
+    >###
+    {
+      "layerType": "geojson",
+      "name": "###<= layer.name >###",
+      ###< if (feature.MV_T_ViewMapAsList && layer.form) { >###
+      "list": "###<= layer.list >###",
+      ###< } >###
+      ###< if (feature.MV_DetailOnClick && layer.form) { >###
+      "form": "###<= layer.form >###",
+      ###< } >###
+      "entityName": "###<= layer.entityName >###",
+      "url": "entities/###<= normalize(entity.name) >###s/geom/###<= normalize(geoPropertyName) >###",
+      "defaultStyle": "###<= layer.defaultStyle >###",
+      "availableStyles": ###<= JSON.stringify(layer.availableStyles) >###
+    }###< if (index != geojsonLayers.length - 1 || (wmsLayers.length + tileLayers.length) > 0 ) { >###,###< } >###
+    ###<
+          });
+        });
+    >###
+
+    ###<
+      wmsLayers?.forEach(function(layer, index) {
+    >###
+    {
+      "layerType": "wms",
+      "name": "###<= layer.name >###",
+      ###< if (feature.MV_T_ViewMapAsList && layer.list) { >###
+      "list": "###<= layer.list >###",
+      ###< } >###
+      ###< if (layer.availableStyles) { >###
+      "availableStyles": ###<= JSON.stringify(layer.availableStyles) >###,
+      ###< } >###
+      "defaultStyle": "###<= layer.defaultStyle >###",
+      ###< if (layer.url) { >###
+      "url": "###<= layer.url >###",
+      ###< } >###
+      "options": {
+        ###< if (!layer.external) { >###
+        "layers": [
+          ###< layer.layers.forEach(function(subLayer, subindex) { >###
+          "###<= normalize(data.basicData.packageInfo.artifact) >###:t_###<= camelToSnakeCase(subLayer) >###" ###<= (subindex != layer.layers.length - 1) ? "," : "" >###
+          ###< }); >###
+        ],
+        ###< } else { >###
+        "layers": ###<= JSON.stringify(layer.layers) >###,
+        "external": true,
+        ###< } >###
+        "format": "image/png",
+        "transparent": true
+      }
+    }###< if (index != wmsLayers.length - 1 || tileLayers.length > 0) { >###,###< } >###
+    ###<
+        });
+    >###
+    ###<
+      tileLayers?.forEach(function(layer, index) {
+    >###
+    {
+      "layerType": "tilelayer",
+      "name": "###<= layer.name >###",
+      "url": "###<= layer.url >###"
+    }###< if (index != tileLayers.length - 1) { >###,###< } >###
+      ###<
+          });
+    >###
+  ###< } >###
+  ]
+}
+###< } >###

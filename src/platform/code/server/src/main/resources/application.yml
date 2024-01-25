@@ -1,0 +1,94 @@
+spring:
+  datasource:
+    host: localhost
+    port: 5432
+    database: /*%= getDatabaseConfigFromSpec(data, 'database', 'gema') %*/
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+  /*% if (feature.T_FileUploader || feature.MV_MS_GJ_Cached) { %*/
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadsInheritContextClassLoaderOfInitializingThread: true
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            useProperties: false
+  /*% } %*/
+  jpa:
+    defer-datasource-initialization: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.jdbc.lob.non_contextual_creation: true
+      hibernate.temp.use_jdbc_metadata_defaults: true
+  servlet:
+    multipart:
+      max-file-size: 250MB     # Set MAX_UPLOAD_FILE_SIZE in gulpfile.js
+      max-request-size: 260MB  # max-file-size + 10
+  sql:
+    init:
+      encoding: UTF-8
+      mode: always
+      continue-on-error: true
+  /*% if (feature.MV_MS_GJ_Cached) { %*/
+  # Static files configuration
+  mvc:
+    static-path-pattern: /api/geometries/**
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
+      static-locations[0]: file:src/main/resources/spatial/
+      static-locations[1]: classpath:/spatial/
+  /*% } %*/
+server:
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
+    min-response-size: 1024
+  uploads: upload
+  temporaryUploads: temporary
+  #Default internal page size (Used for some high database usage methods)
+  pageSize: 3
+  port: 8080
+logging:
+  level:
+    root: INFO
+    es.udc.lbd.gema.lps: DEBUG
+    es.udc.lbd.gema.lps.model.util.EnumConverter: ERROR
+properties:
+  clientHost: http://localhost:1234
+/*% if (feature.T_GIS) { %*/
+  gis:
+    defaultSrid: /*%= data.basicData.SRID || 4326  %*/
+/*% } %*/
+  environment: dev
+/*% if (feature.MV_MS_GeoServer) { %*/
+geoserver:
+  # GeoServer url also goes to gulp/config.js
+  active: true
+  url: http://localhost:9001/geoserver
+  user: admin
+  password: geoserver
+  workspace: /*%= normalize(data.basicData.packageInfo.artifact) %*/
+  datastore: /*%= normalize(data.basicData.packageInfo.artifact) %*/
+/*% } %*/
+/*% if (feature.T_Swagger) { %*/
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+/*% } %*/

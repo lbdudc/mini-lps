@@ -1,0 +1,18 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/datePicker.json',
+        context: lang
+      };
+    });
+>###
+{
+  "datePicker": {
+    "firstDayOfTheWeek": "0",
+    "prevMonthAriaLabel": "Previous month",
+    "nextMonthAriaLabel": "Next month",
+    "nextYearAriaLabel": "Next year",
+    "prevYearAriaLabel": "Previous year"
+  }
+}

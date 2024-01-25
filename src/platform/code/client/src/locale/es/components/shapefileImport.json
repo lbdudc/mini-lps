@@ -1,0 +1,23 @@
+###< if (data.basicData.languages.find(lang => lang=='es')) { >###
+###< if (feature.DM_DI_DF_Shapefile) { >###
+{
+  "shapefile-importer": {
+    "shapefile-importer": "Importador de ShapeFiles",
+    "table-headers": {
+      "column": "Columna",
+      "read-value": "Valor leído",
+      "field": "Campo",
+      "type": "Tipo"
+    },
+    "actions": {
+      "import-data": "Importar datos",
+      "submit-file": "Enviar fichero"
+    },
+    "encoding": "Codificación",
+    "entities": "Entidades",
+    "no-entities": "No hay entidades",
+    "import-success": "Datos importados"
+  }
+}
+###< } >###
+###< } >###

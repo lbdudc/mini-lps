@@ -1,0 +1,120 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+      fileName: lang + '/components/mapViewer.json',
+      context: lang
+      };
+    });
+>###
+###< if (feature.MapViewer) { >###
+{
+  "mapViewer": {
+    "mapViewer": "Map Viewer",
+    "cancel": "Cancel",
+    "close": "Close",
+    "downloadFormat": "Download format",
+    "export": "Export",
+    "exportManager": "Export manager",
+    "listLayerElements": "List layer elements",
+    "margin": "Margin",
+    "portrait": "Portrait",
+    "scale": "Scale",
+    "searchInMap": "Search in map...",
+    "urlToShare": "URL to share",
+    ###< if(feature.MV_T_E_F_URL) { >###
+    "successCopyURL": "The URL was copy to the clipboard",
+    "errorCopyURL": "Something was wrong when copy the URL to the clipboard",
+    ###< } >###
+    ###< if(feature.MV_T_InformationMode) { >###
+    "wmsDetail": {
+      "title": "Selection information",
+      "layers": "Layers",
+      "layer-items": "Layer items",
+      "layer-item-detail": "Item detail",
+      "no-data": "There is no data",
+      "no-property-data": "No data",
+      "form-tooltip": "Go to the item's detail form"
+    },
+    ###< } >###
+    "routeCompletationError": "Please complete or cancel route calculation first",
+    "chooseEntity": "Choose the entity that you want to list",
+    ###< if(feature.MV_LM_StylePreview) { >###
+    "wmsLegend": {
+      "title": "WMS Layer Legend",
+      "no-data": "There is no data available"
+    },
+    ###< } >###
+    "mustSelectAnExportOption": "You must choose at least one of the export formats",
+    "addALayer": "There are no added layers. Add one ",
+    "addALayer-link": "here",
+    "map": "Map",
+    "layer-label": {
+      ###< if (feature.MV_MM_MultipleMapViewer && checkAnyLayer(data.mapViewer)) { >###
+        ###< data.mapViewer.layers.forEach(function(layer, indexLayers) {
+        var label = layer.label ? layer.label : layer.name; >###
+        "###<= layer.name.replace('.', '-') >###": "###<= label >###"###< if (data.mapViewer.layers.length != indexLayers + 1) { >###,
+        ###< } >###
+        ###< }); >###
+      ###< } else { >###
+        "OpenStreetMap-Mapnik": "OpenStreetMap.Mapnik",
+        "Esri-WorldStreetMap": "Esri.WorldStreetMap",
+        "Stamen-Terrain": "Stamen.Terrain",
+        "Stamen-TonerLite": "Stamen.TonerLite"
+        ###< if (feature.MV_MS_GeoJSON || feature.MV_MS_GeoServer) { >###
+          ###<
+            var geographicEntities = data.dataModel.entities.filter(function(entity) {
+                return checkEntityContainsPropertiesOfTypes(entity, geoTypes);
+            });
+          >###
+          ###< geographicEntities.forEach(function(entity, index) {
+                var geographicPropertyNames = getEntityPropertyNamesOfGeographicTypes(entity);
+                geographicPropertyNames.forEach(function(geoPropertyName, indexPropertyNames) { >###
+        ,"###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###": "###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###"
+                ###< }); >###
+      ###<    });
+            }
+      } >###
+    },
+    "style-legend-label": {
+      ###< if (feature.MV_MM_MultipleMapViewer) { >###
+        ###<
+        var tags = [];
+        data.mapViewer.styles?.forEach(function(style, indexStyles) {
+           if (style.type == 'WMSLayerStyle' && style.legendLabel) {
+              if (!tags.includes(style.legendLabel)) {
+                 tags.push(style.legendLabel); >###
+                 "###<= style.legendLabel >###": "###<= style.legendLabel >###"###< if (data.mapViewer.styles.length != indexStyles + 1) { >###,
+                  ###< } >###
+        ###< }
+          } else if (style.type == 'CategorizedStyle') {
+              Object.keys(style.values).forEach(function(value) {
+                if (!tags.includes(value)) {
+                  tags.push(value); >###
+                  "###<= value >###": "###<= value >###"###< if (data.mapViewer.styles.length != indexStyles + 1) { >###,
+                   ###< } >###
+         ###< }
+              });
+          }
+        });
+        >###
+
+      ###< } >###
+    },
+    "map-label": {
+      ###< if (feature.MV_MM_MultipleMapViewer && checkAnyMap(data.mapViewer)) { >###
+        ###< data.mapViewer.maps?.forEach(function(map, indexMaps) {
+        var label = map.label ? map.label : map.name; >###
+        "###<= map.name.replace('.', '-') >###": "###<= label >###"###< if (data.mapViewer.maps.length != indexMaps + 1) { >###,
+        ###< } >###
+        ###< }); >###
+      ###< } else { >###
+      "default": "Default map"
+      ###< } >###
+    }###< if (feature.MV_MM_MMV_MapSelectorInMapViewer) { >###,
+    "mapSelector": "Map selector"
+    ###< } >###
+  }
+}
+
+###< } >###

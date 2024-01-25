@@ -1,0 +1,4 @@
+###<= JSON.stringify({
+  features: Array.from(Object.keys(feature)),
+  data: data
+}, null, 2) >###

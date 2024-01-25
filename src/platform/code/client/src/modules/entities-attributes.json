@@ -1,0 +1,13 @@
+###< if (feature.MV_T_InformationMode) { >###
+{
+###< data.dataModel.entities.forEach(function(entity, entIndex) { >###
+  "###<= normalize(entity.name) >###": [
+    ###< entity.properties.forEach(function(property, propIndex) { >###
+    {
+      "name": "###<= normalize(property.name) >###"
+    }###< if (entity.properties.length -1 != propIndex) { >###,###< } >###
+    ###< }); >###
+  ]###< if (data.dataModel.entities.length -1 != entIndex) { >###,###< } >###
+###< }); >###
+}
+###< } >###

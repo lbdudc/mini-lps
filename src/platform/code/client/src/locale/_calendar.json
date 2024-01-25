@@ -1,0 +1,23 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/calendar.json',
+        context: lang
+      };
+    });
+>###
+{
+  "calendar": {
+    "accept": "Accept",
+    "cancel": "Cancel",
+    "date": "Date",
+    "endTime": "End Time",
+    "initTime": "Init Time",
+    "dateFormat": "DD/MM/YYYY format",
+    "timeFormat": "HH:MM format",
+    "endTimeValidationError": "End time must be later than start time",
+    "timeNotNull": "You must specify a time",
+    "dateNotNull": "You must specify a date"
+  }
+}

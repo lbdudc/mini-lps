@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    host: /*%= getDatabaseConfigFromSpec(data, 'host', '172.17.0.1') %*/
+    port: /*%= getDatabaseConfigFromSpec(data, 'port', '5432') %*/
+    database: /*%= getDatabaseConfigFromSpec(data, 'database', 'gema') %*/-dev
+    username: /*%= getDatabaseConfigFromSpec(data, 'username', 'postgres') %*/
+    password: /*%= getDatabaseConfigFromSpec(data, 'password', 'postgres') %*/
+/*% if (feature.MV_MS_GeoServer) { %*/
+geoserver:
+  active: true
+/*% } %*/

@@ -1,0 +1,50 @@
+{
+  "ignore": [
+    "target",
+    "bower_components",
+    ".gradle",
+    ".project",
+    "bin",
+    "build",
+    ".settings",
+    ".classpath"
+  ],
+  "delimiters": [
+    {
+      "extension": ["html", "jsp", "xml"],
+      "start": "<!--%",
+      "end": "%-->"
+    },
+    {
+      "extension": [
+        "css",
+        "js",
+        "java",
+        "vue",
+        "g4",
+        "tokens",
+        "gradle",
+        "md",
+        "conf",
+        "gitignore",
+        "properties",
+        "sql",
+        "env",
+        "production",
+        "dockerfile"
+      ],
+      "start": "/*%",
+      "end": "%*/"
+    },
+    {
+      "extension": ["py"],
+      "start": "#%",
+      "end": "%#"
+    },
+    {
+      "extension": ["json", "sh"],
+      "start": "###<",
+      "end": ">###"
+    }
+  ]
+}

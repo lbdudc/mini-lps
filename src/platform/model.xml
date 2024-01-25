@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel chosenLayoutAlgorithm="4">
+  <struct>
+    <and mandatory="true" name="GEMA_SPL">
+      <and disabled="true" mandatory="true" name="DataManagement">
+        <and disabled="true" mandatory="true" name="DM_SpatialDatabase">
+          <feature disabled="true" mandatory="true" name="DM_SD_PostGIS"/>
+        </and>
+        <or name="DM_DataInput">
+          <or mandatory="true" name="DM_DI_DataFeeding">
+            <feature mandatory="true" name="DM_DI_DF_Shapefile"/>
+          </or>
+        </or>
+      </and>
+      <and mandatory="true" name="GraphicalUserInterface">
+        <and name="GUI_Forms">
+        </and>
+        <and name="GUI_Lists">
+          <feature name="GUI_L_Sortable"/>
+          <alt name="GUI_L_Filterable">
+            <feature name="GUI_L_F_RowFilter"/>
+            <feature name="GUI_L_F_BasicSearch"/>
+          </alt>
+          <feature disabled="true" name="GUI_L_LocateInMap"/>
+          <feature disabled="true" name="GUI_L_ViewListAsMap"/>
+          <feature name="GUI_L_FormLink"/>
+        </and>
+      </and>
+      <and mandatory="true" name="MapViewer">
+        <or mandatory="true" name="MV_MapServer">
+          <feature mandatory="true" name="MV_MS_GeoServer"/>
+          <and mandatory="true" name="MV_MS_GeoJSON">
+            <feature name="MV_MS_GJ_Cached"/>
+            <feature name="MV_MS_GJ_Paginated"/>
+          </and>
+        </or>
+        <and mandatory="true" name="MV_Tools">
+          <feature name="MV_T_ZoomWindow"/>
+          <and name="MV_T_MeasureControl">
+          </and>
+          <and name="MV_T_Export">
+            <feature name="MV_T_E_SetScale"/>
+            <feature disabled="true" name="MV_T_E_ShowLegend"/>
+            <feature disabled="true" name="MV_T_E_DRM"/>
+            <or mandatory="true" name="MV_T_E_Type">
+              <feature mandatory="true" name="MV_T_E_F_PNG"/>
+              <feature mandatory="true" name="MV_T_E_F_PDF"/>
+              <feature mandatory="true" name="MV_T_E_F_URL"/>
+            </or>
+          </and>
+          <or disabled="true" name="MV_T_Filterable">
+            <and mandatory="true" name="MV_T_F_BasicSearch">
+              <feature disabled="true" name="MV_T_F_BS_ByUserGeolocation"/>
+            </and>
+          </or>
+          <feature name="MV_T_UserGeolocation"/>
+          <feature name="MV_T_InformationMode"/>
+          <feature name="MV_T_ViewMapAsList"/>
+        </and>
+        <or name="MV_ContextInformation">
+          <feature mandatory="true" name="MV_CI_Map"/>
+          <feature mandatory="true" name="MV_CI_Scale"/>
+          <feature mandatory="true" name="MV_CI_CenterCoordinates"/>
+          <feature disabled="true" mandatory="true" name="MV_CI_Dimensions"/>
+        </or>
+        <or name="MV_LayerManagement">
+          <feature mandatory="true" name="MV_LM_BaseLayerSelector"/>
+          <feature mandatory="true" name="MV_LM_Order"/>
+          <feature mandatory="true" name="MV_LM_CenterViewOnLayer"/>
+          <feature mandatory="true" name="MV_LM_HideLayer"/>
+          <feature mandatory="true" name="MV_LM_Opacity"/>
+          <feature mandatory="true" name="MV_LM_Style"/>
+          <feature mandatory="true" name="MV_LM_ExternalLayer"/>
+          <feature mandatory="true" name="MV_LM_StylePreview"/>
+        </or>
+        <alt mandatory="true" name="MV_MapManagement">
+          <and mandatory="true" name="MV_MM_UniqueMapViewer">
+            <alt mandatory="true" name="MV_MM_UMV_MapCenter">
+              <feature mandatory="true" name="MV_MM_UMV_MC_BBox"/>
+              <feature mandatory="true" name="MV_MM_UMV_MC_Coordinates"/>
+              <feature mandatory="true" name="MV_MM_UMV_MC_UserPosition"/>
+            </alt>
+          </and>
+          <and name="MV_MM_MultipleMapViewer">
+            <feature name="MV_MM_MMV_MapSelectorInMapViewer"/>
+            <feature name="MV_MM_MMV_MapSelectorInMenuElement"/>
+          </and>
+        </alt>
+        <feature name="MV_DetailOnClick"/>
+        <feature name="MV_Clustering"/>
+      </and>
+      <and mandatory="true" name="Tools">
+        <feature name="T_Swagger"/>
+        <feature hidden="true" name="T_FileUploader"/>
+        <feature hidden="true" name="T_EntitiesInformation"/>
+        <feature hidden="true" mandatory="true" name="T_GIS"/>
+      </and>
+      <or name="Deploy">
+        <or name="D_Containers">
+          <feature name="D_C_Postgres"/>
+          <feature name="D_C_Geoserver"/>
+          <feature name="D_C_Nginx"/>
+        </or>
+      </or>
+    </and>
+  </struct>
+  <constraints>
+    <rule>
+      <imp>
+        <var>MV_T_F_BS_ByUserGeolocation</var>
+        <var>MV_T_UserGeolocation</var>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>DM_DI_DataFeeding</var>
+        <var>T_EntitiesInformation</var>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>DM_DI_DataFeeding</var>
+        <var>T_FileUploader</var>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>MV_DetailOnClick</var>
+        <var>GUI_Forms</var>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>MV_T_ViewMapAsList</var>
+        <var>GUI_Lists</var>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>D_C_Geoserver</var>
+        <var>MV_MS_GeoServer</var>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>MV_MS_GJ_Paginated</var>
+        <not>
+          <var>MV_MS_GJ_Cached</var>
+        </not>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>MV_MS_GJ_Cached</var>
+        <not>
+          <var>MV_MS_GJ_Paginated</var>
+        </not>
+      </imp>
+    </rule>
+  </constraints>
+  <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+  <comments/>
+  <featureOrder userDefined="false"/>
+</featureModel>
