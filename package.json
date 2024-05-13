@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/lbdudc/mini-lps.git"
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Mini-LPS is a mini version of a SPL with features for the management and visualization of geospatial data.",
   "browserslist": [
     "> 1%",
@@ -49,7 +49,7 @@
     "leaflet.fullscreen": "^2.4.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.defaultsdeep": "^4.6.1",
-    "map-viewer": "git+https://gitlab.lbd.org.es/publico/map-viewer.git",
+    "@lbdudc/map-viewer": "^1.0.7",
     "mongodb": "^3.7.3",
     "morgan": "^1.10.0",
     "normalize.css": "^8.0.1",
