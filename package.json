@@ -1,5 +1,13 @@
 {
+  "name": "@lbdudc/mini-lps",
   "author": "Álex Cortiñas",
+  "homepage": "https://github.com/lbdudc/mini-lps#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbdudc/mini-lps.git"
+  },
+  "version": "0.2.0",
+  "description": "Mini-LPS is a mini version of a SPL with features for the management and visualization of geospatial data.",
   "browserslist": [
     "> 1%",
     "last 2 versions"
@@ -127,7 +135,6 @@
       "autoprefixer": {}
     }
   },
-  "private": true,
   "scripts": {
     "check-products": "bash ./scripts/check-products.sh",
     "debug": "npm-run-all -p -r buildwatch nodemon",
@@ -143,6 +150,5 @@
     "generate": "node scripts/generate.js generate",
     "platform": "node scripts/platform.js",
     "update": "node scripts/generate.js update"
-  },
-  "version": "0.2.0"
+  }
 }
