@@ -1,9 +1,16 @@
-# GEMA LPS
+# Mini LPS
+
+![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2012.0.0-brightgreen.svg)
+
+## Description
+
+This project is a tool to generate a product from a specification. The product is a web application that includes a web client and a backend. The web client is a Vue application that uses Leaflet to display maps and interacts with the backend to get the data. The backend is a SpringBoot application that serves the data to the client.
 
 ## Usage
 
 * Install deps: `npm install`
-* Generate product from specification: 
+* Generate product from specification:
   * Cleaning the previous files: `npm run generate products/spec.json [output folder (default 'output')]`
   * Maintaining the previous files: `npm run update products/spec.json [output folder (default 'output')]`
 * Clean an output folder: `npm run clean [output folder (default 'output')]`
@@ -17,6 +24,7 @@ at the end of the generating/updating command. Example: `npm run generate produc
 
 In order for the linter to run automatically, it is necessary to install the dependencies in the root folder.
 To achieve this, it is necessary:
+
 * Go to the root directory.
 * Execute the command `npm install`
 
@@ -46,3 +54,16 @@ Default values:
   }
 }
 ```
+
+## Authors
+
+| Name                   | Email                       |
+| ---------------------- | --------------------------- |
+| David De Castro        | <david.decastro@udc.es>     |
+| Alejandro Cortiñas     | <alejandro.cortinas@udc.es> |
+| Victor Lamas           | <victor.lamas@udc.es>       |
+| María Isabel Limaylla  | <maria.limaylla@udc.es>     |
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
