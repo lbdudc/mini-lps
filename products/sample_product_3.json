@@ -744,6 +744,8 @@
     "DM_SpatialDatabase",
     "DM_SD_PostGIS",
     "DM_DI_DF_Shapefile",
+    "DM_GenerationType",
+    "DM_GT_Sequence",
     "GUI_Forms",
     "GUI_Lists",
     "MV_MapManagement",
@@ -857,4 +859,3 @@
   ]
 }
 }
-8

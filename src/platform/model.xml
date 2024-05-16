@@ -6,6 +6,9 @@
         <and disabled="true" mandatory="true" name="DM_SpatialDatabase">
           <feature disabled="true" mandatory="true" name="DM_SD_PostGIS"/>
         </and>
+        <alt disabled="true" mandatory="true" name="DM_GenerationType">
+          <feature disabled="true" mandatory="true" name="DM_GT_Sequence"/>
+        </alt>
         <or name="DM_DataInput">
           <or mandatory="true" name="DM_DI_DataFeeding">
             <feature mandatory="true" name="DM_DI_DF_Shapefile"/>

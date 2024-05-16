@@ -120,7 +120,7 @@
       ###< } >###
   ###< } else { >###
     ###< const geojsonLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "geojson"});
-        const wmsLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "wms"});
+        const wmsLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "wms" && !layer.external});
         const tileLayers = data.mapViewer.layers?.filter(function(layer){ return layer.type == "tilelayer"});
         geojsonLayers?.forEach(function(layer, index) {
             var entity = data.dataModel.entities.find(function(entity){ return entity.name == normalize(layer.entityName.split("-")[0], true); });
@@ -163,7 +163,11 @@
       "url": "###<= layer.url >###",
       ###< } >###
       "options": {
-        "layers": ###<= JSON.stringify(layer.layers) >###,
+        "layers": [
+          ###< layer.layers.forEach(function(subLayer, subindex) { >###
+          "###<= normalize(data.basicData.packageInfo.artifact) >###:t_###<= camelToSnakeCase(subLayer) >###" ###<= (subindex != layer.layers.length - 1) ? "," : "" >###
+          ###< }); >###
+        ],
         "format": "image/png",
         "transparent": true
       }
