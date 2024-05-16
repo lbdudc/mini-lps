@@ -31,6 +31,8 @@ import org.locationtech.jts.geom.Geometry;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+
 /*% } %*/
 public class /*%= normalize(context.name, true) %*/FullDTO /*% if (context.superclass) { %*/extends /*%= normalize(context.superclass, true) %*/FullDTO/*%  } %*/ {
   /*% context.properties.forEach(function(prop) { %*/

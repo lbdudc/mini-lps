@@ -51,13 +51,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import es.udc.lbd.gema.lps.config.Constants;
 /*% } %*/
 import jakarta.validation.constraints.NotBlank;
+/*% if (feature.DM_GT_Sequence) { %*/
 import jakarta.persistence.SequenceGenerator;
+/*% } %*/
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.DecimalMax;
-
 /*%
     var pkName = normalize(getEntityProperty(context, 'id').name);
 %*/
@@ -103,8 +104,10 @@ public /*% if (context.abstract) { %*/abstract /*% } %*/class /*%= normalize(con
     @Id
         /*% } %*/
         /*% if (propertyIsAutoinc) { %*/
+          /*% if (feature.DM_GT_Sequence) { %*/
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "/*%= (normalize(context.name)) %*//*%= normalize(prop.name) %*/")
     @SequenceGenerator(name = "/*%= (normalize(context.name)) %*//*%= normalize(prop.name) %*/", sequenceName = "t_/*%= camelToSnake(normalize(context.name)) %*/_/*%= camelToSnake(normalize(prop.name)) %*/_seq", initialValue = 1, allocationSize = 1)
+          /*% } %*/
         /*% } %*/
         /*% if (propertyIsEnum) { %*/
     @Enumerated(EnumType.STRING)
@@ -165,7 +168,6 @@ public /*% if (context.abstract) { %*/abstract /*% } %*/class /*%= normalize(con
                 extraColumn = ', columnDefinition="geometry(Geometry, ' + (data.basicData.SRID || 4326) + ')"';
                 break;
         } %*/
-
         /*% if (prop.required && !prop.pk && prop.name != 'password') { %*/
             /*% if (propertyIsEnum || propertyIsEntity || propertyClass == 'LocalDate' || propertyClass == 'Instant' || propertyClass == 'Long' || propertyClass == 'Integer' || propertyClass == 'BigDecimal' || propertyClass == 'Float' || propertyClass == 'Double' || propertyClass == 'Boolean') { %*/
     @NotNull
@@ -196,7 +198,7 @@ public /*% if (context.abstract) { %*/abstract /*% } %*/class /*%= normalize(con
     @Pattern(regexp="^$|/*%= prop.pattern.replace(/\\/g,'\\\\') %*/")
             /*% } %*/
         /*% } %*/
-        /*% if (!propertyIsEntity) { %*/
+       /*% if (!propertyIsEntity ) { %*/
     @Column(name = "/*%= camelToSnake(normalize(prop.name)) %*/"/*%= extraColumn %*/ /*% if (prop.unique) { %*/ ,unique=true/*% } %*/         /*% if (propertyIsText) { %*/
         ,columnDefinition="TEXT"
         /*% } %*/)

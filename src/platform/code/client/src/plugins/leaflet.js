@@ -13,7 +13,6 @@ Icon.Default.mergeOptions({
   iconUrl: iconDefault,
   shadowUrl: iconShadow
 });
-
 import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
