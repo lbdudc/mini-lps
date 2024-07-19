@@ -55,6 +55,12 @@ Default values:
 }
 ```
 
+## Feature model
+
+A visual representation of the Featore Model can be found in the file `src/platform/model.png`.
+
+ ![Image of the FM](./src/platform/model.png)
+
 ## Authors
 
 | Name                   | Email                       |
