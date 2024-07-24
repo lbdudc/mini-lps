@@ -38,10 +38,13 @@
     <v-card>
       <v-card-title>
         <v-row align="center" justify="space-between" no-gutters>
-          <v-col class="d-none d-md-block">
+          <v-col cols="auto" class="d-none d-md-flex">
             <span class="headline no-split-words">
               {{ $t($route.meta.label) }}
             </span>
+            <v-btn class="ml-3" icon>
+              <v-icon @click="routeBack">mdi-arrow-left</v-icon>
+            </v-btn>
           </v-col>
           /*% if (context.filtering) { %*/
           <v-col
@@ -710,6 +713,9 @@ export default {
     },
     /*% } %*/
     displayManyRelationship,
+    routeBack(){
+      this.$router.push({ path: '/' });
+    }
   }
 };
 </script>

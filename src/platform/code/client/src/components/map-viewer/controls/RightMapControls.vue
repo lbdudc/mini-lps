@@ -1,4 +1,4 @@
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode) { %*/
 <template>
   <div v-if="map" class="map-controls">
     <div class="column">
@@ -66,24 +66,6 @@
             </v-btn>
           </template>
           <span>{{ $t("changeBaseLayer.changeBaseLayerTitle") }}</span>
-        </v-tooltip>
-      </div>
-      /*% } %*/
-
-      /*% if (feature.MV_T_ViewMapAsList) { %*/
-      <div class="column">
-        <v-tooltip left open-delay="200" color="var(--appColor)">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              v-on="on"
-              color="white"
-              @click.stop="buildControl({ component: 'list-layer-management' })"
-            >
-              <v-icon>mdi-format-list-bulleted</v-icon>
-            </v-btn>
-          </template>
-          <span>{{ $t("mapViewer.listLayerElements") }}</span>
         </v-tooltip>
       </div>
       /*% } %*/
