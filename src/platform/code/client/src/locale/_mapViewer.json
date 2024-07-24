@@ -114,6 +114,9 @@
     }###< if (feature.MV_MM_MMV_MapSelectorInMapViewer) { >###,
     "mapSelector": "Map selector"
     ###< } >###
+    ###< if (feature.MV_T_ViewMapAsList) { >###,
+    "listSelector": "List selector"
+    ###< } >###
   }
 }
 

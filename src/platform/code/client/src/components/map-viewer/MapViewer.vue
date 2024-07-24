@@ -7,8 +7,19 @@
           {{ $t($route.meta.label) }}
         </span>
       </v-col>
+      /*%
+        var cols = 12;
+        var md = 6;
+        if(feature.MV_T_ViewMapAsList && feature.MV_MM_MMV_MapSelectorInMapViewer){
+          cols = 6;
+          md = 3;
+        }
+      %*/
+      /*% if (feature.MV_T_ViewMapAsList) { %*/
+      <list-layer-management v-if="map" :map="map"></list-layer-management>
+      /*% } %*/
       /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
-      <v-col cols="12" md="6">
+      <v-col cols="/*%= cols %*/" md="/*%= md %*/">
         <v-row class="justify-end" no-gutters>
           <v-col cols="12" sm="5" class="mt-4 mr-4 text-center text-sm-right">
             <label>

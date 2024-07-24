@@ -1,26 +1,32 @@
 /*% if (feature.MV_T_ViewMapAsList) { %*/
+/*%
+var cols = 12;
+var md = 6;
+if(feature.MV_T_ViewMapAsList && feature.MV_MM_MMV_MapSelectorInMapViewer){
+  cols = 6;
+  md = 3;
+}
+%*/
 <template>
-  <v-card>
-    <v-card-title primary-title class="headline primary white--text">
-      {{ $t("mapViewer.listLayerElements") }}
-    </v-card-title>
-    <v-card-text>
-      <v-row>
-        <v-col class="text-left">
-          <v-select
-            :items="lists"
-            @change="showList"
-            :label="$t('mapViewer.chooseEntity')"
-            :menu-props="{ offsetY: true }"
-          >
-          </v-select>
-        </v-col>
-      </v-row>
-      <v-col class="text-right">
-        <v-btn @click="close">{{ $t("mapViewer.close") }}</v-btn>
+  <v-col cols="/*%= cols %*/" md="/*%= md %*/">
+    <v-row class="justify-end" no-gutters>
+      <v-col cols="12" sm="5" class="mt-4 mr-4 text-center text-sm-right">
+        <label>
+          {{ $t("mapViewer.listSelector") }}
+        </label>
       </v-col>
-    </v-card-text>
-  </v-card>
+      <v-col cols="12" sm="6">
+      <v-select
+        :items="lists"
+        @change="showList"
+        :label="$t('mapViewer.chooseEntity')"
+        :menu-props="{ offsetY: true }"
+        solo
+      >
+      </v-select>
+      </v-col>
+    </v-row>
+  </v-col>
 </template>
 
 <script>
@@ -48,7 +54,7 @@ export default {
   },
   methods: {
     showList(e) {
-      this.$router.push({ name: e });
+      this.$router.push({ name: e + " List"});
     },
     close() {
       this.$emit("close");
