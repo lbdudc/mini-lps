@@ -12,6 +12,7 @@
         <or name="DM_DataInput">
           <or mandatory="true" name="DM_DI_DataFeeding">
             <feature mandatory="true" name="DM_DI_DF_Shapefile"/>
+            <feature mandatory="true" name="DM_DI_DF_GeoTIFF"/>
           </or>
         </or>
       </and>
@@ -158,6 +159,12 @@
         <not>
           <var>MV_MS_GJ_Paginated</var>
         </not>
+      </imp>
+    </rule>
+    <rule>
+      <imp>
+        <var>DM_DI_DF_GeoTIFF</var>
+        <var>MV_MS_GeoServer</var>
       </imp>
     </rule>
   </constraints>

@@ -20,6 +20,13 @@ import jakarta.inject.Inject;
 /*% if (feature.DM_DI_DF_Shapefile) { %*/
 import org.apache.commons.io.FilenameUtils;
 /*% } %*/
+/*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpStatus;
+import es.udc.lbd.gema.lps.config.GeoServerProperties;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
+/*% } %*/
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +44,10 @@ public class StandardDataImportRestController {
 
   @Inject
   private GisImportService gisImportService;
+  /*% } %*/
+  /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+  @Inject
+  GeoServerProperties geoServerProperties;
   /*% } %*/
 
   @Inject
@@ -65,7 +76,20 @@ public class StandardDataImportRestController {
     throw new ImportFileNotSupportedException();
 
   }
-
+  /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+  @RequestMapping(value = "/layer", method = RequestMethod.POST)
+  public ResponseEntity<String> importGeotiff(@RequestParam("file") MultipartFile multipartFile) {
+    try {
+      GeotiffFileImportService geotiffFileImportService =
+        new GeotiffFileImportService(fileUploadImport, geoServerProperties);
+      geotiffFileImportService.importFile(multipartFile);
+      return ResponseEntity.ok("Import process completed successfully.");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body("An unexpected error occurred during the import process.");
+    }
+  }
+  /*% } %*/
   /**
    * Imports data of the file, it can be provided in the body of the request
    * or via an URL
