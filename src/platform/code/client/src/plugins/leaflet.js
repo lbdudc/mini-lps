@@ -51,6 +51,6 @@ import "leaflet-easybutton/src/easy-button.css";
   import "leaflet.locatecontrol/src/L.Control.Locate.scss";
   /*% } %*/
 
-import "proj4/dist/proj4";
+import "proj4";
 import "proj4leaflet/src/proj4leaflet";
 /*% } %*/
