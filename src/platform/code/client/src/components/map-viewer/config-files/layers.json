@@ -175,6 +175,9 @@
         ###< } >###
         "format": "image/png",
         "transparent": true
+        ###< if (layer.version) { >###
+        ,"version": "###<= layer.version >###"
+        ###< } >###
       }
     }###< if (index != wmsLayers.length - 1 || tileLayers.length > 0) { >###,###< } >###
     ###<

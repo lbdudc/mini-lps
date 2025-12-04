@@ -184,10 +184,20 @@ function _updateLayerData(layer, data) {
 }
 /*% } %*/
 
+function _wrapWMSStyle(styleName) {
+  return {
+    id: styleName,
+    isCached: () => true,
+    sld: () => null,
+  };
+}
+
 function _getAvailableStyles(json) {
-  return json.availableStyles?.map((availableStyleName) =>
-    getStyle(availableStyleName)
-  );
+  if (json.styles && json.styles.length > 0) { // local styles
+    return json.availableStyles?.map((availableStyleName) => getStyle(availableStyleName));
+  } else { // remote WMS styles
+    return (json.availableStyles ?? []).map(_wrapWMSStyle);
+  }
 }
 
 function _getDefaultStyle(json, availableStyles, layerInMap) {
