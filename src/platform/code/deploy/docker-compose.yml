@@ -1,9 +1,10 @@
-version: "3"
 services:
   server:
     build:
       context: ../server
       dockerfile: Dockerfile
+      args:
+        JAR_NAME: /*%= normalize(data.basicData.name) %*//*% if (data.basicData.version) { %*/-/*%= data.basicData.version %*//*% } %*/
     container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-server
      /*% if (feature.D_C_Geoserver || feature.D_C_Postgres ) { %*/
     depends_on:
@@ -16,8 +17,6 @@ services:
     /*% } %*/
     networks:
       - local
-    volumes:
-      - "../server/:/app/server/"
     restart: unless-stopped
     ports:
       - '/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/:/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/'
@@ -28,6 +27,7 @@ services:
     container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-client
     networks:
       - local
+    restart: unless-stopped
     /*% if (!feature.D_C_Nginx) { %*/
     ports:
       - '1080:80'
@@ -60,7 +60,7 @@ services:
   /*% if (feature.D_C_Geoserver) { %*/
   geoserver:
     container_name: ${GEOSERVER_CONTAINER_NAME}
-    image: docker.osgeo.org/geoserver:2.21.1
+    image: docker.osgeo.org/geoserver:2.24.1
     environment:
       - CORS_ENABLED=${GEOSERVER_CORS_ENABLED}
       - INSTALL_EXTENSIONS=${GEOSERVER_INSTALL_EXTENSIONS}
