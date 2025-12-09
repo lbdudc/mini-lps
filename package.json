@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/lbdudc/mini-lps.git"
   },
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Mini-LPS is a mini version of a SPL with features for the management and visualization of geospatial data.",
   "browserslist": [
     "> 1%",
