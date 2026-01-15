@@ -27,4 +27,10 @@ module.exports = {
   },
   /*% } %*/
   parallel: false,
+  transpileDependencies: [
+    'vega',
+    'vega-lite',
+    'vega-embed',
+    'vega-label'
+  ]
 };
