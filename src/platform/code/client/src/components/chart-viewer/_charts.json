@@ -1,0 +1,13 @@
+###<@
+return (data.chartViewer && Array.isArray(data.chartViewer.charts)
+  ? data.chartViewer.charts
+  : []
+).map(function (chart) {
+  return {
+    fileName: 'charts/' + chart.name + '.json',
+    context: chart
+  };
+});
+>###
+
+###<= context && context.spec ? JSON.stringify(context.spec, null, 2) : '{}' >###

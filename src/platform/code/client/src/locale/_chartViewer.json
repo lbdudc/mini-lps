@@ -1,0 +1,15 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/chartViewer.json',
+        context: lang
+      };
+    });
+>###
+{
+  "chartViewer": {
+    "title": "Chart Viewer",
+    "selectChart": "Select chart"
+  }
+}

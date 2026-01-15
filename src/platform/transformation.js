@@ -49,6 +49,7 @@ function modelTransformation(input) {
   }
   ret.data.menus = menus(ret, input);
   ret.data.mapViewer = input.mapViewer;
+  ret.data.chartViewer = input.chartViewer;
   ret.data.statics = statics(input.statics);
   return ret;
 }

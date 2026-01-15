@@ -67,6 +67,15 @@
           {{ $t("mapViewer.export") }}
         </v-btn>
         /*% } %*/
+        <v-btn
+          class="ml-2"
+          color="primary"
+          outlined
+          @click="goToChartViewer"
+        >
+          <v-icon left>mdi-chart-line</v-icon>
+          {{ $t("chartViewer.title") }}
+        </v-btn>
       </v-col>
     </v-row>
     /*% } %*/
@@ -454,6 +463,11 @@ export default {
       setTimeout(() => {
         this.loadingMap = false;
       }, 0);
+    },
+    goToChartViewer() {
+      this.$router.push({
+        name: 'chartViewer'
+      });
     },
   }
 };
