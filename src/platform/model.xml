@@ -106,6 +106,7 @@
           <feature name="D_C_Nginx"/>
         </or>
       </or>
+      <feature name="ChartViewer" mandatory="false"/>
     </and>
   </struct>
   <constraints>

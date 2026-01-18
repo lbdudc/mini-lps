@@ -7,9 +7,11 @@
       };
     });
 >###
+###< if (feature.ChartViewer) { >###
 {
   "chartViewer": {
     "title": "Chart Viewer",
     "selectChart": "Select chart"
   }
 }
+###< } >###

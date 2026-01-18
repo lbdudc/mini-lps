@@ -67,6 +67,7 @@
           {{ $t("mapViewer.export") }}
         </v-btn>
         /*% } %*/
+        /*% if (feature.ChartViewer) { %*/
         <v-btn
           class="ml-2"
           color="primary"
@@ -76,6 +77,7 @@
           <v-icon left>mdi-chart-line</v-icon>
           {{ $t("chartViewer.title") }}
         </v-btn>
+        /*% } %*/
       </v-col>
     </v-row>
     /*% } %*/
@@ -464,11 +466,13 @@ export default {
         this.loadingMap = false;
       }, 0);
     },
+    /*% if (feature.ChartViewer) { %*/
     goToChartViewer() {
       this.$router.push({
         name: 'chartViewer'
       });
     },
+    /*% } %*/
   }
 };
 </script>

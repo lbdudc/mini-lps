@@ -1,4 +1,5 @@
 ###<@
+/*% if (feature.ChartViewer) { %*/
 return (data.chartViewer && Array.isArray(data.chartViewer.charts)
   ? data.chartViewer.charts
   : []
@@ -8,6 +9,9 @@ return (data.chartViewer && Array.isArray(data.chartViewer.charts)
     context: chart
   };
 });
+/*% } else { %*/
+return [];
+/*% } %*/
 >###
 
 ###<= context && context.spec ? JSON.stringify(context.spec, null, 2) : '{}' >###

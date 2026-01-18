@@ -6,6 +6,8 @@ import ShapefileImport from "./components/shapefile-import/router";
 /*% } %*/
 /*% if (feature.MapViewer) { %*/
 import MapViewer from "@/components/map-viewer/MapViewer.vue";
+/*% } %*/
+/*% if (feature.ChartViewer) { %*/
 import ChartViewer from "@/components/chart-viewer/ChartViewer.vue";
 /*% } %*/
 
@@ -34,6 +36,7 @@ const routes = [
     component: MapViewer
   },
   /*% } %*/
+  /*% if (feature.ChartViewer) { %*/
   {
     path: "/chart-viewer",
     name: "chartViewer",
@@ -42,6 +45,7 @@ const routes = [
     },
     component: ChartViewer
   },
+  /*% } %*/
   {
     path: "/about",
     name: "about",

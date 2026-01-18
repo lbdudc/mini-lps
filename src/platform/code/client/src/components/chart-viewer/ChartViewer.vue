@@ -1,3 +1,4 @@
+/*% if (feature.ChartViewer) { %*/
 <template>
   <v-container>
     <v-row justify="center">
@@ -107,3 +108,4 @@ export default {
   }
 };
 </script>
+/*% } %*/

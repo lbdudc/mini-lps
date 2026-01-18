@@ -27,10 +27,12 @@ module.exports = {
   },
   /*% } %*/
   parallel: false,
+  /*% if (feature.ChartViewer) { %*/
   transpileDependencies: [
     'vega',
     'vega-lite',
     'vega-embed',
     'vega-label'
-  ]
+  ],
+  /*% } %*/
 };
