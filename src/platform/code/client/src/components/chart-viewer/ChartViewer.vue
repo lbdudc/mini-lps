@@ -4,15 +4,27 @@
     <v-row justify="center">
       <v-col cols="12" md="10">
         <v-card>
-          <v-card-title class="justify-center">
-            <v-btn icon @click="goBack">
-              <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
-            <h3>{{ $t('chartViewer.title') }}</h3>
+
+          <v-card-title>
+            <v-row align="center" class="w-100">
+              <v-col cols="auto">
+                <v-btn icon @click="goBack">
+                  <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
+              </v-col>
+
+              <v-col class="text-center">
+                <h3>{{ $t('chartViewer.title') }}</h3>
+              </v-col>
+
+              <v-col cols="auto" />
+            </v-row>
           </v-card-title>
 
+          <v-divider />
+
           <v-card-text>
-            <v-row justify="center">
+            <v-row justify="center" class="mb-4">
               <v-col cols="12" md="6">
                 <v-select
                   v-model="selectedChart"
@@ -29,9 +41,9 @@
               <v-progress-circular indeterminate />
             </v-row>
 
-            <v-row justify="center" v-if="spec">
+            <v-row v-if="spec">
               <v-col cols="12">
-                <div ref="vegaContainer"></div>
+                <div ref="vegaContainer" />
               </v-col>
             </v-row>
           </v-card-text>
@@ -44,11 +56,7 @@
 <script>
 import embed from "vega-embed";
 
-const context = require.context(
-  "./charts", 
-  false,
-  /\.json$/
-);
+const context = require.context("./charts", false, /\.json$/);
 
 const charts = context.keys().map(file => {
   const name = file.replace("./", "").replace(".json", "");
@@ -63,10 +71,10 @@ export default {
 
   data() {
     return {
+      charts,
       selectedChart: null,
       loading: false,
-      spec: null,
-      charts
+      spec: null
     };
   },
 
@@ -100,8 +108,8 @@ export default {
     goBack() {
       this.$router.push({
         name: "MapViewer",
-        params: {
-          backAction: true
+        params: { 
+          backAction: true 
         }
       });
     }
