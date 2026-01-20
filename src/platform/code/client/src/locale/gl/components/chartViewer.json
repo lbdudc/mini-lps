@@ -1,0 +1,10 @@
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+###< if (feature.ChartViewer) { >###
+{
+  "chartViewer": {
+    "title": "Visor de gráficos",
+    "selectChart": "Selecciona un gráfico"
+  }
+}
+###< } >###
+###< } >###

@@ -7,6 +7,9 @@ import ShapefileImport from "./components/shapefile-import/router";
 /*% if (feature.MapViewer) { %*/
 import MapViewer from "@/components/map-viewer/MapViewer.vue";
 /*% } %*/
+/*% if (feature.ChartViewer) { %*/
+import ChartViewer from "@/components/chart-viewer/ChartViewer.vue";
+/*% } %*/
 
 /*% data.dataModel.entities
       .filter(function(context) {
@@ -31,6 +34,16 @@ const routes = [
       label: "menu.mapViewer"
     },
     component: MapViewer
+  },
+  /*% } %*/
+  /*% if (feature.ChartViewer) { %*/
+  {
+    path: "/chart-viewer",
+    name: "chartViewer",
+    meta: {
+      label: "menu.chartViewer"
+    },
+    component: ChartViewer
   },
   /*% } %*/
   {
