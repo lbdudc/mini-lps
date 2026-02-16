@@ -56,15 +56,18 @@
 <script>
 import embed from "vega-embed";
 
-const context = require.context("./charts", false, /\.json$/);
+let context = null;
+let charts = [];
 
-const charts = context.keys().map(file => {
-  const name = file.replace("./", "").replace(".json", "");
-  return {
-    label: name,
+try {
+  context = require.context("./charts", false, /\.json$/);
+  charts = context.keys().map(file => ({
+    label: file.replace("./", "").replace(".json", ""),
     value: file
-  };
-});
+  }));
+} catch (err) {
+  console.warn("No charts folder found, skipping chart loading.");
+}
 
 export default {
   name: "ChartViewer",
@@ -72,7 +75,7 @@ export default {
   data() {
     return {
       charts,
-      selectedChart: null,
+      selectedChart: charts.length ? charts[0].value : null,
       loading: false,
       spec: null
     };
