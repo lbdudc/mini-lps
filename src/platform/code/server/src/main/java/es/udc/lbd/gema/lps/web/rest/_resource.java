@@ -59,6 +59,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
 
 import jakarta.annotation.Resource;
 import jakarta.inject.Inject;
@@ -108,11 +109,25 @@ public class /*%= normalize(context.name, true) %*/Resource {
         @PageableDefault(page = 0, size = 100000, sort = "/*%= context.displayString.substring(1) %*/") Pageable pageable,
         @RequestParam(value = "filters", required = false) List<String> filters,
         @RequestParam(value = "search", required = false) String search/*% if (feature.MV_T_ViewMapAsList) { %*/,
-        @Spec(path = "/*%= pkName %*/", params = "ids", paramSeparator = ',', spec = In.class) Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/
+        @Spec(path = "/*%= pkName %*/", params = "ids", paramSeparator = ',', spec = In.class) Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/,
+        @RequestParam(value = "format", required = false) String format
     ) {
-        Page</*%= normalize(context.name, true) %*/DTO> page = /*%= normalize(context.name) %*/Service.getAll(pageable, filters, search/*% if (feature.MV_T_ViewMapAsList) { %*/, idsSpec /*% } %*/);
+        Page</*%= normalize(context.name, true) %*/DTO> page = /*%= normalize(context.name) %*/Service.getAll(pageable, filters, search/*% if (feature.MV_T_ViewMapAsList) { %*/, idsSpec /*% } %*/, format);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, /*%= camelToSnakeCase(normalize(context.name)).toUpperCase() %*/_RESOURCE_URL);
         return new ResponseEntity<>(page, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/export/tsv")
+    public ResponseEntity<String> getAllAsTSV(
+        @RequestParam(value = "filters", required = false) List<String> filters,
+        @RequestParam(value = "search", required = false) String search,
+        @Spec(path = "id", params = "ids", paramSeparator = ',', spec = In.class) Specification</*%= normalize(context.name, true) %*/> idsSpec
+    ) {
+        String tsvData = /*%= normalize(context.name) %*/Service.getAllAsTSV(filters, search, idsSpec);
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType("text/tab-separated-values"))
+            .header("Content-Disposition", "attachment; filename=\"/*%= pluralize(normalize(context.name)) %*/.tsv\"")
+            .body(tsvData);
     }
 
     /*% if (!feature.MV_MS_GJ_Cached) { %*/
