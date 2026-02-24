@@ -49,7 +49,6 @@
                   v-model="selectedX"
                   :items="fields"
                   :label="$t('chartViewer.axisX')"
-                  label="Eje X"
                   @change="renderChart"
                 />
               </v-col>
