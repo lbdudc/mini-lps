@@ -3,7 +3,10 @@
 {
   "chartViewer": {
     "title": "Visor de gráficos",
-    "selectChart": "Selecciona un gráfico"
+    "chartCustom": "Gráfico personalizado",
+    "chartEntity": "Selecciona una entidad",
+    "axisX": "Eje X",
+    "axisY": "Eje Y",
   }
 }
 ###< } >###
