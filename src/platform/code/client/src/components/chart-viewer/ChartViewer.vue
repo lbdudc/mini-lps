@@ -24,7 +24,7 @@
           <v-divider />
 
           <v-card-text>
-            <v-row justify="center" class="mb-4">
+            <v-row justify="center">
               <v-col cols="12" md="4">
                 <v-select
                   v-model="selectedChart"
@@ -43,8 +43,13 @@
                   @change="selectEntity"
                 />
               </v-col>
+            </v-row>
 
-              <v-col cols="12" md="4" v-if="fields.length && useEntityTemplateChart">
+            <v-row
+              justify="center"
+              v-if="fields.length && useEntityTemplateChart"
+            >
+              <v-col cols="12" md="4">
                 <v-select
                   v-model="selectedX"
                   :items="fields"
@@ -52,7 +57,8 @@
                   @change="renderChart"
                 />
               </v-col>
-              <v-col cols="12" md="4" v-if="fields.length && useEntityTemplateChart">
+
+              <v-col cols="12" md="4">
                 <v-select
                   v-model="selectedY"
                   :items="fields"
@@ -66,8 +72,8 @@
               <v-progress-circular indeterminate color="primary" />
             </v-row>
 
-           <v-row v-show="!loading && spec">
-              <v-col cols="12">
+           <v-row v-show="!loading && spec" justify="center">
+              <v-col cols="12" md="10" lg="8">
                 <div class="vega-scroll-container">
                   <div ref="vegaContainer" />
                 </div>
@@ -184,7 +190,7 @@ export default {
           await embed(this.$refs.vegaContainer, finalSpec, {
             actions: false,
             renderer: 'svg',
-            width: Math.max(this.$refs.vegaContainer.offsetWidth, 800)
+            width: this.$refs.vegaContainer.offsetWidth
           });
         } catch (e) {
           console.error("Vega Embed Error:", e);
@@ -214,7 +220,7 @@ export default {
 }
 
 .vega-scroll-container > div {
-  min-width: 800px;
+  width: 100%;
 }
 </style>
 /*% } %*/
