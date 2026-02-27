@@ -11,7 +11,10 @@
 {
   "chartViewer": {
     "title": "Chart Viewer",
-    "selectChart": "Select chart"
+    "chartCustom": "Custom Chart",
+    "chartEntity": "Select an Entity",
+    "axisX": "X Axis",
+    "axisY": "Y Axis"
   }
 }
 ###< } >###

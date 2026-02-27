@@ -92,6 +92,42 @@ public class /*%= normalize(context.name, true) %*/ServiceImpl implements /*%= n
     return page.map(/*%= normalize(context.name, true) %*/DTO::new);
   }
 
+  public String getAllAsTSV(
+      List<String> filters, String search/*% if (feature.MV_T_ViewMapAsList) { %*/, Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/) {
+    List</*%= normalize(context.name, true) %*/> list;
+
+    if (idsSpec != null) {
+      list = /*%= normalize(context.name) %*/Repository.findAll(idsSpec);
+    } else if (search != null && !search.isEmpty()) {
+      list = /*%= normalize(context.name) %*/Repository.findAll(/*%= normalize(context.name, true) %*/Specification.searchAll(search));
+    } else {
+      list = /*%= normalize(context.name) %*/Repository.findAll(SpecificationUtil.getSpecificationFromFilters(filters, false));
+    }
+
+    return convertToTSV(list);
+  }
+
+  private String convertToTSV(List</*%= normalize(context.name, true) %*/> list) {
+    StringBuilder tsv = new StringBuilder();
+
+    tsv.append("/*%= context.properties
+                 .filter(function(p){ return ["geometry"].indexOf(normalize(p.name)) === -1; })
+                 .map(function(p){ return normalize(p.name); })
+                 .join("\\t") %*/\n");
+
+    for (/*%= normalize(context.name, true) %*/ e : list) {
+        tsv.append(e.getId())
+        /*%= context.properties
+             .filter(function(p){ return ["id", "geometry"].indexOf(normalize(p.name)) === -1; })
+             .map(function(p){
+                 return '.append("\\t").append(e.get' + normalize(p.name, true) + '() != null ? e.get' + normalize(p.name, true) + '() : "")';
+             }).join("\n") %*/
+            .append("\n");
+    }
+
+    return tsv.toString();
+  }
+
   /*% geographicPropertyNames.forEach(function(geoPropertyName) {
         geoPropertyName = normalize(geoPropertyName);
     %*/
