@@ -109,8 +109,7 @@ public class /*%= normalize(context.name, true) %*/Resource {
         @PageableDefault(page = 0, size = 100000, sort = "/*%= context.displayString.substring(1) %*/") Pageable pageable,
         @RequestParam(value = "filters", required = false) List<String> filters,
         @RequestParam(value = "search", required = false) String search/*% if (feature.MV_T_ViewMapAsList) { %*/,
-        @Spec(path = "/*%= pkName %*/", params = "ids", paramSeparator = ',', spec = In.class) Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/,
-        @RequestParam(value = "format", required = false) String format
+        @Spec(path = "/*%= pkName %*/", params = "ids", paramSeparator = ',', spec = In.class) Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/
     ) {
         Page</*%= normalize(context.name, true) %*/DTO> page = /*%= normalize(context.name) %*/Service.getAll(pageable, filters, search/*% if (feature.MV_T_ViewMapAsList) { %*/, idsSpec /*% } %*/, format);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, /*%= camelToSnakeCase(normalize(context.name)).toUpperCase() %*/_RESOURCE_URL);

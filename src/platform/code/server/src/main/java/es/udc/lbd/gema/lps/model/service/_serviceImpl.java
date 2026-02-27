@@ -78,7 +78,7 @@ public class /*%= normalize(context.name, true) %*/ServiceImpl implements /*%= n
   }
   /*% }); %*/
 
-  public Page</*%= normalize(context.name, true) %*/DTO> getAll(Pageable pageable, List<String> filters, String search/*% if (feature.MV_T_ViewMapAsList) { %*/, Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/, String format){
+  public Page</*%= normalize(context.name, true) %*/DTO> getAll(Pageable pageable, List<String> filters, String search/*% if (feature.MV_T_ViewMapAsList) { %*/, Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/){
     Page</*%= normalize(context.name, true) %*/> page;
     /*% if (feature.MV_T_ViewMapAsList) { %*/
     if (idsSpec != null) {

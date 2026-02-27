@@ -52,7 +52,7 @@ public interface /*%= normalize(context.name, true) %*/Service {
   /*% getOtherRelationshipsNotMultipleAndOwning(data, context).forEach(function(r) { %*/
   List</*%= normalize(context.name, true) %*/DTO> getAllWithout/*%= normalize(r.property.bidirectional, true) %*/();
   /*% }); %*/
-  Page</*%= normalize(context.name, true) %*/DTO> getAll(Pageable pageable, List<String> filters, String search/*% if (feature.MV_T_ViewMapAsList) { %*/, Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/, String format);
+  Page</*%= normalize(context.name, true) %*/DTO> getAll(Pageable pageable, List<String> filters, String search/*% if (feature.MV_T_ViewMapAsList) { %*/, Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/);
   String getAllAsTSV(List<String> filters, String search, Specification</*%= normalize(context.name, true) %*/> idsSpec);
   /*% geographicPropertyNames.forEach(function(geoPropertyName) {
         geoPropertyName = normalize(geoPropertyName);
