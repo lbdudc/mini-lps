@@ -24,55 +24,85 @@
           <v-divider />
 
           <v-card-text>
-            <v-row justify="center">
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="selectedChart"
-                  :items="charts"
-                  item-text="label"
-                  item-value="value"
-                  :label="$t('chartViewer.chartCustom')"  
-                  @change="selectChart"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="selectedEntity"
-                  :items="entities"
-                  :label="$t('chartViewer.chartEntity')"
-                  @change="selectEntity"
-                />
-              </v-col>
-            </v-row>
 
-            <v-row
-              justify="center"
-              v-if="fields.length && useEntityTemplateChart"
-            >
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="selectedX"
-                  :items="fields"
-                  :label="$t('chartViewer.axisX')"
-                  @change="renderChart"
-                />
-              </v-col>
+            <v-tabs v-model="activeTab" background-color="transparent">
+              <v-tab>{{ $t('chartViewer.tabExplorer') }}</v-tab>
+              <v-tab>{{ $t('chartViewer.tabSaved') }}</v-tab>
+            </v-tabs>
 
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="selectedY"
-                  :items="fields"
-                  :label="$t('chartViewer.axisY')"
-                  @change="renderChart"
-                />
-              </v-col>
-            </v-row>
+            <v-tabs-items v-model="activeTab">
+
+              <v-tab-item>
+                <v-row justify="center">
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="selectedEntity"
+                      :items="entities"
+                      :label="$t('chartViewer.chartEntity')"
+                      @change="selectEntity"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="selectedChartType"
+                      :items="chartTypes"
+                      :label="$t('chartViewer.chartType')"
+                      @change="loadChart"
+                    />
+                  </v-col>
+                </v-row>
+
+                <v-row justify="center" v-if="fields.length">
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="selectedX"
+                      :items="fields"
+                      :label="$t('chartViewer.axisX')"
+                      @change="renderChart"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="4">
+                    <v-select
+                      v-model="selectedY"
+                      :items="fields"
+                      :label="$t('chartViewer.axisY')"
+                      @change="renderChart"
+                    />
+                  </v-col>
+
+                  <v-col cols="12" md="2" class="d-flex align-center">
+                    <v-btn block color="primary" @click="exportChart">
+                      <v-icon left>mdi-download</v-icon>
+                      {{ $t('chartViewer.exportChart') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-tab-item>
+
+              <v-tab-item>
+                <v-row justify="center">
+                  <v-col cols="12" md="6">
+                    <v-select
+                      v-model="selectedChart"
+                      :items="charts"
+                      item-text="label"
+                      item-value="value"
+                      :label="$t('chartViewer.chartCustom')"
+                      @change="loadSavedChart"
+                    />
+                  </v-col>
+                </v-row>
+              </v-tab-item>
+
+            </v-tabs-items>
 
             <v-row justify="center" v-if="loading">
               <v-progress-circular indeterminate color="primary" />
             </v-row>
 
-           <v-row v-show="!loading && spec" justify="center">
+            <v-row v-show="!loading && spec" justify="center">
               <v-col cols="12" md="10" lg="8">
                 <div class="vega-scroll-container">
                   <div ref="vegaContainer" />
@@ -89,10 +119,11 @@
 <script>
 import embed from "vega-embed";
 import layers from "../map-viewer/config-files/layers.json";
-import genericChart from "./entityTemplateChart.json";
 
 let context = null;
 let charts = [];
+let templateContext = require.context("./templates", false, /\.json$/);
+const defaultChartType = "linechart.json";
 
 try {
   context = require.context("./charts", false, /\.json$/);
@@ -109,17 +140,40 @@ export default {
 
   data() {
     return {
+      activeTab: 0, // 0 = Explorer, 1 = Saved Charts
       charts,
       selectedChart: null,
       entities: [],
       selectedEntity: null,
-      useEntityTemplateChart: false,
+      useEntityTemplateChart: true,
       loading: false,
       spec: null,
       fields: [], // TSV headers
       selectedX: null,
-      selectedY: null
+      selectedY: null,
+      chartTypes: [
+        { text: this.$t('chartViewer.chartTypeLine'), value: "linechart.json" },
+        { text: this.$t('chartViewer.chartTypeBar'), value: "barchart.json" },
+        { text: this.$t('chartViewer.chartTypePie'), value: "piechart.json" }
+      ],
+      selectedChartType: defaultChartType,
     };
+  },
+  watch: {
+    activeTab(newTab, oldTab) {
+      this.spec = null;      
+      this.selectedX = null;
+      this.selectedY = null;
+
+      if (newTab === 1) {
+        this.useEntityTemplateChart = false;
+        this.selectedChart = null;
+      } else {
+        this.useEntityTemplateChart = true;
+        this.selectedChartType = defaultChartType;
+        this.selectedEntity = null;
+      }
+    }
   },
   mounted() {
     this.entities = layers.layers
@@ -130,47 +184,83 @@ export default {
     selectChart() {
       this.useEntityTemplateChart = false;
       this.selectedEntity = null;
-      this.loadChart();
+      this.loadSavedChart();
     },
     selectEntity() {
       this.useEntityTemplateChart = true;
       this.selectedChart = null;
+
+      this.selectedX = null;
+      this.selectedY = null;
+      this.fields = [];
+      this.spec = null;
+      
       this.loadChart();
     },
     async loadChart() {
+      if (!this.selectedChartType && this.useEntityTemplateChart) return;
       this.loading = true;
 
       try {
-        let baseSpec;
-
-        if (this.useEntityTemplateChart) {
-          baseSpec = genericChart;
-        } else {
-          if (!this.selectedChart) return;
-          baseSpec = context(this.selectedChart);
-        }
+        let baseSpec = this.useEntityTemplateChart
+          ? templateContext(`./${this.selectedChartType}`)
+          : context(this.selectedChart);
 
         let specString = JSON.stringify(baseSpec);
 
         if (this.useEntityTemplateChart && this.selectedEntity) {
-          const entityName = this.selectedEntity.toLowerCase() + "s";
+          const entityName = this.selectedEntity.charAt(0).toLowerCase() + this.selectedEntity.slice(1) + "s";
           specString = specString.replace(/__ENTITY__/g, entityName);
         }
 
         const finalSpec = JSON.parse(specString);
-        const tsvUrl = finalSpec.data[0].url;
-        const response = await fetch(tsvUrl);
-        const text = await response.text();
-        const firstLine = text.split('\n')[0];
-        this.fields = firstLine.split('\t').map(f => f.trim());
 
-        this.selectedX = this.fields[0];
-        this.selectedY = this.fields[1] || this.fields[0];
+        if (this.useEntityTemplateChart) {
+          const tsvUrl = finalSpec.data[0].url;
+          const response = await fetch(tsvUrl);
+          const text = await response.text();
+          const firstLine = text.split('\n')[0];
+          this.fields = firstLine.split('\t').map(f => f.trim());
+
+          this.selectedX = this.selectedX || this.fields[0];
+          this.selectedY = this.selectedY || this.fields[1] || this.fields[0];
+        }
 
         this.spec = finalSpec;
         this.renderChart();
       } catch (err) {
         console.error("Chart error:", err);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+     async loadSavedChart() {
+      if (!this.selectedChart) return;
+      this.loading = true;
+
+      try {
+        const baseSpec = context(this.selectedChart);
+
+        // Only for saved charts: Add extra "s" to entity in URL to handle user-added JSONs that don't include it
+        if (baseSpec.data && baseSpec.data[0] && baseSpec.data[0].url) {
+          const match = baseSpec.data[0].url.match(/\/api\/entities\/([^/]+)\//);
+          if (match) {
+            const entityFromUrl = match[1];
+            let correctedEntity = entityFromUrl.endsWith("ss") 
+              ? entityFromUrl 
+              : entityFromUrl + "s";
+            baseSpec.data[0].url = baseSpec.data[0].url.replace(
+              `/api/entities/${entityFromUrl}/`,
+              `/api/entities/${correctedEntity}/`
+            );
+          }
+        }
+
+        this.spec = baseSpec;
+        this.renderChart();
+      } catch (err) {
+        console.error(err);
       } finally {
         this.loading = false;
       }
@@ -196,6 +286,27 @@ export default {
           console.error("Vega Embed Error:", e);
         }
       });
+    },
+
+    exportChart() {
+      if (!this.spec) return;
+
+      let specString = JSON.stringify(this.spec);
+      specString = specString.replace(/__XFIELD__/g, this.selectedX);
+      specString = specString.replace(/__YFIELD__/g, this.selectedY);
+
+      if (this.useEntityTemplateChart && this.selectedEntity) {
+        const entityName = this.selectedEntity.charAt(0).toLowerCase() + this.selectedEntity.slice(1) + "s";
+        specString = specString.replace(/__ENTITY__/g, entityName);
+      }
+
+      const blob = new Blob([specString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${this.selectedEntity || 'chart'}_${this.selectedX}_${this.selectedY}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     },
 
     goBack() {
