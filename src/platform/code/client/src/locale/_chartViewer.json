@@ -14,7 +14,14 @@
     "chartCustom": "Custom Chart",
     "chartEntity": "Select an Entity",
     "axisX": "X Axis",
-    "axisY": "Y Axis"
+    "axisY": "Y Axis",
+    "exportChart": "Export",
+    "chartType": "Chart type",
+    "chartTypeLine": "Line",
+    "chartTypeBar": "Bar",
+    "chartTypePie": "Pie",
+    "tabExplorer": "Explorer",
+    "tabSaved": "My charts"
   }
 }
 ###< } >###

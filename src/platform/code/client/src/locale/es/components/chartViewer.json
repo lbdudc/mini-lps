@@ -6,7 +6,14 @@
     "chartCustom": "Gráfico personalizado",
     "chartEntity": "Selecciona una entidad",
     "axisX": "Eje X",
-    "axisY": "Eje Y"
+    "axisY": "Eje Y",
+    "exportChart": "Exportar",
+    "chartType": "Tipo de gráfico",
+    "chartTypeLine": "Líneas",
+    "chartTypeBar": "Barras",
+    "chartTypePie": "Circular",
+    "tabExplorer": "Explorador",
+    "tabSaved": "Mis gráficos"
   }
 }
 ###< } >###

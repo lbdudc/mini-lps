@@ -1,0 +1,57 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Dynamic pie chart",
+  "width": {
+    "signal": "clamp(length(data('dataset')) * 40, 350, 700)"
+  },
+  "height": 400,
+  "autosize": "none",
+  "padding": 20,
+  "data": [
+    {
+      "name": "dataset",
+      "url": "###<= data.basicData.extra?.server_deploy_url || 'http://localhost:8080' >###/api/entities/__ENTITY__/export/tsv",
+      "format": { "type": "tsv", "parse": "auto" },
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["__XFIELD__"],
+          "fields": ["__YFIELD__"],
+          "ops": ["sum"],
+          "as": ["__YFIELD__"]
+        },
+        {
+          "type": "pie",
+          "field": "__YFIELD__"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "type": "ordinal",
+      "domain": { "data": "dataset", "field": "__XFIELD__" },
+      "range": { "scheme": "category10" }
+    }
+  ],
+  "marks": [
+    {
+      "type": "arc",
+      "from": { "data": "dataset" },
+      "encode": {
+        "enter": {
+          "fill": { "scale": "color", "field": "__XFIELD__" },
+          "x": { "signal": "width / 2" },
+          "y": { "signal": "height / 2" }
+        },
+        "update": {
+          "startAngle": { "field": "startAngle" },
+          "endAngle": { "field": "endAngle" },
+          "outerRadius": { "signal": "min(width, height) / 2 - 20" },
+          "tooltip": { "signal": "datum" }
+        }
+      }
+    }
+  ]
+}

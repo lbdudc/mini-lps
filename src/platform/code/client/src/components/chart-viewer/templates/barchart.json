@@ -1,0 +1,57 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Dynamic bar chart for selected entity",
+  "width": {
+    "signal": "max(800, length(data('dataset')) * 30)"
+  },
+  "height": 400,
+  "padding": 5,
+  "autosize": {
+    "type": "fit",
+    "contains": "padding"
+  },
+  "data": [
+    {
+      "name": "dataset",
+      "url": "###<= data.basicData.extra?.server_deploy_url || 'http://localhost:8080' >###/api/entities/__ENTITY__/export/tsv",
+      "format": { "type": "tsv", "parse": "auto" }
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "band",
+      "domain": { "data": "dataset", "field": "__XFIELD__" },
+      "range": "width",
+      "padding": 0.1
+    },
+    {
+      "name": "y",
+      "type": "linear",
+      "domain": { "data": "dataset", "field": "__YFIELD__" },
+      "range": "height",
+      "nice": true,
+      "zero": true
+    }
+  ],
+  "axes": [
+    { "orient": "bottom", "scale": "x", "title": "__XFIELD__", "labelAngle": -45 },
+    { "orient": "left", "scale": "y", "title": "__YFIELD__", "grid": true }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": { "data": "dataset" },
+      "encode": {
+        "update": {
+          "x": { "scale": "x", "field": "__XFIELD__" },
+          "width": { "scale": "x", "band": 1 },
+          "y": { "scale": "y", "field": "__YFIELD__" },
+          "y2": { "scale": "y", "value": 0 },
+          "fill": { "value": "steelblue" },
+          "tooltip": { "signal": "datum" }
+        }
+      }
+    }
+  ]
+}
