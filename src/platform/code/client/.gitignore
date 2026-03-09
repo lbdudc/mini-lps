@@ -23,5 +23,3 @@ yarn-error.log*
 
 # Certificates
 /public/keys/*.pem
-
-!src/platform/code/client/src/components/chart-viewer/templates/*.json
