@@ -1,0 +1,673 @@
+{
+	"info": {
+		"_postman_id": "fc6931fc-220c-48ad-8e51-c85a22b70237",
+		"name": "QGIS-WPS",
+		"description": "Ejemplos de ejecución de prueba del servidor de procesamiento QGIS-WPS:\n\n- API de procesos OGC WPS QGIS: [http://localhost:8888](http://localhost:8888)\n- Servidor de mapas QGIS Server: [http://localhost:8082/ows/](http://localhost:8082/ows/)\n\nLa suite de pruebas permite interactuar con los algoritmos de procesamiento de QGIS mediante la API de procesos (WPS) y acceder a sus resultados a través de servicios OGC como WFS y WCS. Su objetivo es proporcionar **plantillas de consulta y ejemplos reproducibles** para validar el funcionamiento de los procesos, la gestión de resultados y la publicación de capas de manera automatizada dentro de un entorno QGIS. \n\n\\-- NOTA: para un funcionamiento correcto, las peticiones deben alinearse con los resultados reales de su entorno de trabajo. Los ejemplos proporcionados deben considerarse como plantillas de consulta que requieren adaptación a los datos y ejecuciones específicas de cada equipo.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21385399"
+	},
+	"item": [
+		{
+			"name": "GENERAL",
+			"item": [
+				{
+					"name": "LIST PROCESSES",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes?",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LIST JOBS",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Job-Realm",
+								"value": "+lvm+",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8888/jobs",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"jobs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE JOB",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Job-Realm",
+								"value": "+lvm+",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8888/jobs/3081df20-deec-11ef-a26b-0242ac170003",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"jobs",
+								"3081df20-deec-11ef-a26b-0242ac170003"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Ejemplos de ejecución de prueba de los procesos fundamentales del servicio WPS, tales como la obtención del listado de procesos disponibles (LIST PROCESSES), la consulta del estado de trabajos en ejecución o finalizados (LIST JOBS), y la eliminación de trabajos almacenados en el servidor (DELETE JOB). Estos procesos constituyen la base operativa del servicio, permitiendo gestionar y supervisar las tareas de procesamiento espacial de forma centralizada."
+		},
+		{
+			"name": "MAP-STATE",
+			"item": [
+				{
+					"name": "IMPORT MAP STATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Job-Realm",
+								"value": "+lvm+",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"MAP_STATE\": \"{\\\"id\\\":\\\"defaultEmpty\\\",\\\"view\\\":{\\\"center\\\":{\\\"lat\\\":44.55916341529182,\\\"lng\\\":-87.05566406250001},\\\"zoom\\\":4},\\\"minZoom\\\":0,\\\"maxZoom\\\":18,\\\"layerOrder\\\":[\\\"us-states.geojson\\\"],\\\"layers\\\":[{\\\"options\\\":{\\\"id\\\":\\\"OpenStreetMap.Mapnik\\\",\\\"type\\\":\\\"TILE\\\",\\\"opacity\\\":null,\\\"selected\\\":true,\\\"baseLayer\\\":true,\\\"url\\\":\\\"http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\\\",\\\"filters\\\":[]}},{\\\"options\\\":{\\\"id\\\":\\\"us-states.geojson\\\",\\\"type\\\":\\\"GEOJSON\\\",\\\"opacity\\\":55.00000000000001,\\\"selected\\\":true,\\\"clustering\\\":false,\\\"availableStyles\\\":[{\\\"id\\\":\\\"defaultStyle\\\",\\\"type\\\":\\\"GeoJSONLayerStyle\\\",\\\"fillColor\\\":\\\"#D4321B\\\",\\\"strokeColor\\\":\\\"#D4321B\\\",\\\"fillOpacity\\\":0.55,\\\"strokeOpacity\\\":0.55,\\\"weight\\\":3,\\\"radius\\\":7}],\\\"style\\\":{\\\"id\\\":\\\"defaultStyle\\\",\\\"type\\\":\\\"GeoJSONLayerStyle\\\",\\\"fillColor\\\":\\\"#D4321B\\\",\\\"strokeColor\\\":\\\"#D4321B\\\",\\\"fillOpacity\\\":0.55,\\\"strokeOpacity\\\":0.55,\\\"weight\\\":3,\\\"radius\\\":7},\\\"baseLayer\\\":false,\\\"color\\\":\\\"#D4321B\\\",\\\"added\\\":true,\\\"url\\\":\\\"https://raw.githubusercontent.com/shawnbot/topogram/master/data/us-states.geojson\\\",\\\"label\\\":\\\"us-states.geojson\\\",\\\"filters\\\":[]}}],\\\"dimensionFilters\\\":[]}\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:importmapstate/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:importmapstate",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE MAP STATE",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Job-Realm",
+								"value": "+lvm+",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"MAP_ID\": \"3b439502-efa4-11ef-a155-0242ac170002\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:deletemapstate/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:deletemapstate",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Ejemplos de ejecución de prueba del los procesos asociados a la creación de proyectos de QGIS (.qgs) a partir de estados generados a partir de la librería _map-viewer_ y considerando las extensiones del proyecto _lvm_ (filtro de las capas, etc).\n\nEl resto de algoritmos de procesamiento espacial ofrecidos por el servidor requieren un proyecto base sobre el cual operar. Por ello, es necesario generar previamente un entorno de procesamiento adecuado y proporcionar la referencia a dicho proyecto como parámetro de entrada.\n\n| Procesos disponibles | Descripción |\n| --- | --- |\n| Importar estado de un mapa (importmapstate) | Convierte el estado de un mapa en formato JSON, proveniente de _map-viewer,_ en un proyecto de QGIS (.qgs) que sirva como base para la ejecución de otros algoritmos de procesamiento. |\n| Eliminar estado de un mapa (deletemapstate) | Elimina un proyecto de QGIS (.qgs) generado a partir del poceso anterior. |"
+		},
+		{
+			"name": "CUSTOM",
+			"item": [
+				{
+					"name": "BUFFER DESC",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/vector_geometry:buffer",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"vector_geometry:buffer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EXECUTE BUFFER",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Prefer",
+								"value": "respond-async",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"INPUT\": \"us-states.geojson\",\n        \"DISTANCE\": 500,\n        \"DISSOLVE\": false,\n        \"END_CAP_STYLE\": \"Round\",\n        \"JOIN_STYLE\": \"Round\",\n        \"MITER_LIMIT\": 2,\n        \"OUTPUT\": \"Buffer 2\",\n        \"SEGMENTS\": 5\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/vector_geometry:buffer/execution?MAP=690642df-795e-4728-b6e9-0fae80431eca",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"vector_geometry:buffer",
+								"execution"
+							],
+							"query": [
+								{
+									"key": "MAP",
+									"value": "690642df-795e-4728-b6e9-0fae80431eca"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "El proveedor _custom_ encapsula los métodos nativos expuestos a través de la implementación realizada. Se incluye un ejemplo de ejecución del método _buffer_."
+		},
+		{
+			"name": "RESULTS",
+			"item": [
+				{
+					"name": "CREATE TABLE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"TASK_ID\": \"71a5951a-9872-11f0-a203-466530aae4f1\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:createtable/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:createtable",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SAVE TO DATABASE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"TASK_ID\": \"71a5951a-9872-11f0-a203-466530aae4f1\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:createtable/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:createtable",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PIN JOB RESULT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Job-Realm",
+								"value": "+lvm+",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"TASK_ID\": \"f5ef62a2-e3b3-11ef-a71c-0242ac170003\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:pinresult/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:pinresult",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Ejemplos de ejecución de prueba de los procesos responsables de la gestión de resultados generados por otros algoritmos de análisis espacial:\n\n| Procesos disponibles | Descripción |\n| --- | --- |\n| Crear tabla (createtable) | Crea una tabla en la base de datos a partir del resultado de una tarea, válido solo si el resultado es una capa vectorial generada por un algoritmo de procesamiento vectorial. |\n| Save to database (savetodb) | Guarda el resultado de una tarea en la base de datos en la tabla t_qgis_process_result, válido solo si el resultado es una capa vectorial generada por un algoritmo de procesamiento vectorial. |\n| Pin result (pinresult) | Algoritmo de procesamiento que hace permanente en memoria el resultado de una tarea. |"
+		},
+		{
+			"name": "FILES",
+			"item": [
+				{
+					"name": "PUBLISH SHAPEFILE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"FILE_OPTIONS\": \"{\\\"id\\\":\\\"07_municipality.shp\\\",\\\"url\\\":\\\"/cesga/admin/shp/07_municipality.shp\\\",\\\"type\\\":\\\"SHAPEFILE\\\"}\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:publishfile/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:publishfile",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUBLISH GEOPACKAGE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"FILE_OPTIONS\": \"{\\\"id\\\":\\\"ctd_intecmar_2023-09.gpkg\\\",\\\"url\\\":\\\"/cesga/admin/ctd_intecmar_2023-09.gpkg\\\",\\\"type\\\":\\\"GEOPACKAGE\\\"}\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:publishfile/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:publishfile",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUBLISH GEOJSON",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"FILE_OPTIONS\": \"{\\\"id\\\":\\\"us-states.geojson\\\",\\\"url\\\":\\\"/cesga/admin/us-states.geojson\\\",\\\"type\\\":\\\"GEOJSON\\\"}\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:publishfile/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:publishfile",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUBLISH GEOTIFF",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inputs\": {\n        \"FILE_OPTIONS\": \"{\\\"id\\\":\\\"PNOA_MDT25_ETRS89_HU30_0046_LID.tif\\\",\\\"url\\\":\\\"/cesga/PNOA_MDT25_ETRS89_HU30_0046_LID.tif\\\",\\\"type\\\":\\\"GEOTIFF\\\"}\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8888/processes/common:publishfile/execution",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8888",
+							"path": [
+								"processes",
+								"common:publishfile",
+								"execution"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Ejemplos de ejecución de prueba del proceso encargado de publicar directamente un archivo accesible desde el sistema de archivos del entorno _py-qgis-wps_ y _py-qgis-server_, exponiéndola mediante un servicio OGC adecuado:\n\n| Procesos disponibles | Descripción |\n| --- | --- |\n| Publicar fichero (publishfile) | Publica un archivo local como capa en QGIS, registrándolo temporalmente en el proyecto y exponiéndolo mediante un servicio OGC (WFS para vectores o WCS para ráster) sin copiar ni mover el archivo a través de _py-qgis-server_. |"
+		},
+		{
+			"name": "QGIS-SERVER",
+			"item": [
+				{
+					"name": "RASTER DESCRIBECOVERAGE",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/ows/?MAP=/results/0fdfc8c0-fe88-11ef-a9b0-0242ac170004/raster_layer_relief.qgs&service=WCS&version=2.0.0&request=DescribeCoverage&coverage=out",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"ows",
+								""
+							],
+							"query": [
+								{
+									"key": "MAP",
+									"value": "/results/0fdfc8c0-fe88-11ef-a9b0-0242ac170004/raster_layer_relief.qgs"
+								},
+								{
+									"key": "service",
+									"value": "WCS"
+								},
+								{
+									"key": "version",
+									"value": "2.0.0"
+								},
+								{
+									"key": "request",
+									"value": "DescribeCoverage"
+								},
+								{
+									"key": "coverage",
+									"value": "out"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RASTER GETCOVERAGE",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/ows/?MAP=/results/0fdfc8c0-fe88-11ef-a9b0-0242ac170004/raster_layer_relief.qgs&service=WCS&version=1.0.0&request=GetCoverage&coverage=out&crs=OGC:CRS84&bbox=-8.190585,43.496465,-7.850021,43.670189&width=500&height=500&format=image/tiff&interpolation=nearest",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"ows",
+								""
+							],
+							"query": [
+								{
+									"key": "MAP",
+									"value": "/results/0fdfc8c0-fe88-11ef-a9b0-0242ac170004/raster_layer_relief.qgs"
+								},
+								{
+									"key": "service",
+									"value": "WCS"
+								},
+								{
+									"key": "version",
+									"value": "1.0.0"
+								},
+								{
+									"key": "request",
+									"value": "GetCoverage"
+								},
+								{
+									"key": "coverage",
+									"value": "out"
+								},
+								{
+									"key": "crs",
+									"value": "OGC:CRS84"
+								},
+								{
+									"key": "bbox",
+									"value": "-8.190585,43.496465,-7.850021,43.670189"
+								},
+								{
+									"key": "width",
+									"value": "500"
+								},
+								{
+									"key": "height",
+									"value": "500"
+								},
+								{
+									"key": "format",
+									"value": "image/tiff"
+								},
+								{
+									"key": "interpolation",
+									"value": "nearest"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VECTOR GETFEATURES",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/ows/?MAP=/results/e16e532e-fe89-11ef-a9b0-0242ac170004/vector_geometry_buffer.qgs&service=WFS&request=GetFeature&typename=Distritos_output&outputformat=application/json",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"ows",
+								""
+							],
+							"query": [
+								{
+									"key": "MAP",
+									"value": "/results/e16e532e-fe89-11ef-a9b0-0242ac170004/vector_geometry_buffer.qgs"
+								},
+								{
+									"key": "service",
+									"value": "WFS"
+								},
+								{
+									"key": "request",
+									"value": "GetFeature"
+								},
+								{
+									"key": "typename",
+									"value": "Distritos_output"
+								},
+								{
+									"key": "outputformat",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Ejemplo de peticiones al servidor de mapas de _py-qgis-server_, a través del cuál es posible consultar los resultados generados por los algoritmos de procesamiento a través de servicios OGC como WMS, WFS y WCS de manera automatizada."
+		}
+	]
+}

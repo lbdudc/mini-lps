@@ -1,0 +1,38 @@
+{
+  "band": {
+    "method": "parameterAsInt"
+  },
+  "boolean": {
+    "method": "parameterAsBoolean"
+  },
+  "enum": {
+    "method": "parameterAsEnum"
+  },
+  "distance": {
+    "method": "parameterAsDouble"
+  },
+  "double": {
+    "method": "parameterAsDouble"
+  },
+  "field": {
+    "method": "parameterAsFields"
+  },
+  "fileDestination": {
+    "method": "parameterAsFileOutput"
+  },
+  "folderDestination": {
+    "method": "parameterAsFileOutput"
+  },
+  "integer": {
+    "method": "parameterAsInt"
+  },
+  "outputFile": {
+    "method": "parameterAsFileOutput"
+  },
+  "raster": {
+    "method": "parameterAsRasterLayer"
+  },
+  "string": {
+    "method": "parameterAsString"
+  }
+}
