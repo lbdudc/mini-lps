@@ -6,7 +6,7 @@ services:
       args:
         JAR_NAME: /*%= normalize(data.basicData.name) %*//*% if (data.basicData.version) { %*/-/*%= data.basicData.version %*//*% } %*/
     container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-server
-     /*% if (feature.D_C_Geoserver || feature.D_C_Postgres ) { %*/
+    /*% if (feature.D_C_Geoserver || feature.D_C_Postgres ) { %*/
     depends_on:
       /*% if (feature.D_C_Geoserver) { %*/
       - geoserver
@@ -57,6 +57,74 @@ services:
       test: "PGPASSWORD=${POSTGRES_PASSWORD} pg_isready -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
 
   /*% } %*/
+
+  /*% if (feature.MV_Processes) { %*/
+  py-qgis-wps:
+    image: 3liz/qgis-wps:3.28
+    container_name: qgis-wps
+    depends_on:
+      - redis
+    environment:
+      QGSWPS_SERVER_PARALLELPROCESSES: ${QGSWPS_SERVER_PARALLELPROCESSES}
+      QGSWPS_SERVER_LOGSTORAGE: REDIS
+      QGSWPS_SERVER_ADMIN_REALM: '+lvm+'
+      QGSWPS_SERVER_ENABLE_JOB_REALM: 'yes'
+      QGSWPS_REDIS_HOST: redis
+      QGSWPS_PROCESSING_PROVIDERS_MODULE_PATH: /processing
+      QGSWPS_CACHE_ROOTDIR: /projects
+      QGSWPS_SERVER_WORKDIR: /results
+      QGSWPS_SERVER_HTTP_PROXY: 'yes'
+      QGSWPS_SERVER_PROXY_URL: ${QGSWPS_SERVER_PROXY_URL}
+      QGSWPS_LOGLEVEL: ${QGSWPS_LOGLEVEL}
+      QGSWPS_SERVER_RESPONSE_EXPIRATION: 3600
+      QGSWPS_SERVER_RESULTS_MAP_URI: /results/
+      QGSWPS_SERVER_OWS_SERVICE_URL: ${QGSWPS_SERVER_OWS_SERVICE_URL}
+      QGSWPS_SERVER_RESTARTMON: /processing/models
+      QGSWPS_USER: ${QGSWPS_USER}
+      QGSWPS_DB_NAME: ${QGSWPS_DB_NAME}
+      QGSWPS_DB_HOST: ${QGSWPS_DB_HOST}
+      QGSWPS_DB_PORT: ${QGSWPS_DB_PORT}
+      QGSWPS_DB_USER: ${QGSWPS_DB_USER}
+      QGSWPS_DB_PASSWORD: ${QGSWPS_DB_PASSWORD}
+    volumes:
+      - "../qgis/processing:/processing"
+      - ${QGSWPS_MODELS_PATH}:/processing/models
+      - ${QGSWPS_PROJECTS_PATH}:/projects
+      - results:/results
+      - ${CESGA_DIR}:/cesga
+    networks:
+      - local
+    restart: unless-stopped
+    ports:
+      - "8888:8080"
+
+  py-qgis-server:
+    image: 3liz/qgis-map-server:3.40
+    container_name: qgis-server
+    environment:
+      QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS}
+      QGSWPS_SERVER_HTTP_PROXY: 'yes'
+      QGSWPS_SERVER_PROXY_URL: ${QGSRV_SERVER_PROXY_URL}
+      QGSRV_LOGGING_LEVEL: ${QGSRV_LOGGING_LEVEL}
+      QGSRV_CACHE_ROOTDIR: /results/
+      QGSRV_CACHE_STRICT_CHECK: 'no'
+    volumes:
+      - results:/results
+      - ${CESGA_DIR}:/cesga
+    networks:
+      - local
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+
+  redis:
+    container_name: qgis-redis
+    image: redis:4
+    networks:
+      - local
+    restart: unless-stopped
+  /*% } %*/
+
   /*% if (feature.D_C_Geoserver) { %*/
   geoserver:
     container_name: ${GEOSERVER_CONTAINER_NAME}
@@ -97,11 +165,18 @@ services:
     restart: unless-stopped
 
   /*% } %*/
-/*% if (feature.D_C_Postgres) { %*/
 volumes:
+/*% if (feature.D_C_Postgres) { %*/
   postgres:
     external: false
-
+/*% } %*/
+/*% if (feature.MV_Processes) { %*/
+  results:
+    external: false
+  projects:
+    external: false
+  models:
+    external: false
 /*% } %*/
 networks:
   local:
