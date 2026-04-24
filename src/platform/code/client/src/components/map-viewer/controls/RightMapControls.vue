@@ -51,6 +51,24 @@
         </v-tooltip>
       </div>
       /*% } %*/
+      
+      /*% if (feature.MV_Processes) { %*/
+      <div class="column">
+        <v-tooltip left open-delay="200" color="var(--appColor)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="white"
+              @click.stop="buildControl({ component: 'toolbox' })"
+            >
+              <v-icon dense>mdi-toolbox</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("toolbox.title") }}</span>
+        </v-tooltip>
+      </div>
+      /*% } %*/
 
       /*% if (feature.MV_LM_BaseLayerSelector) { %*/
       <div class="column">
