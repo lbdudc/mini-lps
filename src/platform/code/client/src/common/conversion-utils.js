@@ -152,6 +152,15 @@ function localDateToVCalendarString(localDate) {
   return year + "-" + month + "-" + day + " " + hour + ":" + min;
 }
 
+function utcDateToLocalCalendarString(utcDate) {
+  return new Date(utcDate)
+    .toLocaleString("es-ES", {
+      hour12: false,
+    })
+    .replace(",", "")
+    .replace(/\//g, "-");
+}
+
 function localDateToISOString(localDate) {
   const date = localDate
     ? localDate[3] != null
@@ -185,6 +194,7 @@ export {
   formatDateOnlyHours,
   toMilliSeconds,
   localDateToVCalendarString,
+  utcDateToLocalCalendarString,
   localDateToISOString,
   firstToLowerCase
 };
