@@ -1,0 +1,111 @@
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+###< if (feature.MV_Processes) { >###
+{
+  "process": {
+    "provider": {
+      "model": "Modelos",
+      "raster_analysis": "Análise ráster",
+      "raster_terrain": "Análise do terreo raster",
+      "vector_geometry": "Xeometría vectorial",
+      "vector_transform": "Transformación vectorial"
+    },
+    "not_available": {
+      "title": "Título non dispoñible",
+      "description": "Descrición non dispoñible"
+    },
+    "aspect": {
+      "title": "Exposición",
+      "description": "Este algoritmo calcula o aspecto do modelo dixital do terreo na entrada. A capa ráster de aspecto final contén valores de 0 a 360 que expresan a dirección da pendente: comezando polo norte (0°) e continuando no sentido horario."
+    },
+    "buffer": {
+      "title": "Buffer",
+      "description": "Este algoritmo calcula unha área de búfer para tódalas entidades nunha capa de entrada, usando unha distancia fixa ou dinámica. O parámetro segmentos controla o número de segmentos de liña a usar para aproximar un cuarto de círculo cando se crean desprazamentos redondeados. O parámetro estilo de finalización controla como se manexan as finalizacións das liñas no búfer. O parámetro estilo de unión especifica se as unións redondas, en bispel ou biseladas deben empregarse no caso de desprazamentos dunha liña. O parámetro límite do bispel só se aplica para estilos de unión en bispel, e controla a distancia máxima dende a curva de desprazamento a empregar cando se crea unha unión en bispel."
+    },
+    "centroids": {
+      "title": "Centroides",
+      "description": "Este algoritmo crea unha nova capa de puntos, con puntos que representan o centroide das xeometrías nunha capa de entrada. Os atributos asociados a cada punto na capa resultante son os mesmos asociados ás entidades orixinais."
+    },
+    "collect": {
+      "title": "Capturar xeometrías",
+      "description": "Este algoritmo toma unha capa vectorial e captura as súas xeometrías en novas xeometrías multiparte. Pódense especificar un ou máis atributos para capturar só xeometrías que pertenzan á mesma clase (tendo o mesmo valor para atributos específicos), alternativamente pódense capturar tódalas xeometrías. Tódalas xeometrías resultantes converteranse a xeometrías multi, incluso aquelas con só partes sinxelas. Este algoritmo non disolve as xeometrías superpostas - serán capturadas xuntas sen modificar a forma de cada parte da xeometría."
+    },
+    "convexhull": {
+      "title": "Convex hull",
+      "description": "Este algoritmo calcula o envoltorio convexo para cada entidade nunha capa de entrada."
+    },
+    "deleteduplicategeometries": {
+      "title": "Eliminar xeometrías duplicadas",
+      "description": "Este algoritmo atopa xeometrías duplicadas e elimínaas. Os atributos non están marcados, polo que no caso de que dúas entidades teñan xeometrías idénticas pero atributos diferentes, só se engadirá unha delas á capa de resultado."
+    },
+    "delaunaytriangulation": {
+      "title": "Triangulación de Delaunay",
+      "description": "Crea unha capa de polígonos coa triangulación de Delaunay correspondente á capa de puntos."
+    },
+    "dissolve": {
+      "title": "Disolver",
+      "description": "Este algoritmo toma unha capa vectorial e combina as súas entidades en novas entidades. Poden especificarse un ou máis atributos para disolver só entidades que pertenzan á mesma clase (tendo o mesmo valor para os atributos especificados), alternativamente pódense disolver tódalas entidades nunha soa. Tódalas xeometrías resultantes converteranse a multi xeometrías.No caso de que a entrada sexa unha capa poligonal, borraranse os límites comúns de polígonos adxacentes a disolver. De activarse, a configuración opcional 'Manter entidades disxuntas separadas' causará que as entidades e partes que non se solapen se exporten como entidades separadas (en vez de partes dunha entidade multiparte sinxela)."
+    },
+    "extractvertices": {
+      "title": "Extraer vértices",
+      "description": "Este algoritmo toma unha capa vectorial e xera unha capa de puntos con puntos que representan os vértices nas xeometrías de entrada. Os atributos asociados a cada punto son os mesmos que os asociados á entidade á que pertence o punto.\nEngádense campos adicionais ao punto que indican o índice do vértice (comezando en 0), a parte do vértice e o seu índice dentro da parte (así como o seu anel no caso de polígonos), a distancia ao longo da xeometría orixinal e o ángulo bisector do vértice na xeometría orixinal."
+    },
+    "fillnodata": {
+      "title": "Encher celas Sen Datos",
+      "description": "Este algoritmo restablece os valores Sen Datos da capa ráster de entrada ó valor escollido, resultando un conxunto de datos ráster sen píxeles Sen Datos. Este valor pode establecerse polo usuario utilizando o parámetro Encher valor. O algoritmo respecta o tipo de datos ráster de entrada (ex: un valor de recheo decimal será truncado cando se aplique a un ráster de enteiros)."
+    },
+    "hillshade": {
+      "title": "Sombreado",
+      "description": "Este algoritmo calcula a sombra do modelo dixital do terreo na entrada. O sombreado da capa calcúlase segundo a posición do sol (azimut e elevación)."
+    },
+    "pointonsurface": {
+      "title": "Punto na superficie",
+      "description": "Devolve un punto que garanta que estea na superficie dunha xeometría."
+    },
+    "linestopolygons": {
+      "title": "Liñas a polígonos",
+      "description": "Este algoritmo xera unha capa poligonal utilizando como aneis do polígono as liñas dunha capa de liñas de entrada. A táboa de atributos da capa resultante é a mesma que a da capa de liñas de entrada."
+    },
+    "poleofinaccessibility": {
+      "title": "Polo de Inaccesibilidade",
+      "description": "Este algoritmo calcula o polo de inaccesibilidade dunha capa de polígonos, que é o punto interno máis afastado do límite da superficie. Este algoritmo utiliza o algoritmo 'polylabel' (Vladimir Agafonkin, 2016), que é un enfoque iterativo garantido para atopar o verdadeiro polo de inaccesibilidade dentro dunha tolerancia especificada (en unidades de capa). Tolerancias máis precisas requiren máis iteracións e tardarán máis tempo en calcularse. A distancia desde o polo calculado ata o límite do polígono almacenarase como un novo atributo na capa de saída."
+    },
+    "polygonstolines": {
+      "title": "Polígonos a liñas",
+      "description": "Converter polígonos a liñas."
+    },
+    "pointstopath": {
+      "title": "Puntos a camiño",
+      "description": "Este algoritmo toma unha capa de puntos e conecta as súas características creando unha nova capa de liña. Pódese especificar un atributo ou expresión para definir a orde na que se deben conectar os puntos. Se non se especifica ningunha expresión de orde, utilízase o ID de función. Pódese usar unha ordenación natural ao ordenar por un atributo ou expresión de cadea (por exemplo, colocar 'a9' antes de 'a10'). Pódese seleccionar un atributo ou expresión para agrupar puntos que teñan o mesmo valor na mesma liña resultante."
+    },
+    "rastercalculator": {
+      "title": "Calculadora Ráster",
+      "description": ""
+    },
+    "relief": {
+      "title": "Relevo",
+      "description": "Este algoritmo crea unha capa de relevo sombreado dende datos dixitais de elevación."
+    },
+    "ruggednessindex": {
+      "title": "Índice de rugosidade",
+      "description": "Este algoritmo calcula a medida cuantitativa do terreo, a heteroxeneidade descrita por Riley et al. (1999). Calcúlase para cada localización, resumindo o cambio de elevación dentro da cuadrícula de 3x3 píxeles. Cada píxel contén a diferenza de elevación dunha cela central e das 8 celas circundantes."
+    },
+    "simplifygeometries": {
+      "title": "Simplificar",
+      "description": "Este algoritmo simplifica as xeometrías nunha capa de liñas ou polígonos. Crea unha nova capa coas mesmas entidades que as da capa de entrada, pero con xeometrías que conteñen un menor número de vértices. O algoritmo ofrece escoller métodos de simplificación, incluíndo os baseados na distancia (o algoritmo 'Douglas-Peucker'), baseados na área (algoritmo 'Visvalingam') e axuste de xeometrías a unha grade."
+    },
+    "slope": {
+      "title": "Pendente",
+      "description": "Este algoritmo calcula o ángulo de pendente do terreo a partir dunha capa ráster de entrada. A pendente exprésase en graos."
+    },
+    "voronoipolygons": {
+      "title": "Polígonos de Voronoi",
+      "description": "Xera una capa poligonal que contén o diagrama de Voronoi que se corresponde cos puntos de entrada."
+    },
+    "minimumboundinggeometry": {
+      "title": "Xeometría delimitadora mínima",
+      "description": "Este algoritmo crea xeometrías que encerran as entidades da capa de entrada. Admítense numerosos tipos de xeometría, incluídas as caixas delimitadoras (envoltorios), rectángulos orientados, círculos e envoltorios convexos. Opcionalmente, as entidades poden agruparse por un campo. De establecerse, isto provoca que a capa de saída conteña unha entidade por valor agrupado cunha xeometría mínima cubrindo só as entidades con valores coincidentes."
+    }
+  }
+}
+###< } >###
+###< } >###

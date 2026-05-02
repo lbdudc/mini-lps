@@ -1,0 +1,72 @@
+###< if (data.basicData.languages.find(lang => lang=='es')) { >###
+###< if (feature.MV_Processes) { >###
+{
+  "toolbox": {
+    "title": "Caja de herramientas",
+    "jobForm": "Nueva tarea",
+    "jobStatus": "Estado tareas",
+    "modelsControl": "Gestión de modelos",
+    "loadEnvironment": "Prepararando del entorno de procesamiento...",
+    "loadError": "Error al crear el entorno de procesamiento",
+    "searchProcess": "Buscar proceso...",
+    "processes": "Procesos",
+    "noProcesses": "No hay ningún proceso seleccionado.",
+    "inputLayer": "Capa de entrada",
+    "layerRequired": "Es obligatorio seleccionar una capa",
+    "fieldRequired": "El campo '{field}' de tipo '{type}' es obligatorio",
+    "noSpacesAllowed": "Non se permiten espazos no campo de entrada '{field}'",
+    "jobs": {
+      "noJobs": "No hay tareas activas",
+      "processId": "Proceso",
+      "created": "Creación",
+      "message": "Mensaje",
+      "status": "Estado",
+      "started": "Iniciado",
+      "finished": "Finalizado",
+      "progress": "Progreso",
+      "viewResult": "Ver resultado",
+      "deleteJob": "Eliminar tarea",
+      "deleteDialog": "Las capas creadas a partir de esta tarea serán eliminadas, ¿seguro que quieres eliminar los resultados?"
+    },
+    "error": {
+      "title": "No hay procesos disponibles",
+      "text": "Error al conectar con el proveedor de procesos"
+    },
+    "models": {
+      "model": "Modelo",
+      "name": "Nombre",
+      "description": "Descripción",
+      "examine": "Examinar",
+      "import": "Importar modelo",
+      "search": "Buscar modelo...",
+      "noModel": "No se ha seleccionado ningún modelo.",
+      "lastModifiedDate": "Última modificación",
+      "invalid_file": {
+        "title": "Error al subir el archivo",
+        "text": "Sólo se permiten archivos con extensión .model3"
+      },
+      "large_file": {
+        "title": "Error al subir el archivo",
+        "text": "El fichero seleccionado excede el límite de 10 MB"
+      },
+      "overwrite": {
+        "title": "El modelo ya existe",
+        "text": "Ya existe un modelo con este nombre. ¿Está seguro de que desea sobrescribir este modelo?"
+      },
+      "duplicated_algorithm": {
+        "title": "Aviso",
+        "text": "Nombre de algoritmo duplicado, sólo uno estará disponible en la caja de herramientas"
+      },
+      "success": {
+        "title": "Éxito",
+        "save": "Modelo guardado con éxito",
+        "delete": "Modelo eliminado con éxito"
+      },
+      "notFound": "Model no encontrado.",
+      "alreadyExists": "Ya existe un modelo con este nombre.",
+      "invalidFile": "El modelo contiene errores o no es compatible."
+    }
+  }
+}
+###< } >###
+###< } >###

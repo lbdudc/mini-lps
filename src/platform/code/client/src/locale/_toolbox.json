@@ -1,0 +1,79 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/toolbox.json',
+        context: lang
+      };
+    });
+>###
+###< if (feature.MV_Processes) { >###
+{
+  "toolbox": {
+    "title": "Toolbox",
+    "jobForm": "New job",
+    "jobStatus": "Running jobs",
+    "modelsControl": "Models management",
+    "loadEnvironment": "Preparing processing environment...",
+    "loadError": "Error creating processing environment",
+    "searchProcess": "Search process..",
+    "processes": "Processes",
+    "noProcesses": "There are no processes selected.",
+    "inputLayer": "Input layer",
+    "layerRequired": "Selecting a layer is mandatory",
+    "fieldRequired": "Input field '{field}' of type '{type}' is mandatory",
+    "noSpacesAllowed": "Spaces are not allowed for input field '{field}'",
+    "jobs": {
+      "noJobs": "There are no active jobs",
+      "processId": "Process",
+      "created": "Creation",
+      "message": "Message",
+      "status": "Status",
+      "started": "Started",
+      "finished": "Finished",
+      "progress": "Progress",
+      "viewResult": "View result",
+      "deleteJob": "Delete job",
+      "deleteDialog": "The layers created from this job will be deleted, are you sure you want to delete the results?"
+    },
+    "error": {
+      "title": "No processes available",
+      "text": "Error connecting to processes provider"
+    },
+    "models": {
+      "model": "Model",
+      "name": "Name",
+      "description": "Description",
+      "examine": "Examine",
+      "import": "Import model",
+      "search": "Search model...",
+      "noModel": "No model has been selected.",
+      "lastModifiedDate": "Last modification",
+      "invalid_file": {
+        "title": "File upload error",
+        "text": "Only files with the .model3 extension are allowed"
+      },
+      "large_file": {
+        "title": "File upload error",
+        "text": "Selected file is larger than 10 MB"
+      },
+      "overwrite": {
+        "title": "Model already exists",
+        "text": "A model with this name already exists, are you sure you want to overwrite this model?"
+      },
+      "duplicated_algorithm": {
+        "title": "Warning",
+        "text": "Duplicate algorithm name, only one will be available in the toolbox"
+      },
+      "success": {
+        "title": "Success",
+        "save": "Model saved successfully",
+        "delete": "Model deleted successfully"
+      },
+      "notFound": "Model not found.",
+      "alreadyExists": "A model with this name already exists.",
+      "invalidFile": "Model contains errors or is not supported."
+    }
+  }
+}
+###< } >###

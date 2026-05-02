@@ -1,0 +1,72 @@
+###< if (data.basicData.languages.find(lang => lang=='gl')) { >###
+###< if (feature.MV_Processes) { >###
+{
+  "toolbox": {
+    "title": "Caixa de ferramentas",
+    "jobForm": "Nova tarefa",
+    "jobStatus": "Estado das tarefa",
+    "modelsControl": "Xestión de modelos",
+    "loadEnvironment": "Preparando o entorno de procesamento...",
+    "loadError": "Produciuse un erro ao crear o entorno de procesamento",
+    "searchProcess": "Buscar proceso...",
+    "processes": "Procesos",
+    "noProcesses": "Non hai procesos seleccionados.",
+    "inputLayer": "Capa de entrada",
+    "layerRequired": "É obrigatorio seleccionar unha capa",
+    "fieldRequired": "O campo '{field}' de tipo '{type}' é obrigatorio",
+    "noSpacesAllowed": "Spaces are not allowed for input field '{field}'",
+    "jobs": {
+      "noJobs": "Non hai tarefas activas",
+      "processId": "Proceso",
+      "created": "Creación",
+      "message": "Mensaxe",
+      "status": "Estado",
+      "started": "Iniciado",
+      "finished": "Rematado",
+      "progress": "Progreso",
+      "viewResult": "Ver resultado",
+      "deleteJob": "Eliminar tarefa",
+      "deleteDialog": "As capas creadas a partir desta tarefa eliminaranse, estás seguro de que queres eliminar os resultados?"
+    },
+    "error": {
+      "title": "Non hai procesos dispoñibles",
+      "text": "Erro ao conectar co provedor de procesos"
+    },
+    "models": {
+      "model": "Modelo",
+      "name": "Nome",
+      "description": "Descrición",
+      "examine": "Examinar",
+      "import": "Importar modelo",
+      "search": "Buscar modelo...",
+      "noModel": "Non se seleccionou ningún modelo.",
+      "lastModifiedDate": "Última modificación",
+      "invalid_file": {
+        "title": "Error ao subir o arquivo",
+        "text": "Só se permiten ficheiros coa extensión .model3"
+      },
+      "large_file": {
+        "title": "Error ao subir o arquivo",
+        "text": "O arquivo seleccionado excede o límite de 10 MB"
+      },
+      "overwrite": {
+        "title": "O modelo xa existe",
+        "text": "Xa hai un modelo con este nome. Estás seguro de que queres sobrescribir este modelo?"
+      },
+      "duplicated_algorithm": {
+        "title": "Aviso",
+        "text": "Nome do algoritmo duplicado, só un estará dispoñible na caixa de ferramentas"
+      },
+      "success": {
+        "title": "Éxito",
+        "save": "Modelo gardado con éxito",
+        "delete": "Modelo eliminado con éxito"
+      },
+      "notFound": "Non se atopou o modelo.",
+      "alreadyExists": "Xa hai un modelo con este nome.",
+      "invalidFile": "O modelo contén erros ou non é compatible."
+    }
+  }
+}
+###< } >###
+###< } >###
