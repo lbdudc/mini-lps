@@ -99,7 +99,7 @@
       v-model="showDialog"
       hide-overlay
       :fullscreen="$vuetify.breakpoint.mdAndDown"
-      :width="/*% if (feature.MV_T_InformationMode) { %*/wmsFeatures != null ? 1200 :/*% } %*/500"
+      :width="/*% if (feature.MV_T_InformationMode) { %*/wmsFeatures != null ? 1200 :/*% } %*/dialogComponent === 'toolbox' ? 900 : 500"
       @click:outside="closeDialog"
     >
       <component

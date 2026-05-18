@@ -198,8 +198,8 @@ export default {
 
 <style>
 .card {
-  height: 100%;
-  overflow: hidden;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 .load-error {
