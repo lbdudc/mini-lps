@@ -31,7 +31,10 @@ async function handleResult(job, result, map) {
  * Returns true if the job result corresponds to a layer to be displayed
  */
 function _resultHasLayer(result) {
-  return result.OUTPUT && result.SERVICE;
+  const hasOgcOutput = Object.values(result).some(
+    (value) => typeof value === "object" && value?.type?.startsWith("application/x-ogc")
+  );
+  return !!result.OUTPUT || hasOgcOutput;
 }
 
 /**

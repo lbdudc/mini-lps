@@ -14,6 +14,8 @@
         private String password;
         private String workspace;
         private String datastore;
+        private String pgHost;
+
 
         public Boolean getActive() {
           return active;
@@ -62,5 +64,14 @@
         public void setDatastore(String datastore) {
             this.datastore = datastore;
         }
+
+        public String getPgHost() {
+            return pgHost;
+        }
+
+        public void setPgHost(String pgHost) {
+            this.pgHost = pgHost;
+        }
+
     }
     /*% } %*/

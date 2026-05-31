@@ -99,6 +99,11 @@ public class GeoServerInit {
             //  availableStyles array and has been created previously
             processLayersFile(publisher, createdStyles);
 
+            if (prop.getEnvironment().equals("dev")) {
+              Thread.sleep(3000); // wait for GeoServer to finish publishing before recalculating bbox
+              reloadWMSLayersBbox();
+            }
+
           /*% if (data.mapViewer == null) { %*/
             // Add a layer for each geographic entity
               /*% geographicEntities.forEach(function(entity) {
@@ -130,7 +135,7 @@ public class GeoServerInit {
 
     private void createDataStore(GeoServerRESTStoreManager manager) {
         final GSPostGISDatastoreEncoder storeEncoder = new GSPostGISDatastoreEncoder(gsProp.getDatastore());
-        storeEncoder.setHost(pgHost);
+        storeEncoder.setHost(gsProp.getPgHost() != null ? gsProp.getPgHost() : pgHost);
         storeEncoder.setPort(pgPort);
         storeEncoder.setUser(pgUser);
         storeEncoder.setPassword(pgPassword);
