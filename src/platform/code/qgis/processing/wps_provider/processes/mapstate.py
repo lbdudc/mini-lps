@@ -4,6 +4,7 @@ import uuid
 import json
 import time
 import os
+import zipfile
 
 from ..utils.layerfactory import LayerFactory
 from ..utils.filterfactory import FilterFactory
@@ -124,27 +125,20 @@ class ImportMapState(QgsProcessingAlgorithm):
                     if qgs_layer.isValid():
                         project.addMapLayer(qgs_layer)
 
-            # Save the QGIS project file
+            # Write project as .qgs to /projects/ (layers saved there too, so paths persist)
             project_path = f"/projects/{id_ref}.qgs"
+            feedback.pushInfo(f"Writing project to {project_path}")
             project_success = project.write(project_path)
+            file_exists = os.path.exists(project_path)
+            feedback.pushInfo(f"project.write() returned: {project_success}, file exists: {file_exists}")
 
-            # Wait for file to be written (timeout 120 seconds)
-            elapsed_time = 0
-            while not os.path.exists(project_path):
-                if elapsed_time >= 120:  # 2 minutes timeout
-                    raise QgsProcessingException(
-                        "Project file was not created in time."
-                    )
-                time.sleep(0.5)
-                elapsed_time += 0.5
+            if not file_exists:
+                raise QgsProcessingException(f"Project file not created: write={project_success}, exists={file_exists}")
 
-            if project_success:
-                return {
-                    self.REF_ID: id_ref,
-                    self.MESSAGE: "Success importing map state into a QGIS project.",
-                }
-            else:
-                raise QgsProcessingException("Error saving project.")
+            return {
+                self.REF_ID: id_ref,
+                self.MESSAGE: "Success importing map state into a QGIS project.",
+            }
 
         except Exception as e:
             traceback.print_exc()
@@ -204,19 +198,17 @@ class DeleteMapState(QgsProcessingAlgorithm):
         try:
             map_id = self.parameterAsString(parameters, self.MAP_ID, context)
             project_path = f"/projects/{map_id}.qgs"
-            attach_path = f"/projects/{map_id}_attachments.zip"
-            tmp_path = f"/tmp/{map_id}"
+            layer_dir = f"/projects/{map_id}"
 
-            # Remove temporary files related to map
-            if os.path.exists(tmp_path):
-                shutil.rmtree(tmp_path)
-
-            # Check if the file exists
-            if os.path.exists(project_path) and os.path.exists(attach_path):
+            if os.path.exists(project_path):
                 os.remove(project_path)
-                os.remove(attach_path)
+            if os.path.exists(layer_dir):
+                shutil.rmtree(layer_dir)
+
+            if not os.path.exists(project_path) and not os.path.exists(layer_dir):
+                pass  # successfully deleted
             else:
-                raise QgsProcessingException(f"Project file not found: {project_path}")
+                raise QgsProcessingException(f"Could not delete project files for: {map_id}")
 
             return {self.MESSAGE: "Success deleting stored map state."}
 

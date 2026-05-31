@@ -29,6 +29,7 @@ class LayerFactory:
             "SHAPEFILE": self.init_shapefile,
             "WCS": self.init_wcs_layer,
             "WFS": self.init_vector_layer,
+            "WMS": self.init_wms_as_wfs,
             "POSTGRES": self.init_db_layer,
         }
 
@@ -147,6 +148,46 @@ class LayerFactory:
         )
 
         return QgsVectorLayer(db_source, layer_options["id"], "postgres")
+
+    def init_wms_as_wfs(self, layer_options):
+        """
+        Load a WMS-backed layer as WFS. Downloads GeoJSON to /projects/{map_id}/
+        so the files persist when the project is reloaded for process execution.
+        """
+        geoserver_url = os.getenv("QGSWPS_GEOSERVER_URL")
+        if not geoserver_url:
+            self.feedback.pushInfo(
+                f"QGSWPS_GEOSERVER_URL not set, cannot load WMS layer {layer_options['id']} as WFS"
+            )
+            return QgsVectorLayer("", layer_options["id"], "ogr")
+
+        sublayers = layer_options.get("params", {}).get("layers", [])
+        if not sublayers:
+            return QgsVectorLayer("", layer_options["id"], "ogr")
+
+        typename = sublayers[0]
+        wfs_url = (
+            f"{geoserver_url}/wfs"
+            f"?service=WFS&version=2.0.0&request=GetFeature"
+            f"&typeNames={typename}&outputFormat=application/json"
+        )
+
+        self.feedback.pushInfo(f"Fetching WFS: {wfs_url}")
+        response = requests.get(wfs_url, timeout=30)
+        if response.status_code != 200:
+            self.feedback.pushInfo(
+                f"WFS request failed with status {response.status_code} for {typename}"
+            )
+            return QgsVectorLayer("", layer_options["id"], "ogr")
+
+        map_id = layer_options.get("map", "tmp")
+        layer_dir = f"/projects/{map_id}"
+        os.makedirs(layer_dir, exist_ok=True)
+        layer_path = os.path.join(layer_dir, f"{layer_options['id']}.geojson")
+        with open(layer_path, "wb") as f:
+            f.write(response.content)
+
+        return QgsVectorLayer(layer_path, layer_options["id"], "ogr")
 
     def _create_temp_file(self, source, map_id, suffix):
         """

@@ -62,6 +62,7 @@ services:
   py-qgis-wps:
     image: 3liz/qgis-wps:3.28
     container_name: qgis-wps
+    user: root
     depends_on:
       - redis
     environment:
@@ -76,6 +77,7 @@ services:
       QGSWPS_SERVER_HTTP_PROXY: 'yes'
       QGSWPS_SERVER_PROXY_URL: ${QGSWPS_SERVER_PROXY_URL}
       QGSWPS_LOGLEVEL: ${QGSWPS_LOGLEVEL}
+      QGSWPS_GEOSERVER_URL: ${QGSWPS_GEOSERVER_URL}
       QGSWPS_SERVER_RESPONSE_EXPIRATION: 3600
       QGSWPS_SERVER_RESULTS_MAP_URI: /results/
       QGSWPS_SERVER_OWS_SERVICE_URL: ${QGSWPS_SERVER_OWS_SERVICE_URL}
@@ -89,7 +91,7 @@ services:
     volumes:
       - "../qgis/processing:/processing"
       - ${QGSWPS_MODELS_PATH}:/processing/models
-      - ${QGSWPS_PROJECTS_PATH}:/projects
+      - projects:/projects
       - results:/results
       - ${CESGA_DIR}:/cesga
     networks:
