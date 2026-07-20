@@ -48,10 +48,22 @@ function modelTransformation(input) {
     ret.data.lists = [];
   }
   ret.data.menus = menus(ret, input);
-  ret.data.mapViewer = input.mapViewer;
+  ret.data.mapViewer = mapViewer(input.mapViewer);
   ret.data.chartViewer = input.chartViewer;
   ret.data.statics = statics(input.statics);
   return ret;
+}
+
+// gp-gis-dsl never sets "cached", so styles never got published in GeoServer. Default to true.
+function mapViewer(input) {
+  if (!input || !Array.isArray(input.styles)) return input;
+  return {
+    ...input,
+    styles: input.styles.map((style) => ({
+      cached: true,
+      ...style,
+    })),
+  };
 }
 
 function normalize(str, upper) {

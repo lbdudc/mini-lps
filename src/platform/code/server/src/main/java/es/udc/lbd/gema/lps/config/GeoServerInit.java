@@ -67,7 +67,7 @@ public class GeoServerInit {
     @Value("${spring.datasource.password}")
     private String pgPassword;
 
-    private static final String SLDS_FOLDER = "./geoserver/slds/";
+    private static final String SLDS_FOLDER = "geoserver/slds/";
 
     @PostConstruct
     public void init() {
@@ -183,7 +183,8 @@ public class GeoServerInit {
   }
 
   private String createStyle(GeoServerRESTPublisher publisher, String name) {
-    String stylePath = SLDS_FOLDER + name + ".sld";
+    String fileName = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    String stylePath = SLDS_FOLDER + fileName + ".sld";
     String sldBody = readFile(stylePath);
     publisher.publishStyleInWorkspace(gsProp.getWorkspace(), sldBody, name);
     return name;

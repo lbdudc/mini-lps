@@ -1,5 +1,5 @@
 /*%@ return data.mapViewer && data.mapViewer.styles
-      ? data.mapViewer.styles.filter((style) => style.cached && style.type === "WMSLayerSLDStyle" && !style.sld)
+      ? data.mapViewer.styles.filter((style) => style.cached && style.type === "WMSLayerStyle" && !style.sld)
           .map((st) => {
             return {
               fileName: normalize(st.name, true) + '.sld',
@@ -18,69 +18,52 @@
 		<UserStyle>
 			<IsDefault>1</IsDefault>
 			<FeatureTypeStyle>
-				/*% context.availableGeometries.forEach((ag) => { %*/
-				/*% if (ag.type === 'POINT') { %*/
-					<Rule>
-						/*% if (context.availableGeometries.length > 1) { %*/
-						<MinScaleDenominator>10000</MinScaleDenominator>
-						/*% } %*/
-						<PointSymbolizer>
-						/*% if (ag.property) { %*/
-							<Geometry>
-								<ogc:PropertyName>/*%= ag.property %*/</ogc:PropertyName>
-							</Geometry>
-						/*% } %*/
-							<Graphic>
-								<Mark>
-									<WellKnownName>circle</WellKnownName>
-									<Fill>
-										<CssParameter name="fill">#ff641a</CssParameter>
-										<CssParameter name="fill-opacity">0.7</CssParameter>
-									</Fill>
-									<Stroke>
-										<CssParameter name="stroke">#0079C2</CssParameter>
-										<CssParameter name="stroke-opacity">1</CssParameter>
-									</Stroke>
-								</Mark>
-							</Graphic>
-						</PointSymbolizer>
-					</Rule>
-					/*% } else if (ag.type === 'POLYGON') { %*/
-					<Rule>
-						/*% if (context.availableGeometries.length > 1) { %*/
-						<MaxScaleDenominator>10000</MaxScaleDenominator>
-						/*% } %*/
-						<PolygonSymbolizer>
-						/*% if (ag.property) { %*/
-							<Geometry>
-								<ogc:PropertyName>/*%= ag.property %*/</ogc:PropertyName>
-							</Geometry>
-						/*% } %*/
-							<Fill>
-								<CssParameter name="fill">#ff641a</CssParameter>
-								<CssParameter name="fill-opacity">0.7</CssParameter>
-							</Fill>
-							<Stroke>
-								<CssParameter name="stroke">#0079C2</CssParameter>
-								<CssParameter name="stroke-opacity">1</CssParameter>
-							</Stroke>
-						</PolygonSymbolizer>
-					</Rule>
-					/*% } else if (ag.type === 'LINE') { %*/
-					<Rule>
-						<LineSymbolizer>
-						/*% if (ag.property) { %*/
-							<Geometry>
-								<ogc:PropertyName>/*%= ag.property %*/</ogc:PropertyName>
-							</Geometry>
-						/*% } %*/
-							<Stroke>
-								<CssParameter name="stroke">#0079C2</CssParameter>
-								<CssParameter name="stroke-opacity">1</CssParameter>
-							</Stroke>
-						</LineSymbolizer>
-					</Rule>
-					/*% }}); %*/
+				<Rule>
+				/*% if (context.geometryType === 'Point') { %*/
+					<PointSymbolizer>
+						<Graphic>
+							<Mark>
+								<WellKnownName>circle</WellKnownName>
+								<Fill>
+									<CssParameter name="fill">/*%= context.fillColor %*/</CssParameter>
+									<CssParameter name="fill-opacity">/*%= context.fillOpacity %*/</CssParameter>
+								</Fill>
+								<Stroke>
+									<CssParameter name="stroke">/*%= context.strokeColor %*/</CssParameter>
+									<CssParameter name="stroke-opacity">/*%= context.strokeOpacity %*/</CssParameter>
+									/*% if (context.strokeWidth) { %*/
+									<CssParameter name="stroke-width">/*%= context.strokeWidth %*/</CssParameter>
+									/*% } %*/
+								</Stroke>
+							</Mark>
+						</Graphic>
+					</PointSymbolizer>
+				/*% } else if (context.geometryType === 'Polygon') { %*/
+					<PolygonSymbolizer>
+						<Fill>
+							<CssParameter name="fill">/*%= context.fillColor %*/</CssParameter>
+							<CssParameter name="fill-opacity">/*%= context.fillOpacity %*/</CssParameter>
+						</Fill>
+						<Stroke>
+							<CssParameter name="stroke">/*%= context.strokeColor %*/</CssParameter>
+							<CssParameter name="stroke-opacity">/*%= context.strokeOpacity %*/</CssParameter>
+							/*% if (context.strokeWidth) { %*/
+							<CssParameter name="stroke-width">/*%= context.strokeWidth %*/</CssParameter>
+							/*% } %*/
+						</Stroke>
+					</PolygonSymbolizer>
+				/*% } else if (context.geometryType === 'LineString') { %*/
+					<LineSymbolizer>
+						<Stroke>
+							<CssParameter name="stroke">/*%= context.strokeColor %*/</CssParameter>
+							<CssParameter name="stroke-opacity">/*%= context.strokeOpacity %*/</CssParameter>
+							/*% if (context.strokeWidth) { %*/
+							<CssParameter name="stroke-width">/*%= context.strokeWidth %*/</CssParameter>
+							/*% } %*/
+						</Stroke>
+					</LineSymbolizer>
+				/*% } %*/
+				</Rule>
 			</FeatureTypeStyle>
 		</UserStyle>
 	</NamedLayer>
