@@ -9,8 +9,9 @@ module.exports = {
   configureWebpack: {
     /*% if (feature.MV_LM_ExternalLayer) { %*/
     externals: ["better-sqlite3"], //FIXME fix for optional dependency warning in geopackage
-  },
     /*% } %*/
+  },
+  /*% } %*/
   pwa: {
     // configure the workbox plugin
     workboxPluginMode: "InjectManifest",
