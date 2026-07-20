@@ -64,7 +64,12 @@ services:
     container_name: qgis-wps
     user: root
     depends_on:
-      - redis
+      redis:
+        condition: service_started
+      /*% if (feature.D_C_Postgres) { %*/
+      postgres:
+        condition: service_healthy
+      /*% } %*/
     environment:
       QGSWPS_SERVER_PARALLELPROCESSES: ${QGSWPS_SERVER_PARALLELPROCESSES}
       QGSWPS_SERVER_LOGSTORAGE: REDIS
