@@ -59,11 +59,20 @@ services:
   /*% } %*/
 
   /*% if (feature.MV_Processes) { %*/
+  qgis-wps-init:
+    image: busybox
+    container_name: qgis-wps-init
+    command: chown -R ${QGSWPS_USER:-9001:9001} /projects
+    volumes:
+      - projects:/projects
+
   py-qgis-wps:
     image: 3liz/qgis-wps:3.28
     container_name: qgis-wps
     user: root
     depends_on:
+      qgis-wps-init:
+        condition: service_completed_successfully
       redis:
         condition: service_started
       /*% if (feature.D_C_Postgres) { %*/
