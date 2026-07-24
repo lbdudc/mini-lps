@@ -325,5 +325,5 @@ function _incrementBBox(xmin, xmax, ymin, ymax) {
 }
 /*% } %*/
 
-export { createWMSLayer, createGeoJSONLayer /*% if (feature.MV_Processes) { %*/, createGeoJSONResultLayer/*% } %*/, getUniqueLayerId /*% if (feature.MV_MS_GJ_Paginated) { %*/, updateLayer/*% } %*/ };
+export { createWMSLayer, createGeoJSONLayer /*% if (feature.MV_Processes) { %*/, createGeoJSONResultLayer, getUniqueLayerId/*% } %*/ /*% if (feature.MV_MS_GJ_Paginated) { %*/, updateLayer/*% } %*/ };
 /*% } %*/

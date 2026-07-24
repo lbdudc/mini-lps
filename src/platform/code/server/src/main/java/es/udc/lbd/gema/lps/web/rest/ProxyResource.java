@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 package es.udc.lbd.gema.lps.web.rest;
 
 import es.udc.lbd.gema.lps.model.service.exceptions.RequestNotSuccesfulException;
@@ -125,3 +126,5 @@ public class ProxyResource {
     }
   }
 }
+
+/*% } %*/

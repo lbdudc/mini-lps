@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 // considered inputs conditions for auto generated form
 const PROCESS_INPUTS = [
   {
@@ -48,3 +49,5 @@ const PROCESS_INPUTS = [
 ];
 
 export { PROCESS_INPUTS };
+
+/*% } %*/

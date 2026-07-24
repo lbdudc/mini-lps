@@ -1,3 +1,7 @@
+/*%@
+if (!feature.MV_Processes) return [];
+return [{ fileName: fileName, basePath: basePath, context: context }];
+%*/
 # QGIS Process Translator
 
 ## Overview

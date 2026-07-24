@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 <template>
   <v-dialog persistent width="500" :value="dialog">
     <v-card>
@@ -72,3 +73,5 @@ export default {
   },
 };
 </script>
+
+/*% } %*/

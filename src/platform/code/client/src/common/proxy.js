@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 import properties from "@/properties";
 
 /**
@@ -95,3 +96,5 @@ async function _httpResponse(url, optionsRequest = null) {
 }
 
 export { handleURL, retrieveURL, handleRequest };
+
+/*% } %*/

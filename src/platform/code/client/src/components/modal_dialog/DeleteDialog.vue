@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 <template>
   <modal-dialog
     @cancel="$emit('cancel')"
@@ -33,3 +34,5 @@ export default {
   },
 };
 </script>
+
+/*% } %*/

@@ -1,3 +1,7 @@
+/*%@
+if (!feature.MV_Processes) return [];
+return [{ fileName: fileName, basePath: basePath, context: context }];
+%*/
 [general]
 name=Custom
 qgisMinimumVersion=3.4

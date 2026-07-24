@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 package es.udc.lbd.gema.lps.web.rest.custom;
 
 import java.net.URL;
@@ -68,3 +69,5 @@ public class HTTPRequestDTO {
     this.queryParams = queryParams;
   }
 }
+
+/*% } %*/

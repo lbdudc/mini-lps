@@ -1,3 +1,4 @@
+/*% if (feature.MV_Processes) { %*/
 <template>
   <v-container class="spinnerContainer">
     <v-progress-circular
@@ -41,3 +42,5 @@ export default {
   align-items: center;
 }
 </style>
+
+/*% } %*/

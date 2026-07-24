@@ -1,3 +1,7 @@
+/*%@
+if (!feature.MV_Processes) return [];
+return [{ fileName: fileName, basePath: basePath, context: context }];
+%*/
 # QGIS
 
 This project uses [Py-QGIS-WPS](https://github.com/3liz/py-qgis-wps) and [Py-QGIS-Server](https://github.com/3liz/py-qgis-server) to provide geospatial processing services and serve the results of these processes via WFS/WCS.
