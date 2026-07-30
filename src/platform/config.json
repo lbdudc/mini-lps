@@ -31,7 +31,8 @@
         "sql",
         "env",
         "production",
-        "dockerfile"
+        "dockerfile",
+        "model3"
       ],
       "start": "/*%",
       "end": "%*/"
