@@ -1,9 +1,8 @@
-/*%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%*/
+/*% if (feature.MV_Processes) { %*/
 [general]
 name=Custom
 qgisMinimumVersion=3.4
 qgisMaximumVersion=3.99
 wps=True
+
+/*% } %*/

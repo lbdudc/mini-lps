@@ -1,7 +1,4 @@
-/*%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%*/
+/*% if (feature.MV_Processes) { %*/
 # QGIS
 
 This project uses [Py-QGIS-WPS](https://github.com/3liz/py-qgis-wps) and [Py-QGIS-Server](https://github.com/3liz/py-qgis-server) to provide geospatial processing services and serve the results of these processes via WFS/WCS.
@@ -169,3 +166,5 @@ A Postman collection is included in the `test/` folder to help try out some requ
 ## Translations
 
 The `/i18n` folder contains a script to handle translations for QGIS processing algorithms.  
+
+/*% } %*/

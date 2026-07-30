@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import traceback
 import json
 import os
@@ -269,3 +266,5 @@ class RasterWrapper(ProcessWrapper):
             traceback.print_exc()
 
             raise QgsProcessingException(f"Error running task. Details: {str(e)}")
+
+#% } %#

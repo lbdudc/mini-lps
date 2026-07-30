@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import traceback
 import json
 
@@ -111,3 +108,5 @@ class SaveToDatabase(QgsProcessingAlgorithm):
             raise QgsProcessingException(
                 f"Error saving results from task { self.parameterAsString(parameters, self.TASK_ID, context) }. Details: { str(e) }"
             )
+
+#% } %#

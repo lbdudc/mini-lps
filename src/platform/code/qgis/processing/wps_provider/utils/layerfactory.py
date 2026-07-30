@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import re
 import os
 import requests
@@ -221,3 +218,5 @@ class LayerFactory:
             return result.scheme in ("http", "https")
         except:
             return False
+
+#% } %#

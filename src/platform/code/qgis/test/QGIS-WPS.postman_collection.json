@@ -1,7 +1,4 @@
-###<@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
->###
+###< if (feature.MV_Processes) { >###
 {
 	"info": {
 		"_postman_id": "fc6931fc-220c-48ad-8e51-c85a22b70237",
@@ -675,3 +672,4 @@ return [{ fileName: fileName, basePath: basePath, context: context }];
 		}
 	]
 }
+###< } >###

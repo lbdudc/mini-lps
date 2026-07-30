@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import os
 import json
 
@@ -61,3 +58,5 @@ class CustomProvider(QgsProcessingProvider):
         """
         for a in self.algs:
             self.addAlgorithm(a)
+
+#% } %#

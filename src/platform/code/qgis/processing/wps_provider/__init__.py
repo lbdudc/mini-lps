@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import os
 import json
 
@@ -24,3 +21,5 @@ def WPSClassFactory(iface):
         providers = json.load(f)
         for group in providers:
             iface.registerProvider(CustomProvider(group))
+
+#% } %#

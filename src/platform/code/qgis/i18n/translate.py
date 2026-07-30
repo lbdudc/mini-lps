@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import argparse
 import json
 import sys
@@ -160,3 +157,5 @@ if __name__ == "__main__":
         print(json.dumps(algorithm_info, indent=2, ensure_ascii=False), "\n")
 
     qgis_application.exitQgis()
+
+#% } %#

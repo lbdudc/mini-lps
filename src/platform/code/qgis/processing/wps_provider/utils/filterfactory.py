@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import os
 import tempfile
 
@@ -113,3 +110,5 @@ class FilterFactory:
 
         # Create new filtered layer
         return QgsRasterLayer(output_path, f"{layer.name()}", "gdal")
+
+#% } %#

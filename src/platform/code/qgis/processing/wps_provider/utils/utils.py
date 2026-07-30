@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import os
 import psycopg2
 import json
@@ -51,3 +48,5 @@ def get_postgres_connection():
         user=os.getenv("QGSWPS_DB_USER"),
         password=os.getenv("QGSWPS_DB_PASSWORD"),
     )
+
+#% } %#

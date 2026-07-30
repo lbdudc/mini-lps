@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import os
 import json
 import traceback
@@ -118,3 +115,5 @@ class PublishFile(QgsProcessingAlgorithm):
         except Exception as e:
             traceback.print_exc()
             raise Exception(f"Error in process: {str(e)}")
+
+#% } %#

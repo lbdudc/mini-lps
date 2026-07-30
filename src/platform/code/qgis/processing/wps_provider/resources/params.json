@@ -1,7 +1,4 @@
-###<@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
->###
+###< if (feature.MV_Processes) { >###
 {
   "band": {
     "method": "parameterAsInt"
@@ -40,3 +37,5 @@ return [{ fileName: fileName, basePath: basePath, context: context }];
     "method": "parameterAsString"
   }
 }
+
+###< } >###

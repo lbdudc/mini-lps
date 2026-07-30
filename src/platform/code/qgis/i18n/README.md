@@ -1,7 +1,4 @@
-/*%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%*/
+/*% if (feature.MV_Processes) { %*/
 # QGIS Process Translator
 
 ## Overview
@@ -133,3 +130,5 @@ The script outputs a JSON object containing the translated process name, descrip
 }
 ```
 
+
+/*% } %*/

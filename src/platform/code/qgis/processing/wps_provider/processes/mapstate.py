@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import traceback
 import shutil
 import uuid
@@ -220,3 +217,5 @@ class DeleteMapState(QgsProcessingAlgorithm):
             traceback.print_exc()
 
             raise QgsProcessingException(f"Error deleting map state. Details: {str(e)}")
+
+#% } %#

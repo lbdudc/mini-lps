@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 import traceback
 import json
 
@@ -85,3 +82,5 @@ class PinResult(QgsProcessingAlgorithm):
             raise QgsProcessingException(
                 f"Error saving results from task {task_id}. Details: {str(e)}"
             )
+
+#% } %#

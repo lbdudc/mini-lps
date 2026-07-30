@@ -1,7 +1,4 @@
-#%@
-if (!feature.MV_Processes) return [];
-return [{ fileName: fileName, basePath: basePath, context: context }];
-%#
+#% if (feature.MV_Processes) { %#
 from qgis.core import QgsProcessingProvider
 
 from .processes.pinresult import PinResult
@@ -55,3 +52,5 @@ class CommonProvider(QgsProcessingProvider):
         """
         for a in self.algs:
             self.addAlgorithm(a)
+
+#% } %#
