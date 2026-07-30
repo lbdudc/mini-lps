@@ -67,7 +67,7 @@ public class GeoServerInit {
     @Value("${spring.datasource.password}")
     private String pgPassword;
 
-    private static final String SLDS_FOLDER = "./geoserver/slds/";
+    private static final String SLDS_FOLDER = "geoserver/slds/";
 
     @PostConstruct
     public void init() {
@@ -98,6 +98,11 @@ public class GeoServerInit {
             // Then we create the layers and set as available styles that ones that are specificated in
             //  availableStyles array and has been created previously
             processLayersFile(publisher, createdStyles);
+
+            if (prop.getEnvironment().equals("dev")) {
+              Thread.sleep(3000); // wait for GeoServer to finish publishing before recalculating bbox
+              reloadWMSLayersBbox();
+            }
 
           /*% if (data.mapViewer == null) { %*/
             // Add a layer for each geographic entity
@@ -130,7 +135,7 @@ public class GeoServerInit {
 
     private void createDataStore(GeoServerRESTStoreManager manager) {
         final GSPostGISDatastoreEncoder storeEncoder = new GSPostGISDatastoreEncoder(gsProp.getDatastore());
-        storeEncoder.setHost(pgHost);
+        storeEncoder.setHost(gsProp.getPgHost() != null ? gsProp.getPgHost() : pgHost);
         storeEncoder.setPort(pgPort);
         storeEncoder.setUser(pgUser);
         storeEncoder.setPassword(pgPassword);
@@ -178,7 +183,8 @@ public class GeoServerInit {
   }
 
   private String createStyle(GeoServerRESTPublisher publisher, String name) {
-    String stylePath = SLDS_FOLDER + name + ".sld";
+    String fileName = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    String stylePath = SLDS_FOLDER + fileName + ".sld";
     String sldBody = readFile(stylePath);
     publisher.publishStyleInWorkspace(gsProp.getWorkspace(), sldBody, name);
     return name;

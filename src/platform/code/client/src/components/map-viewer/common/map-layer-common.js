@@ -113,6 +113,38 @@ function createGeoJSONLayer(json, layerParams, layerInMap = {}/*% if (feature.MV
     );
 }
 
+/*% if (feature.MV_Processes) { %*/
+/**
+ * Creates a GeoJSON Layer from a WPS result (no repository needed)
+ */
+function createGeoJSONResultLayer(json, layerParams, layerInMap = {}) {
+  const availableStyles = _getAvailableStyles(json);
+  const defaultStyle = _getDefaultStyle(json, availableStyles, layerInMap);
+
+  const url = json.url || layerParams.url;
+
+  // Fetch the GeoJSON data from the URL
+  const dataPromise = fetch(url).then((res) => res.json());
+
+  const options = {
+    id: json.name || layerParams.name || layerParams.label,
+    label: layerParams.label,
+    baseLayer: false,
+    selected: layerInMap.selected || layerInMap.selected == null,
+    url: url,
+    added: layerParams.added,
+    type: layerParams.type,
+  };
+
+  return new GeoJSONLayer(
+    dataPromise, 
+    options,
+    availableStyles,
+    defaultStyle
+  );
+}
+/*% } %*/
+
 /*% if (feature.MV_MS_GJ_Paginated) { %*/
 /**
  * Updates GeoJSON layer features within a given bounding box.
@@ -191,6 +223,20 @@ function _wrapWMSStyle(styleName) {
     sld: () => null,
   };
 }
+
+/*% if (feature.MV_Processes) { %*/
+/**
+ * Generates a unique layer ID for an existing map.
+ */
+function getUniqueLayerId(map, layerName, count = 1) {
+  const uniqueId = `${layerName}.${count}`;
+  if (map.getLayer(uniqueId)) {
+    return getUniqueLayerId(map, layerName, count + 1);
+  } else {
+    return uniqueId;
+  }
+}
+/*% } %*/
 
 function _getAvailableStyles(json) {
   if (json.styles && json.styles.length > 0) { // local styles
@@ -279,5 +325,5 @@ function _incrementBBox(xmin, xmax, ymin, ymax) {
 }
 /*% } %*/
 
-export { createWMSLayer, createGeoJSONLayer/*% if (feature.MV_MS_GJ_Paginated) { %*/, updateLayer/*% } %*/ };
+export { createWMSLayer, createGeoJSONLayer /*% if (feature.MV_Processes) { %*/, createGeoJSONResultLayer, getUniqueLayerId/*% } %*/ /*% if (feature.MV_MS_GJ_Paginated) { %*/, updateLayer/*% } %*/ };
 /*% } %*/

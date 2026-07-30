@@ -1,0 +1,195 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/params.json',
+        context: lang
+      };
+    });
+>###
+###< if (feature.MV_Processes) { >###
+{
+  "param": {
+    "all_parts": {
+      "title": "Create centroid for each part",
+      "description": ""
+    },
+    "auto_colors": {
+      "title": "Generate relief classes automatically",
+      "description": ""
+    },
+    "azimuth": {
+      "title": "Azimuth (horizontal angle)",
+      "description": ""
+    },
+    "band": {
+      "title": "Band Number",
+      "description": ""
+    },
+    "band_a": {
+      "title": "Number of raster band for A",
+      "description": ""
+    },
+    "band_b": {
+      "title": "Number of raster band for B",
+      "description": ""
+    },
+    "band_c": {
+      "title": "Number of raster band for C",
+      "description": ""
+    },
+    "band_d": {
+      "title": "Number of raster band for D",
+      "description": ""
+    },
+    "band_e": {
+      "title": "Number of raster band for E",
+      "description": ""
+    },
+    "band_f": {
+      "title": "Number of raster band for F",
+      "description": ""
+    },
+    "buffer": {
+      "title": "Buffer region",
+      "description": ""
+    },
+    "close_path": {
+      "title": "Create closed paths",
+      "description": ""
+    },
+    "colors": {
+      "title": "Relief colors",
+      "description": ""
+    },
+    "dissolve": {
+      "title": "Dissolve result",
+      "description": ""
+    },
+    "distance": {
+      "title": "Distance",
+      "description": ""
+    },
+    "end_cap_style": {
+      "title": "End cap style",
+      "description": ""
+    },
+    "extra": {
+      "title": "Additional command-line parameters",
+      "description": ""
+    },
+    "field": {
+      "title": "Field",
+      "description": ""
+    },
+    "fill_value": {
+      "title": "Fill value",
+      "description": ""
+    },
+    "formula": {
+      "title": "Formula",
+      "description": "Calculation in gdalnumeric syntax using +-/* or any numpy array functions (i.e. logical_and())"
+    },
+    "frequency_distribution": {
+      "title": "Frequency distribution",
+      "description": ""
+    },
+    "input": {
+      "title": "Input layer",
+      "description": ""
+    },
+    "input_a": {
+      "title": "Input layer A",
+      "description": ""
+    },
+    "input_b": {
+      "title": "Input layer B",
+      "description": ""
+    },
+    "input_c": {
+      "title": "Input layer C",
+      "description": ""
+    },
+    "input_d": {
+      "title": "Input layer D",
+      "description": ""
+    },
+    "input_e": {
+      "title": "Input layer E",
+      "description": ""
+    },
+    "input_f": {
+      "title": "Input layer F",
+      "description": ""
+    },
+    "join_style": {
+      "title": "Miter limit",
+      "description": ""
+    },
+    "json_geom": {
+      "title": "Features geometry",
+      "description": ""
+    },
+    "method": {
+      "title": "Simplification method",
+      "description": ""
+    },
+    "miter_limit": {
+      "title": "Join style",
+      "description": ""
+    },
+    "natural_sort": {
+      "title": "Sort text containing numbers naturally",
+      "description": ""
+    },
+    "no_data": {
+      "title": "Output NoData value",
+      "description": ""
+    },
+    "options": {
+      "title": "Additional creation options",
+      "description": ""
+    },
+    "output": {
+      "title": "Output",
+      "description": ""
+    },
+    "projwin": {
+      "title": "Output extent",
+      "description": "Custom extent of the output raster"
+    },
+    "rtype": {
+      "title": "Output raster type",
+      "description": ""
+    },
+    "segments": {
+      "title": "Segments",
+      "description": "The segments parameter controls the number of line segments to use to approximate a quarter circle when creating rounded offsets."
+    },
+    "separate_disjoint": {
+      "title": "Keep disjoint features separate",
+      "description": ""
+    },
+    "success": {
+      "title": "Process success",
+      "description": ""
+    },
+    "tolerance": {
+      "title": "Tolerance",
+      "description": ""
+    },
+    "type": {
+      "title": "Geometry type",
+      "description": ""
+    },
+    "v_angle": {
+      "title": "Vertical angle",
+      "description": ""
+    },
+    "z_factor": {
+      "title": "Z factor",
+      "description": ""
+    }
+  }
+}
+###< } >###

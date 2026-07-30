@@ -92,6 +92,7 @@
         </alt>
         <feature name="MV_DetailOnClick"/>
         <feature name="MV_Clustering"/>
+        <feature name="MV_Processes"/>
       </and>
       <and mandatory="true" name="Tools">
         <feature name="T_Swagger"/>

@@ -1,0 +1,48 @@
+###< if (feature.MV_Processes) { >###
+{
+  "vector_geometry": {
+    "class" : "VectorWrapper",
+    "algorithms": [
+      "native:buffer",
+      "native:centroids",
+      "native:collect",
+      "native:convexhull",
+      "native:deleteduplicategeometries",
+      "native:dissolve",
+      "native:extractvertices",
+      "native:poleofinaccessibility",
+      "native:simplifygeometries",
+      "qgis:delaunaytriangulation",
+      "qgis:minimumboundinggeometry",
+      "qgis:voronoipolygons"
+    ]
+  },
+  "vector_transform": {
+    "class" : "VectorWrapper",
+    "algorithms": [
+      "native:pointonsurface",
+      "native:pointstopath",
+      "native:polygonstolines",
+      "qgis:linestopolygons"
+    ]
+  },
+  "raster_analysis": {
+    "class": "RasterWrapper",
+    "algorithms": [
+      "gdal:rastercalculator",
+      "native:fillnodata"
+    ]
+  },
+  "raster_terrain": {
+    "class": "RasterWrapper",
+    "algorithms": [
+      "qgis:aspect",
+      "qgis:hillshade",
+      "qgis:relief",
+      "qgis:slope",
+      "qgis:ruggednessindex"
+    ]
+  }
+}
+
+###< } >###

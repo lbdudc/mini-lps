@@ -99,7 +99,7 @@
       v-model="showDialog"
       hide-overlay
       :fullscreen="$vuetify.breakpoint.mdAndDown"
-      :width="/*% if (feature.MV_T_InformationMode) { %*/wmsFeatures != null ? 1200 :/*% } %*/500"
+      :width="/*% if (feature.MV_T_InformationMode) { %*/wmsFeatures != null ? 1200 :/*% } %*/dialogComponent === 'toolbox' ? 900 : 500"
       @click:outside="closeDialog"
     >
       <component
@@ -138,6 +138,9 @@ import ExportManagement from "./export-management/ExportManagement";
 /*% } %*/
 /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode) { %*/
 import RightMapControls from "./controls/RightMapControls.vue";
+/*% } %*/
+/*% if (feature.MV_Processes) { %*/
+import Toolbox from "@/components/map-viewer/toolbox/Toolbox.vue";
 /*% } %*/
 /*% if (feature.MV_LM_ExternalLayer) { %*/
 import AddNewLayer from "./add-new-layer/AddNewLayer";
@@ -180,6 +183,7 @@ export default {
     /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode) { %*/
     RightMapControls,
     /*% } %*/
+    /*% if (feature.MV_Processes) { %*/Toolbox, /*% } %*/
     /*% if (feature.MV_DetailOnClick) { %*/"information-popup": InformationPopup,/*% } %*/
     /*% if (feature.MV_T_Export) { %*/"export-management": ExportManagement,/*% } %*/
     /*% if (feature.MV_LM_BaseLayerSelector) { %*/"change-base-layer": ChangeBaseLayer,/*% } %*/

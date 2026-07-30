@@ -1,0 +1,188 @@
+###< if (data.basicData.languages.find(lang => lang=='es')) { >###
+###< if (feature.MV_Processes) { >###
+{
+  "param": {
+    "all_parts": {
+      "title": "Crear punto para cada parte",
+      "description": ""
+    },
+    "auto_colors": {
+      "title": "Generar clases de relieve automáticamente",
+      "description": ""
+    },
+    "azimuth": {
+      "title": "Azimut (ángulo horizontal)",
+      "description": ""
+    },
+    "band": {
+      "title": "Número de banda",
+      "description": ""
+    },
+    "band_a": {
+      "title": "Número de banda ráster para A",
+      "description": ""
+    },
+    "band_b": {
+      "title": "Número de banda ráster para B",
+      "description": ""
+    },
+    "band_c": {
+      "title": "Número de banda ráster para C",
+      "description": ""
+    },
+    "band_d": {
+      "title": "Número de banda ráster para D",
+      "description": ""
+    },
+    "band_e": {
+      "title": "Número de banda ráster para E",
+      "description": ""
+    },
+    "band_f": {
+      "title": "Número de banda ráster para F",
+      "description": ""
+    },
+    "buffer": {
+      "title": "Región de buffer",
+      "description": ""
+    },
+    "close_path": {
+      "title": "Crear rutas cerradas",
+      "description": ""
+    },
+    "colors": {
+      "title": "Colores de relieve",
+      "description": ""
+    },
+    "dissolve": {
+      "title": "Disolver resultado",
+      "description": ""
+    },
+    "distance": {
+      "title": "Distancia",
+      "description": ""
+    },
+    "end_cap_style": {
+      "title": "Estilo de terminación",
+      "description": ""
+    },
+    "extra": {
+      "title": "Parámetros adicionales de línea de órdenes",
+      "description": ""
+    },
+    "field": {
+      "title": "Campo",
+      "description": ""
+    },
+    "fill_value": {
+      "title": "Valor de relleno",
+      "description": ""
+    },
+    "formula": {
+      "title": "Fórmula",
+      "description": "Cálculo en sintaxis gdalnumeric usando + - / * o cualquier numpy array funciones (es decir, logical_and ())."
+    },
+    "frequency_distribution": {
+      "title": "Distribución de frecuencia",
+      "description": ""
+    },
+    "input": {
+      "title": "Capa de entrada",
+      "description": ""
+    },
+    "input_a": {
+      "title": "Capa de entrada A",
+      "description": ""
+    },
+    "input_b": {
+      "title": "Capa de entrada B",
+      "description": ""
+    },
+    "input_c": {
+      "title": "Capa de entrada C",
+      "description": ""
+    },
+    "input_d": {
+      "title": "Capa de entrada D",
+      "description": ""
+    },
+    "input_e": {
+      "title": "Capa de entrada E",
+      "description": ""
+    },
+    "input_f": {
+      "title": "Capa de entrada F",
+      "description": ""
+    },
+    "join_style": {
+      "title": "Límite de inglete",
+      "description": ""
+    },
+    "json_geom": {
+      "title": "Colección de geometrías",
+      "description": ""
+    },
+    "method": {
+      "title": "Método de simplificación",
+      "description": ""
+    },
+    "miter_limit": {
+      "title": "Estilo de unión",
+      "description": ""
+    },
+    "natural_sort": {
+      "title": "Ordenar texto conteniendo números naturalmente",
+      "description": ""
+    },
+    "no_data": {
+      "title": "Valor NoData de salida",
+      "description": ""
+    },
+    "options": {
+      "title": "Opciones adicionales de creación",
+      "description": ""
+    },
+    "output": {
+      "title": "Salida",
+      "description": ""
+    },
+    "projwin": {
+      "title": "Extensión de salida",
+      "description": "Extensión personalizada del ráster de salida."
+    },
+    "rtype": {
+      "title": "Tipo de ráster de salida",
+      "description": ""
+    },
+    "segments": {
+      "title": "Segmentos",
+      "description": "El parámetro segmentos controla el número de segmentos de línea a utilizar para aproximar un cuarto de círculo, al crear desplazamientos redondeados."
+    },
+    "separate_disjoint": {
+      "title": "Mantener objetos disjuntos separados",
+      "description": ""
+    },
+    "success": {
+      "title": "Éxito do proceso",
+      "description": ""
+    },
+    "tolerance": {
+      "title": "Tolerancia",
+      "description": ""
+    },
+    "type": {
+      "title": "Tipo de geometría",
+      "description": ""
+    },
+    "v_angle": {
+      "title": "Ángulo vertical",
+      "description": ""
+    },
+    "z_factor": {
+      "title": "Factor Z",
+      "description": ""
+    }
+  }
+}
+###< } >###
+###< } >###

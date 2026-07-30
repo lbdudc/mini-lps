@@ -1,0 +1,118 @@
+###<@ return data.basicData.languages
+    .filter(function(lang) { return lang !== "es" && lang !== "gl"; })
+    .map(function(lang) {
+      return {
+        fileName: lang + '/components/processes.json',
+        context: lang
+      };
+    });
+>###
+###< if (feature.MV_Processes) { >###
+{
+  "process": {
+    "provider": {
+      "model": "Models",
+      "raster_analysis": "Raster analysis",
+      "raster_terrain": "Raster terrain analysis",
+      "vector_geometry": "Vector geometry",
+      "vector_transform": "Vector transform"
+    },
+    "not_available": {
+      "title": "Title not available",
+      "description": "Description not available"
+    },
+    "aspect": {
+      "title": "Aspect",
+      "description": "This algorithm calculates the aspect of the Digital Terrain Model in input. The final aspect raster layer contains values from 0 to 360 that express the slope direction: starting from North (0°) and continuing clockwise."
+    },
+    "buffer": {
+      "title": "Buffer",
+      "description": "This algorithm computes a buffer area for all the features in an input layer, using a fixed or dynamic distance. The segments parameter controls the number of line segments to use to approximate a quarter circle when creating rounded offsets. The end cap style parameter controls how line endings are handled in the buffer. The join style parameter specifies whether round, miter or beveled joins should be used when offsetting corners in a line. The miter limit parameter is only applicable for miter join styles, and controls the maximum distance from the offset curve to use when creating a mitered join."
+    },
+    "centroids": {
+      "title": "Centroids",
+      "description": "This algorithm creates a new point layer, with points representing the centroid of the geometries in an input layer. The attributes associated to each point in the output layer are the same ones associated to the original features."
+    },
+    "collect": {
+      "title": "Collect geometries",
+      "description": "This algorithm takes a vector layer and collects its geometries into new multipart geometries. One or more attributes can be specified to collect only geometries belonging to the same class (having the same value for the specified attributes), alternatively all geometries can be collected. All output geometries will be converted to multi geometries, even those with just a single part. This algorithm does not dissolve overlapping geometries - they will be collected together without modifying the shape of each geometry part."
+    },
+    "convexhull": {
+      "title": "Convex hull",
+      "description": "This algorithm calculates the convex hull for each feature in an input layer."
+    },
+    "deleteduplicategeometries": {
+      "title": "Delete duplicate geometries",
+      "description": "This algorithm finds duplicated geometries and removes them. Attributes are not checked, so in case two features have identical geometries but different attributes, only one of them will be added to the result layer."
+    },
+    "delaunaytriangulation": {
+      "title": "Delaunay triangulation",
+      "description": "Creates a polygon layer with the Delaunay triangulation corresponding to a points layer."
+    },
+    "dissolve": {
+      "title": "Dissolve",
+      "description": "This algorithm takes a vector layer and combines their features into new features. One or more attributes can be specified to dissolve features belonging to the same class (having the same value for the specified attributes), alternatively all features can be dissolved in a single one. All output geometries will be converted to multi geometries. In case the input is a polygon layer, common boundaries of adjacent polygons being dissolved will get erased. If enabled, the optional 'Keep disjoint features separate' setting will cause features and parts that do not overlap or touch to be exported as separate features (instead of parts of a single multipart feature)."
+    },
+    "extractvertices": {
+      "title": "Extract vertices",
+      "description": "This algorithm takes a vector layer and generates a point layer with points representing the vertices in the input geometries. The attributes associated to each point are the same ones associated to the feature that the point belongs to.\nAdditional fields are added to the point indicating the vertex index (beginning at 0), the vertex’s part and its index within the part (as well as its ring for polygons), distance along original geometry and bisector angle of vertex for original geometry."
+    },
+    "fillnodata": {
+      "title": "Fill NoData cells",
+      "description": "This algorithm resets the NoData values in the input raster to a chosen value, resulting in a raster dataset with no NoData pixels. This value can be set by the user using the Fill value parameter. The algorithm respects the input raster data type (eg. a floating point fill value will be truncated when applied to an integer raster)."
+    },
+    "hillshade": {
+      "title": "Hillshade",
+      "description": "This algorithm calculates the hillshade of the Digital Terrain Model in input. The shading of the layer is calculated according to the sun position (azimuth and elevation)."
+    },
+    "pointonsurface": {
+      "title": "Point on surface",
+      "description": "Returns a point guaranteed to lie on the surface of a geometry."
+    },
+    "linestopolygons": {
+      "title": "Lines to polygons",
+      "description": "This algorithm generates a polygon layer using as polygon rings the lines from an input line layer. The attribute table of the output layer is the same as the one from of the input line layer."
+    },
+    "poleofinaccessibility": {
+      "title": "Pole of inaccessibility",
+      "description": "This algorithm calculates the pole of inaccessibility for a polygon layer, which is the most distant internal point from the boundary of the surface. This algorithm uses the 'polylabel' algorithm (Vladimir Agafonkin, 2016), which is an iterative approach guaranteed to find the true pole of inaccessibility within a specified tolerance (in layer units). More precise tolerances require more iterations and will take longer to calculate. The distance from the calculated pole to the polygon boundary will be stored as a new attribute in the output layer."
+    },
+    "polygonstolines": {
+      "title": "Polygons to lines",
+      "description": "Converts polygons to lines."
+    },
+    "pointstopath": {
+      "title": "Points to path",
+      "description": "This algorithm takes a point layer and connects its features creating a new line layer. An attribute or expression may be specified to define the order the points should be connected. If no order expression is specified, the feature ID is used. A natural sort can be used when sorting by a string attribute or expression (ie. place 'a9' before 'a10'). An attribute or expression can be selected to group points having the same value into the same resulting line."
+    },
+    "rastercalculator": {
+      "title": "Raster calculator",
+      "description": ""
+    },
+    "relief": {
+      "title": "Relief",
+      "description": "This algorithm creates a shaded relief layer from digital elevation data."
+    },
+    "ruggednessindex": {
+      "title": "Ruggedness index",
+      "description": "This algorithm calculates the quantitative measurement of terrain heterogeneity described by Riley et al. (1999). It is calculated for every location, by summarizing the change in elevation within the 3x3 pixel grid. Each pixel contains the difference in elevation from a center cell and the 8 cells surrounding it."
+    },
+    "simplifygeometries": {
+      "title": "Simplify",
+      "description": "This algorithm simplifies the geometries in a line or polygon layer. It creates a new layer with the same features as the ones in the input layer, but with geometries containing a lower number of vertices. The algorithm gives a choice of simplification methods, including distance based (the 'Douglas-Peucker' algorithm), area based ('Visvalingam' algorithm) and snapping geometries to a grid."
+    },
+    "slope": {
+      "title": "Slope",
+      "description": "This algorithm calculates the angle of inclination of the terrain from an input raster layer. The slope is expressed in degrees."
+    },
+    "voronoipolygons": {
+      "title": "Voronoi polygons",
+      "description": "Generates a polygon layer containing the Voronoi diagram corresponding to input points."
+    },
+    "minimumboundinggeometry": {
+      "title": "Minimum bounding geometry",
+      "description": "This algorithm creates geometries which enclose the features from an input layer. Numerous enclosing geometry types are supported, including bounding boxes (envelopes), oriented rectangles, circles and convex hulls. Optionally, the features can be grouped by a field. If set, this causes the output layer to contain one feature per grouped value with a minimal geometry covering just the features with matching values."
+    }
+  }
+}
+###< } >###
