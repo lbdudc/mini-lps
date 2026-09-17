@@ -172,17 +172,29 @@ function _auxGetLayer(tile, attr, maxZoom) {
 
 function getLayerFromBaseLayerName(baseLayerName) {
   switch (baseLayerName) {
+    /* Stamen's own tile service (stamen-tiles-*.a.ssl.fastly.net) was
+       decommissioned in 2023; the case names are kept for compatibility with
+       any product still selecting them by this base layer name, but the URLs
+       now point at CARTO's Positron (a close visual match for Toner Lite) and
+       OpenTopoMap (a terrain/topo style, not a re-hosting of Stamen's own
+       terrain rendering), both free and keyless. See the matching fix in the
+       config-files/*.json base layer definitions actually used at runtime —
+       this function itself isn't currently called from anywhere in the
+       generated client, but is kept in sync so it isn't a trap if it is.
+       NOTE: this file is stripped of all newlines before being eval'd by
+       spl-js-engine's template processor, so a `//` line comment here would
+       swallow everything after it to end of file — block comments only. */
     case "Stamen.TonerLite":
       return _auxGetLayer(
-        "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png",
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         20
       );
     case "Stamen.Terrain":
       return _auxGetLayer(
-        "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        18
+        "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        "Map data: &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href=\"https://opentopomap.org\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)",
+        17
       );
     case "Esri.WorldStreetMap":
       return _auxGetLayer(
