@@ -20,6 +20,27 @@ services:
     restart: unless-stopped
     ports:
       - '/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/:/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/'
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*//actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+  /*% if (feature.DM_DI_DF_Shapefile) { %*/
+  data-importer:
+    build:
+      context: ./importer
+      dockerfile: Dockerfile
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-data-importer
+    environment:
+      SERVER_HOST: 'http://server:/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/'
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - local
+    restart: "no"
+  /*% } %*/
   client:
     build:
       context: ../client

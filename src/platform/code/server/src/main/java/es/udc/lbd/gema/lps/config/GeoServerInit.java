@@ -8,6 +8,7 @@ package es.udc.lbd.gema.lps.config;
 
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
+import it.geosolutions.geoserver.rest.HTTPUtils;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
 import it.geosolutions.geoserver.rest.encoder.datastore.GSPostGISDatastoreEncoder;
@@ -172,8 +173,16 @@ public class GeoServerInit {
         String styleType = (String) style.get("type");
         Boolean styleCached = (Boolean) style.get("cached");
         if (styleCached != null && styleCached == true) {
-          createdStyles.add(
-            createStyle(publisher, (String) style.get("name")));
+          String name = (String) style.get("name");
+          // One layer missing/unreadable SLD (e.g. a layer with no custom QGIS
+          // style) must not abort every style after it in this list, so each
+          // style is isolated rather than relying on the try/catch around the
+          // whole loop.
+          try {
+            createdStyles.add(createStyle(publisher, name));
+          } catch (Exception e) {
+            logger.warn("Could not create GeoServer style '" + name + "', skipping it: " + e.getMessage());
+          }
         }
       }
     } catch (Exception e) {
@@ -182,11 +191,25 @@ public class GeoServerInit {
     return createdStyles;
   }
 
+  // geoserver-manager's publishStyleInWorkspace() always POSTs as legacy SLD 1.0
+  // (application/vnd.ogc.sld+xml). QGIS's own "Save as SLD" export uses the SE 1.1.0
+  // vocabulary instead (se:Rule, se:Fill, se:SvgParameter...), which GeoServer's SLD 1.0
+  // parser doesn't recognise — it silently drops every Fill/Stroke it can't parse, so the
+  // style still gets created but renders with GeoServer's default grey fill. The
+  // auto-generated random-colour style template (_WMSLayerSLDStyles.txt) is genuine SLD 1.0
+  // and is unaffected, so only SE-tagged bodies need the different content type.
+  private static final String SE_CONTENT_TYPE = "application/vnd.ogc.se+xml";
+
   private String createStyle(GeoServerRESTPublisher publisher, String name) {
     String fileName = Character.toUpperCase(name.charAt(0)) + name.substring(1);
     String stylePath = SLDS_FOLDER + fileName + ".sld";
     String sldBody = readFile(stylePath);
-    publisher.publishStyleInWorkspace(gsProp.getWorkspace(), sldBody, name);
+    if (sldBody.contains("xmlns:se=")) {
+      String url = gsProp.getUrl() + "/rest/workspaces/" + gsProp.getWorkspace() + "/styles?name=" + name;
+      HTTPUtils.post(url, sldBody, SE_CONTENT_TYPE, gsProp.getUser(), gsProp.getPassword());
+    } else {
+      publisher.publishStyleInWorkspace(gsProp.getWorkspace(), sldBody, name);
+    }
     return name;
   }
 
@@ -331,10 +354,18 @@ public class GeoServerInit {
   }
 
   private String readFile(String fileName) {
+    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    InputStream inputStream = classloader.getResourceAsStream(fileName);
+    if (inputStream == null) {
+      // A layer with no custom QGIS style never had an SLD to bundle here — that's
+      // expected, not an error worth a stack trace; the caller decides what to do
+      // with an empty body.
+      logger.warn("Resource not found on classpath: " + fileName);
+      return "";
+    }
+
     try {
       StringBuilder strbld = new StringBuilder();
-      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream inputStream = classloader.getResourceAsStream(fileName);
       InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
       BufferedReader reader = new BufferedReader(streamReader);
       for (String line; (line = reader.readLine()) != null; ) {
