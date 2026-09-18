@@ -782,7 +782,16 @@ function getExtraConfigFromSpec(data, name, defaultValue) {
 function normalizeKebabCase(str) {
   return str
     .replace(/[\s-]+/g, '-')
-    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    // Was '$1_$2' -- inserting an underscore at camelCase boundaries defeats
+    // the entire point of a *kebab*-case helper (copy-pasted from
+    // normalizeSnakeCase below and never fixed). docker-compose.yml uses this
+    // for the project/container name basis, so a name like "DemoTfmQgis1051"
+    // came out "demo_tfm_qgis1051" -- underscores that Tomcat's strict
+    // Host-header parser then rejects outright on every server->GeoServer
+    // REST call ("The character [_] is never valid in a domain name"),
+    // silently breaking every layer/style publish with no error surfaced
+    // anywhere but the server's own logs.
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
     .toLowerCase();
 }
 
