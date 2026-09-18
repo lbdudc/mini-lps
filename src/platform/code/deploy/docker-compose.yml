@@ -9,10 +9,12 @@ services:
     /*% if (feature.D_C_Geoserver || feature.D_C_Postgres ) { %*/
     depends_on:
       /*% if (feature.D_C_Geoserver) { %*/
-      - geoserver
+      geoserver:
+        condition: service_healthy
       /*% } %*/
       /*% if (feature.D_C_Postgres) { %*/
-      - postgres
+      postgres:
+        condition: service_healthy
       /*% } %*/
     /*% } %*/
     networks:
@@ -181,6 +183,19 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+    # Without this, `server`'s `depends_on: geoserver` (see above) only waits for
+    # this container to start, not for GeoServer's own webapp deployment -- which
+    # takes far longer than the container itself -- to actually accept requests.
+    # `server`'s GeoServerInit then hits "Connection refused" for its entire
+    # workspace/datastore/featuretype/style publishing sequence exactly once at
+    # boot with no retry, so nothing gets published: every generated app layer and
+    # style silently never reaches GeoServer, even though the run reports healthy.
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-s", "-o", "/dev/null", "http://localhost:8080/geoserver/web/"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
 
   /*% } %*/
   /*% if (feature.D_C_Nginx) { %*/
