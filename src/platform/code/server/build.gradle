@@ -16,23 +16,19 @@ sourceCompatibility = '17'
 targetCompatibility = '17'
 
 repositories {
-  maven { url "http://download.osgeo.org/webdav/geotools/"
-    allowInsecureProtocol = true
-  }
-  maven { url "https://repo.osgeo.org/repository/release/"
-    allowInsecureProtocol = true
-  }
-  maven { url "http://maven.geotoolkit.org/"
-    allowInsecureProtocol = true
-  }
+  // download.osgeo.org/webdav/geotools, maven.geotoolkit.org and
+  // jasperreports.sourceforge.net/maven2 were removed here: the first two no
+  // longer serve any GeoTools artifact (repo.osgeo.org is the artifact's real
+  // home and already covers it below; maven.geotoolkit.org doesn't resolve at
+  // all any more, same finding lps already acted on), and no dependency below
+  // pulls anything from org.jasperreports.
+  maven { url "https://repo.osgeo.org/repository/release/" }
   /*% if (feature.MV_MS_GeoServer) { %*/
-  maven { url "http://maven.geo-solutions.it/"
-    allowInsecureProtocol = true
-  }
+  // https, not the historical http://maven.geo-solutions.it — the plain-http
+  // host now just 301s here, so serving it directly needs no
+  // allowInsecureProtocol escape hatch.
+  maven { url "https://maven.geo-solutions.it/" }
   /*% } %*/
-  maven { url "http://jasperreports.sourceforge.net/maven2/"
-    allowInsecureProtocol = true
-  }
   mavenCentral()
 }
 
@@ -57,7 +53,7 @@ dependencies {
   implementation "com.fasterxml.jackson.core:jackson-databind"
   implementation "commons-beanutils:commons-beanutils:1.9.4"
 
-  runtimeOnly "org.postgresql:postgresql:42.3.8"
+  runtimeOnly "org.postgresql:postgresql:42.7.13"
 
   implementation "net.kaczmarzyk:specification-arg-resolver:2.6.2"
   /*% if (feature.T_Swagger) { %*/
