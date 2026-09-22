@@ -195,10 +195,12 @@ services:
       - ../client/:/app/client/
     ports:
       - "80:80"
-    /*% if (feature.D_C_Geoserver) { %*/
     depends_on:
+      - server
+      - client
+      /*% if (feature.D_C_Geoserver) { %*/
       - geoserver
-    /*% } %*/
+      /*% } %*/
     restart: unless-stopped
 
   /*% } %*/
