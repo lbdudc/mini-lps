@@ -17,13 +17,14 @@
         ###< if (context.traceable) { >###"owner": "owner",###<
       } >###
         ###<= context.properties.map(function(prop) {
+          var displayLabel = prop.label || normalize(prop.name);
           if (prop.class == 'Point') {
             return
-              '"' + normalize(prop.name) + '": "' + normalize(prop.name) + '",\n        ' +
-              '"' + normalize(prop.name) + 'Custom.x": "' + normalize(prop.name) + ' X",\n        ' +
-              '"' + normalize(prop.name) + 'Custom.y": "' + normalize(prop.name) + ' Y"';
+              '"' + normalize(prop.name) + '": "' + displayLabel + '",\n        ' +
+              '"' + normalize(prop.name) + 'Custom.x": "' + displayLabel + ' X",\n        ' +
+              '"' + normalize(prop.name) + 'Custom.y": "' + displayLabel + ' Y"';
         }
-          return '"' + normalize(prop.name) + '": "' + normalize(prop.name) + '"';
+          return '"' + normalize(prop.name) + '": "' + displayLabel + '"';
       }).join(',\n        ') >###
     },
     "messages": {
