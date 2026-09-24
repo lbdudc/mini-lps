@@ -1,100 +1,38 @@
 /*% if (feature.MapViewer) { %*/
 <template>
-  <v-container fluid id="map-container">
-    <v-row justify="start" class="mb-1" no-gutters>
-      <v-col class="d-none d-md-block mr-2">
-        <span class="headline no-split-words">
-          {{ $t($route.meta.label) }}
-        </span>
-      </v-col>
-      /*%
-        var cols = 12;
-        var md = 6;
-        if(feature.MV_T_ViewMapAsList && feature.MV_MM_MMV_MapSelectorInMapViewer){
-          cols = 6;
-          md = 3;
-        }
-      %*/
-      /*% if (feature.MV_T_ViewMapAsList) { %*/
-      <list-layer-management v-if="map" :map="map"></list-layer-management>
-      /*% } %*/
-      /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
-      <v-col cols="/*%= cols %*/" md="/*%= md %*/">
-        <v-row class="justify-end" no-gutters>
-          <v-col cols="12" sm="5" class="mt-4 mr-4 text-center text-sm-right">
-            <label>
-              {{ $t("mapViewer.mapSelector") }}
-            </label>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-select
-              :items="maps"
-              item-value="id"
-              item-text="label"
-              :label="$t('mapViewer.map')"
-              v-if="maps.length > 0"
-              v-model="mapSelected"
-              @change="changeRoute"
-              solo
-            >
-            </v-select>
-          </v-col>
-        </v-row>
-      </v-col>
-      /*% } %*/
-    </v-row>
-    /*% if (feature.MV_T_F_BasicSearch || feature.MV_T_Export) { %*/
-    <v-row class="mt-1 mb-4" no-gutters>
-      <v-col class="text-right">
-        /*% if (feature.MV_T_F_BasicSearch) { %*/
-        <v-text-field
-          dense
-          v-model="form.query"
-          append-icon="search"
-          @click:append="searchInMap"
-          :label="$t('mapViewer.searchInMap')"
-          @keydown.enter="searchInMap"
-          single-line
-          hide-details
-          class="d-inline-block"
-        ></v-text-field>
-        /*% } %*/
-        /*% if (feature.MV_T_Export) { %*/
-        <v-btn
-          class="primary ml-2"
-          @click="openDialog({ component: 'export-management' })"
-        >
-          {{ $t("mapViewer.export") }}
-        </v-btn>
-        /*% } %*/
-        /*% if (feature.ChartViewer) { %*/
-        <v-btn
-          class="ml-2"
-          color="primary"
-          outlined
-          @click="goToChartViewer"
-        >
-          <v-icon left>mdi-chart-line</v-icon>
-          {{ $t("chartViewer.title") }}
-        </v-btn>
-        /*% } %*/
-      </v-col>
-    </v-row>
+  <v-container fluid id="map-container" class="pa-0">
+    /*% if (feature.MV_T_F_BasicSearch) { %*/
+    <v-toolbar dense flat color="grey lighten-4" class="map-toolbar" elevation="1">
+      <v-text-field
+        dense
+        v-model="form.query"
+        prepend-inner-icon="mdi-magnify"
+        @click:append="searchInMap"
+        :label="$t('mapViewer.searchInMap')"
+        @keydown.enter="searchInMap"
+        single-line
+        hide-details
+        outlined
+        rounded
+        class="map-toolbar-select mr-2"
+      ></v-text-field>
+    </v-toolbar>
     /*% } %*/
 
     <div ref="map" id="map">
-    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
       <right-map-controls
         :overlays="viewOverlays"
         :map="map"
         :loadingMap="loadingMap"
         /*% if (feature.MV_T_InformationMode && feature.MV_T_F_BasicSearch) { %*/:form="form"/*% } %*/
+        /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/:hasMultipleMaps="maps.length > 1"/*% } %*/
         @build-control="openDialog"
       ></right-map-controls>
     /*% } %*/
     </div>
 
-    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector) { %*/
+    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
     <v-dialog
       v-model="showDialog"
       hide-overlay
@@ -108,7 +46,9 @@
         :map="map"
       /*% if (feature.MV_T_InformationMode) { %*/:features="wmsFeatures"/*% } %*/
       /*% if (feature.MV_LM_StylePreview) { %*/:wmsLegend="wmsLegendSelected"/*% } %*/
+      /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/:maps="maps" :mapSelected="mapSelected"/*% } %*/
         @layer-added="refreshLayerManager"
+      /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/@change-map="selectMap"/*% } %*/
         @close="closeDialog"
       ></component>
     </v-dialog>
@@ -136,7 +76,7 @@ import devCheck from "@/common/device-check";
 /*% if (feature.MV_T_Export) { %*/
 import ExportManagement from "./export-management/ExportManagement";
 /*% } %*/
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
 import RightMapControls from "./controls/RightMapControls.vue";
 /*% } %*/
 /*% if (feature.MV_Processes) { %*/
@@ -148,8 +88,8 @@ import AddNewLayer from "./add-new-layer/AddNewLayer";
 /*% if (feature.MV_LM_BaseLayerSelector ) { %*/
 import ChangeBaseLayer from "./change-base-layer/ChangeBaseLayer";
 /*% } %*/
-/*% if (feature.MV_T_ViewMapAsList) { %*/
-import ListLayerManagement from "./list-layer-management/ListLayerManagement";
+/*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+import ChangeMap from "./change-map/ChangeMap";
 /*% } %*/
 /*% if (feature.MV_T_InformationMode) { %*/
 import WMSInformation from "./wms-information/WMSInformation";
@@ -178,16 +118,16 @@ import { /*% if (feature.MV_CI_Scale) { %*/buildMapScaleControl,/*% } %*/
 
 export default {
   name: "Map",
-  /*% if (feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick) { %*/
+  /*% if (feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
   components: {
-    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
     RightMapControls,
     /*% } %*/
     /*% if (feature.MV_Processes) { %*/Toolbox, /*% } %*/
     /*% if (feature.MV_DetailOnClick) { %*/"information-popup": InformationPopup,/*% } %*/
     /*% if (feature.MV_T_Export) { %*/"export-management": ExportManagement,/*% } %*/
     /*% if (feature.MV_LM_BaseLayerSelector) { %*/"change-base-layer": ChangeBaseLayer,/*% } %*/
-    /*% if (feature.MV_T_ViewMapAsList) { %*/"list-layer-management": ListLayerManagement,/*% } %*/
+    /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/"change-map": ChangeMap,/*% } %*/
     /*% if (feature.MV_T_InformationMode) { %*/"wms-information": WMSInformation,/*% } %*/
     /*% if (feature.MV_LM_ExternalLayer) { %*/"add-new-layer": AddNewLayer,/*% } %*/
     /*% if (feature.MV_LM_StylePreview) { %*/"wms-legend": WMSLegend,/*% } %*/
@@ -198,7 +138,7 @@ export default {
       /*% if (feature.MV_T_F_BasicSearch) { %*/
       form: { query: null },
       /*% } %*/
-      /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector) { %*/
+      /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
       dialogComponent: null,
       showDialog: false,
       /*% if (feature.MV_T_InformationMode) { %*/
@@ -282,7 +222,7 @@ export default {
         )
       );
     },
-    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_StylePreview || feature.MV_LM_BaseLayerSelector) { %*/
+    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_StylePreview || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
     closeDialog() {
       this.dialogComponent = "";
       this.showDialog = false;
@@ -298,6 +238,13 @@ export default {
       /*% } %*/
       this.dialogComponent = args.component;
       this.showDialog = true;
+    },
+    /*% } %*/
+    /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+    selectMap(mapId) {
+      this.mapSelected = mapId;
+      this.changeRoute();
+      this.closeDialog();
     },
     /*% } %*/
     changeRoute() {
@@ -470,13 +417,6 @@ export default {
         this.loadingMap = false;
       }, 0);
     },
-    /*% if (feature.ChartViewer) { %*/
-    goToChartViewer() {
-      this.$router.push({
-        name: 'chartViewer'
-      });
-    },
-    /*% } %*/
   }
 };
 </script>
@@ -488,10 +428,24 @@ export default {
   flex-direction: column;
 }
 
+.map-toolbar {
+  flex: 0 0 auto;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+::v-deep .map-toolbar .v-toolbar__content {
+  flex-wrap: wrap;
+  height: auto !important;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  gap: 4px;
+}
+
 #map {
   width: 100%;
   height: 100%;
   z-index: 1;
+  flex: 1 1 auto;
 }
 
 ::v-deep .leaflet-top.leaflet-right {

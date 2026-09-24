@@ -8,6 +8,18 @@
   margin-top: 20px;
 }
 
+// Compact selects embedded in the map viewer's toolbar (list/map selectors) --
+// shared here rather than duplicated in each component's own scoped styles,
+// since Vue 2's `scoped` attribute can't reach across component boundaries.
+.map-toolbar-select {
+  max-width: 220px;
+  min-width: 140px;
+
+  .v-input__control {
+    min-height: 40px;
+  }
+}
+
 /* clase para no resaltar el icono de la toolbar de login
      cuando se está en la página de login */
 .v-btn:not(.v-btn--text):not(.v-btn--outlined).v-btn--active.hide-active:before {

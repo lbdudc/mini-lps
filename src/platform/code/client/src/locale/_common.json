@@ -106,6 +106,7 @@ const langTranslations = {
     "employee": "Employee",
     "logout": "Logout",
     "mapViewer": "Map Viewer",
+    "chartViewer": "Chart Viewer",
     "maps": "Maps",
     "myProfile": "My Profile",
     "plannedVisits": "Planned Visits",
