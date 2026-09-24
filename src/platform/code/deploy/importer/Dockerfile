@@ -1,5 +1,11 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY import.js .
+# .mjs, not .js: gispublisher/src/templates/import.mjs (staged here by
+# import-util.js's copyGeographicDataForImport) uses ESM `import` syntax and
+# this directory has no package.json to set "type":"module" for a plain .js
+# file -- without the extension, `node import.js` throws "Cannot use import
+# statement outside a module" and this container exits 1 immediately, leaving
+# the generated app's database empty.
+COPY import.mjs .
 COPY data/ ./data/
-CMD ["node", "import.js"]
+CMD ["node", "import.mjs"]

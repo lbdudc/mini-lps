@@ -2,7 +2,18 @@
 FROM node:16.20-bullseye-slim AS build-stage
 
 RUN mkdir -p /app/client
-COPY .. /app/client
+# `.` (not `..`): the build context is already the client/ directory itself
+# (docker-compose.yml's `context: ../client`), and `..` tries to reach
+# outside it. Docker/BuildKit silently clamps that to the context root
+# instead of erroring, which happened to produce a working image the first
+# time -- but its build-cache key for the COPY layer doesn't track the
+# clamped path's real content, so every later `docker compose build` (even
+# --build) reused the stale COPY layer forever, no matter what actually
+# changed under src/. Real symptom: edit any client source file, rebuild,
+# restart the container, and the browser (even with a hard-refreshed cache)
+# still serves the old code -- only `docker compose build --no-cache`
+# worked around it. `COPY .` fixes the cache key at the source.
+COPY . /app/client
 WORKDIR /app/client
 
 # Installing git and exiftool package to remove EXIF data from pictures

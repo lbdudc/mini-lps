@@ -98,6 +98,7 @@ const langTranslations = {
     "employee": "Empregado",
     "logout": "Saír",
     "mapViewer": "Visor de mapas",
+    "chartViewer": "Visor de gráficos",
     "maps": "Mapas",
     "myProfile": "O meu Perfil",
     ###< if (feature.T_Payments) { >###

@@ -1,4 +1,4 @@
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
 <template>
   <div v-if="map" class="map-controls">
     <div class="column">
@@ -88,6 +88,42 @@
       </div>
       /*% } %*/
 
+      /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+      <div v-if="hasMultipleMaps" class="column">
+        <v-tooltip left open-delay="200" color="var(--appColor)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="white"
+              @click.stop="buildControl({ component: 'change-map' })"
+            >
+              <v-icon>mdi-map-outline</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("mapViewer.mapSelector") }}</span>
+        </v-tooltip>
+      </div>
+      /*% } %*/
+
+      /*% if (feature.MV_T_Export) { %*/
+      <div class="column">
+        <v-tooltip left open-delay="200" color="var(--appColor)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="white"
+              @click.stop="buildControl({ component: 'export-management' })"
+            >
+              <v-icon>mdi-export-variant</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("mapViewer.export") }}</span>
+        </v-tooltip>
+      </div>
+      /*% } %*/
+
       /*% if (feature.MV_T_InformationMode) { %*/
       <div class="column">
         <v-tooltip left open-delay="200" color="var(--appColor)">
@@ -147,6 +183,12 @@ export default {
     form: {
       type: Object,
       default: () => {},
+    },
+    /*% } %*/
+    /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+    hasMultipleMaps: {
+      type: Boolean,
+      default: false,
     },
     /*% } %*/
     loadingMap: {
@@ -213,17 +255,32 @@ export default {
 .map-controls {
   position: absolute;
   z-index: 1000;
-  top: 4px;
-  right: 0px;
+  top: 12px;
+  right: 8px;
   margin-right: 0px;
   padding: 0;
 }
 .column {
   margin-top: 0.6em;
-  padding-right: 8px;
+  padding-right: 0;
 }
 
-/* we will explain what these classes do next! */
+/* Every floating control button (wrench toggle, layer manager, add layer,
+   toolbox, base layer, info mode) gets the same rounded, elevated look
+   instead of a flat undecorated square, with a subtle lift on hover. */
+.map-controls ::v-deep .v-btn {
+  border-radius: 50% !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.map-controls ::v-deep .v-btn:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* Fade transition for a control panel opening/closing (e.g. the layer
+   manager, add-new-layer dialog). */
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.4s ease;
@@ -235,7 +292,7 @@ export default {
 }
 
 .btn-selected {
-  border: 2px solid #1976d2;
+  border: 2px solid var(--appColor);
 }
 
 .arrow-icon {
