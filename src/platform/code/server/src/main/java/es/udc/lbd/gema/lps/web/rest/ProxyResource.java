@@ -50,7 +50,8 @@ public class ProxyResource {
       headers.add(
           "Access-Control-Expose-Headers", String.join(", ", response.getHeaders().keySet()));
 
-      return new ResponseEntity<String>(response.getBody().toString(), headers, HttpStatus.OK);
+      return new ResponseEntity<String>(
+          response.getBody().toString(), headers, response.getStatusCode());
     } catch (RequestNotSuccesfulException e) {
       return new ResponseEntity<String>(HttpStatus.BAD_GATEWAY);
     }

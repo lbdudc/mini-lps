@@ -39,6 +39,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import es.udc.lbd.gema.lps.model.service.util.GeoServerUtil;
+/*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+import es.udc.lbd.gema.lps.component.standard_data_importer.GeoServerRasterService;
+/*% } %*/
 
 @Component
 public class GeoServerInit {
@@ -52,6 +55,11 @@ public class GeoServerInit {
 
     @Inject
     private GeoServerUtil gsUtil;
+
+    /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+    @Inject
+    private GeoServerRasterService geoServerRasterService;
+    /*% } %*/
 
     @Value("${spring.datasource.host}")
     private String pgHost;
@@ -83,7 +91,7 @@ public class GeoServerInit {
             final GeoServerRESTStoreManager manager = new GeoServerRESTStoreManager(new URL(gsProp.getUrl()), gsProp.getUser(), gsProp.getPassword());
 
             if (prop.getEnvironment().equals("dev")) {
-              removeWorkspace(publisher);
+              resetWorkspace(reader, publisher);
               Thread.sleep(
                 3000); // geoserver-manager library is not async, so we wait for the workspace to be
               // removed
@@ -99,6 +107,10 @@ public class GeoServerInit {
             // Then we create the layers and set as available styles that ones that are specificated in
             //  availableStyles array and has been created previously
             processLayersFile(publisher, createdStyles);
+            /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+            // The rasters uploaded before survive in GeoServer, the styles were just created again
+            geoServerRasterService.reapplyStyles(reader);
+            /*% } %*/
 
             if (prop.getEnvironment().equals("dev")) {
               Thread.sleep(3000); // wait for GeoServer to finish publishing before recalculating bbox
@@ -124,7 +136,16 @@ public class GeoServerInit {
         }
     }
 
-    private void removeWorkspace(GeoServerRESTPublisher publisher) {
+    private void resetWorkspace(GeoServerRESTReader reader, GeoServerRESTPublisher publisher) {
+        /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+        // The uploaded rasters can't be rebuilt from the database like the vector layers can:
+        // removing the whole workspace would lose them, so only the datastore goes.
+        if (!reader.getCoverageStores(gsProp.getWorkspace()).isEmpty()) {
+          logger.debug("Removing datastore (the workspace has rasters)");
+          publisher.removeDatastore(gsProp.getWorkspace(), gsProp.getDatastore(), true);
+          return;
+        }
+        /*% } %*/
         logger.debug("Removing workspace");
         publisher.removeWorkspace(gsProp.getWorkspace(), true);
     }
@@ -228,7 +249,8 @@ public class GeoServerInit {
 
       for (Object layerObject : layers) {
         JSONObject layer = (JSONObject) layerObject;
-        if ("wms".equals((String) layer.get("layerType"))) {
+        // A raster is not a database table: its coverage is created when its file is uploaded
+        if ("wms".equals((String) layer.get("layerType")) && !isRaster(layer)) {
           JSONObject options = (JSONObject) layer.get("options");
           JSONArray subLayers = (JSONArray) options.get("layers");
 
@@ -328,6 +350,10 @@ public class GeoServerInit {
     return layersWithStyles;
   }
 
+  private boolean isRaster(JSONObject layer) {
+    return Boolean.TRUE.equals(layer.get("raster"));
+  }
+
   private void reloadWMSLayersBbox() {
     try {
       JSONParser parser = new JSONParser();
@@ -338,7 +364,7 @@ public class GeoServerInit {
 
       for (Object layerObject : layers) {
         JSONObject layer = (JSONObject) layerObject;
-        if ("wms".equals((String) layer.get("layerType"))) {
+        if ("wms".equals((String) layer.get("layerType")) && !isRaster(layer)) {
           JSONObject options = (JSONObject) layer.get("options");
           JSONArray subLayers = (JSONArray) options.get("layers");
 

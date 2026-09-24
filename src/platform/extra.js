@@ -636,6 +636,16 @@ function camelToSnakeCase(str) {
 }
 
 /**
+ * Name under which GeoServer publishes a WMS layer's sublayer (without the workspace).
+ * A vector layer is a feature type named after its entity, t_<entity>. A raster has no
+ * entity: its layer name was chosen once by gispublisher and is used as it is everywhere
+ * (see raster-util.js there), so it is not derived from anything here.
+ */
+function geoserverSubLayer(layer, subLayer) {
+  return layer.raster ? subLayer : "t_" + camelToSnakeCase(subLayer);
+}
+
+/**
  * Comprueba si alguna de las entidades tiene una propiedad de tipo geográfica
  * @param  {Object}  'entities' del json de especificación
  * @return {boolean} 'true' si alguna entidad tiene una propiedad geográfica

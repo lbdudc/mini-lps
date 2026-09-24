@@ -209,9 +209,12 @@ class DeleteMapState(QgsProcessingAlgorithm):
             map_id = self.parameterAsString(parameters, self.MAP_ID, context)
             project_path = f"/projects/{map_id}.qgs"
             layer_dir = f"/projects/{map_id}"
+            attachments_path = f"/projects/{map_id}_attachments.zip"
 
             if os.path.exists(project_path):
                 os.remove(project_path)
+            if os.path.exists(attachments_path):
+                os.remove(attachments_path)
             if os.path.exists(layer_dir):
                 shutil.rmtree(layer_dir)
 

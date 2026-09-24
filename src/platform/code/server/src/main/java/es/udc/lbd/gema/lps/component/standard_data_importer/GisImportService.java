@@ -407,7 +407,8 @@ public class GisImportService extends StandardDataImportService {
         } catch (FactoryException e) {
             throw new AppRuntimeException("Unable to obtain EPSG ", e);
         }
-        try (FeatureIterator<SimpleFeature> features = collection.features()) {
+        FeatureIterator<SimpleFeature> features = collection.features();
+        try {
 
             // For each entry we read all values (Geom and attributes)
             while (features.hasNext()) {
@@ -436,6 +437,15 @@ public class GisImportService extends StandardDataImportService {
                 saveEntity(clazzRepositoryName, saveMethod, instanceObject);
             }
 
+        } finally {
+            // GeoTools closes its readers by itself once the last feature is read, and for some
+            // shapefiles closing the iterator again throws ("does not hold the lock"). Every
+            // feature is saved by then, so that must not turn a finished import into a 500.
+            try {
+                features.close();
+            } catch (IllegalArgumentException e) {
+                logger.debug("Ignoring a second close of the shapefile reader: " + e.getMessage());
+            }
         }
     }
 

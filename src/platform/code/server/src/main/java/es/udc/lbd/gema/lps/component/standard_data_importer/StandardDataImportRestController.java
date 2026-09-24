@@ -26,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import es.udc.lbd.gema.lps.config.GeoServerProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /*% } %*/
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -48,6 +50,11 @@ public class StandardDataImportRestController {
   /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
   @Inject
   GeoServerProperties geoServerProperties;
+
+  @Inject
+  private GeoServerRasterService geoServerRasterService;
+
+  private static final Logger logger = LoggerFactory.getLogger(StandardDataImportRestController.class);
   /*% } %*/
 
   @Inject
@@ -77,14 +84,29 @@ public class StandardDataImportRestController {
 
   }
   /*% if (feature.DM_DI_DF_GeoTIFF) { %*/
+  /**
+   * Uploads a GeoTIFF to GeoServer. "name" is the GeoServer layer name to publish it under (the
+   * one the generated client asks for); without it the name is derived from the file name.
+   */
   @RequestMapping(value = "/layer", method = RequestMethod.POST)
-  public ResponseEntity<String> importGeotiff(@RequestParam("file") MultipartFile multipartFile) {
+  public ResponseEntity<String> importGeotiff(
+      @RequestParam("file") MultipartFile multipartFile,
+      @RequestParam(value = "name", required = false) String name) {
+    // The name ends up in a GeoServer REST URL: only plain lowercase names are accepted
+    if (name != null && !name.matches("^[a-z0-9_]{1,63}$")) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body("The layer name may only contain lowercase letters, digits and underscores.");
+    }
     try {
       GeotiffFileImportService geotiffFileImportService =
-        new GeotiffFileImportService(fileUploadImport, geoServerProperties);
+        new GeotiffFileImportService(fileUploadImport, geoServerProperties, name);
       geotiffFileImportService.importFile(multipartFile);
+      if (name != null) {
+        geoServerRasterService.applyStyles(name);
+      }
       return ResponseEntity.ok("Import process completed successfully.");
     } catch (Exception e) {
+      logger.error("Error importing the GeoTIFF " + multipartFile.getOriginalFilename(), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body("An unexpected error occurred during the import process.");
     }

@@ -12,7 +12,8 @@
   "toolbox": {
     "title": "Toolbox",
     "jobForm": "New job",
-    "jobStatus": "Running jobs",
+    "jobStatus": "Job history",
+    "jobHistory": "Job history",
     "modelsControl": "Models management",
     "loadEnvironment": "Preparing processing environment...",
     "loadError": "Error creating processing environment",
@@ -24,9 +25,26 @@
     "fieldRequired": "Input field '{field}' of type '{type}' is mandatory",
     "noSpacesAllowed": "Spaces are not allowed for input field '{field}'",
     "jobs": {
-      "noJobs": "There are no active jobs",
+      "noJobs": "No jobs yet",
       "processId": "Process",
       "created": "Creation",
+      "map": "Map",
+      "expires": "Available until",
+      "addToMap": "Add result to the map",
+      "removeFromMap": "Remove result from the map",
+      "deleteFromHistory": "Delete from history",
+      "statuses": {
+        "accepted": "Queued",
+        "running": "Running",
+        "successful": "Finished",
+        "failed": "Failed",
+        "dismissed": "Cancelled",
+        "expired": "Expired"
+      },
+      "resultError": {
+        "title": "Result not available",
+        "text": "The result of this job could not be loaded"
+      },
       "message": "Message",
       "status": "Status",
       "started": "Started",

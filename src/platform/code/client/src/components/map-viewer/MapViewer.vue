@@ -20,7 +20,7 @@
     /*% } %*/
 
     <div ref="map" id="map">
-    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
       <right-map-controls
         :overlays="viewOverlays"
         :map="map"
@@ -33,12 +33,14 @@
     /*% } %*/
     </div>
 
-    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
     <v-dialog
       v-model="showDialog"
       hide-overlay
-      :fullscreen="$vuetify.breakpoint.mdAndDown"
-      :width="/*% if (feature.MV_T_InformationMode) { %*/wmsFeatures != null ? 1200 :/*% } %*/dialogComponent === 'toolbox' ? 900 : 500"
+      :fullscreen="$vuetify.breakpoint.smAndDown"
+      :scrollable="dialogComponent === 'toolbox'"
+      :content-class="dialogComponent === 'toolbox' ? 'toolbox-dialog' : ''"
+      :width="/*% if (feature.MV_T_InformationMode) { %*/wmsFeatures != null ? 1200 :/*% } %*/dialogComponent === 'toolbox' ? 1000 : 500"
       @click:outside="closeDialog"
     >
       <component
@@ -77,7 +79,7 @@ import devCheck from "@/common/device-check";
 /*% if (feature.MV_T_Export) { %*/
 import ExportManagement from "./export-management/ExportManagement";
 /*% } %*/
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
 import RightMapControls from "./controls/RightMapControls.vue";
 /*% } %*/
 /*% if (feature.MV_Processes) { %*/
@@ -119,9 +121,9 @@ import { /*% if (feature.MV_CI_Scale) { %*/buildMapScaleControl,/*% } %*/
 
 export default {
   name: "Map",
-  /*% if (feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+  /*% if (feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
   components: {
-    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
     RightMapControls,
     /*% } %*/
     /*% if (feature.MV_Processes) { %*/Toolbox, /*% } %*/
@@ -139,7 +141,7 @@ export default {
       /*% if (feature.MV_T_F_BasicSearch) { %*/
       form: { query: null },
       /*% } %*/
-      /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+      /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
       dialogComponent: null,
       showDialog: false,
       /*% if (feature.MV_T_InformationMode) { %*/
@@ -240,7 +242,7 @@ export default {
         )
       );
     },
-    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_StylePreview || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
+    /*% if (feature.MV_T_Export || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_StylePreview || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
     closeDialog() {
       this.dialogComponent = "";
       this.showDialog = false;

@@ -35,6 +35,7 @@
 
 <script>
 import layerList from "@/components/map-viewer/config-files/layers.json";
+import maps from "@/components/map-viewer/config-files/maps.json";
 import { TileLayer } from "@lbdudc/map-viewer";
 export default {
   name: "changeBaseLayerControl",
@@ -47,7 +48,18 @@ export default {
     };
   },
   mounted() {
-    this.items = layerList.layers.filter((e) => e.layerType == "tilelayer");
+    /*
+     * A tile layer a map uses as an overlay (an XYZ layer from QGIS) is not a
+     * background: offering it here would add a second layer with the same id.
+     */
+    const overlayNames = new Set(
+      maps.maps.flatMap((map) =>
+        map.layers.filter((layer) => !layer.baseLayer).map((layer) => layer.name)
+      )
+    );
+    this.items = layerList.layers.filter(
+      (e) => e.layerType == "tilelayer" && !overlayNames.has(e.name)
+    );
   },
 
   methods: {
@@ -65,6 +77,7 @@ export default {
         opacity: 0.5,
         selected: true,
         url: selectedLayer.url,
+        params: selectedLayer.options,
       };
 
       const addedLayer = baseLayers.find(

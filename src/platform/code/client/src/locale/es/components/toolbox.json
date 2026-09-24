@@ -4,7 +4,8 @@
   "toolbox": {
     "title": "Caja de herramientas",
     "jobForm": "Nueva tarea",
-    "jobStatus": "Estado tareas",
+    "jobStatus": "Historial de tareas",
+    "jobHistory": "Historial de tareas",
     "modelsControl": "Gestión de modelos",
     "loadEnvironment": "Prepararando del entorno de procesamiento...",
     "loadError": "Error al crear el entorno de procesamiento",
@@ -16,9 +17,26 @@
     "fieldRequired": "El campo '{field}' de tipo '{type}' es obligatorio",
     "noSpacesAllowed": "Non se permiten espazos no campo de entrada '{field}'",
     "jobs": {
-      "noJobs": "No hay tareas activas",
+      "noJobs": "Todavía no hay tareas",
       "processId": "Proceso",
       "created": "Creación",
+      "map": "Mapa",
+      "expires": "Disponible hasta",
+      "addToMap": "Añadir el resultado al mapa",
+      "removeFromMap": "Quitar el resultado del mapa",
+      "deleteFromHistory": "Eliminar del historial",
+      "statuses": {
+        "accepted": "En cola",
+        "running": "En ejecución",
+        "successful": "Finalizada",
+        "failed": "Fallida",
+        "dismissed": "Cancelada",
+        "expired": "Caducada"
+      },
+      "resultError": {
+        "title": "Resultado no disponible",
+        "text": "No se pudo cargar el resultado de esta tarea"
+      },
       "message": "Mensaje",
       "status": "Estado",
       "started": "Iniciado",

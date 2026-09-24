@@ -6,8 +6,33 @@ import i18n from "@/plugins/i18n";
 import maps from "@/components/map-viewer/config-files/maps.json";
 import layers from "../config-files/layers.json";
 import properties from "@/properties";
-import { createGeoJSONLayer, createWMSLayer } from "./map-layer-common";
+import { createGeoJSONLayer, createWMSLayer, getZoomLimits } from "./map-layer-common";
 import { Map, TileLayer, WMSLayer } from "@lbdudc/map-viewer";
+
+/**
+ * Map.addLayer() asks every overlay whether it was added by the user (isAdded), which
+ * map-viewer's TileLayer, meant for base layers, doesn't answer: an overlay of tiles
+ * (an XYZ layer from QGIS) would throw there, and take every overlay after it along.
+ * The layer manager asks overlays for their styles and bounds too.
+ */
+class OverlayTileLayer extends TileLayer {
+  isAdded() {
+    return false;
+  }
+
+  getAvailableStyles() {
+    return [];
+  }
+
+  getStyle() {
+    return null;
+  }
+
+  /* a tile service has no extent: "zoom to layer" just stays where the map is */
+  getBounds() {
+    return Promise.resolve(this.getMap().getLeafletMap().getBounds());
+  }
+}
 
 /**
  * Creates a Map-Viewer map using the options from maps.layer configuration file
@@ -129,14 +154,15 @@ function loadOverlaysLayers(map, mapSelected /*% if (feature.MV_DetailOnClick) {
         );
       } else if (json.layerType === "tilelayer") {
         map.addLayer(
-          new TileLayer({
+          new OverlayTileLayer({
             id: json.name,
             label: layerParams.label,
             baseLayer: false,
             opacity: layerInMap.opacity,
             selected: layerInMap.selected || layerInMap.selected == null,  // if no value is given, it is shown in map
             url: json.url,
-            params: json.options,
+            /* the layer's own tile options, and the QGIS scale limits of this map */
+            params: Object.assign({}, json.options, getZoomLimits(layerInMap)),
           })
         );
       }

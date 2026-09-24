@@ -1,5 +1,6 @@
 /*% if (feature.MV_Processes) { %*/
 import { handleRequest, handleURL } from "@/common/proxy";
+import { WMSLayer } from "@lbdudc/map-viewer";
 import {
   getUniqueLayerId,
   createGeoJSONResultLayer
@@ -22,18 +23,26 @@ async function handleResult(job, result, map) {
   const layers = [];
   for (const output of outputs) {
     const [url, params] = _splitOutputHref(output.href);
-    const service = result.SERVICE || (await _getResultSource(url, params));
-
-    if (service !== "WFS") {
-      console.warn(
-        `Raster (${service}) results can not be displayed yet: ${output.key}`
-      );
-      continue;
-    }
+    const service =
+      result.SERVICE ||
+      (/wcs/i.test(output.type || "")
+        ? "WCS"
+        : await _getResultSource(url, params));
 
     // A single output keeps the job id as its layer id, several get a suffix
     const id = outputs.length === 1 ? job.jobID : `${job.jobID}-${output.key}`;
-    layers.push(_handleVectorResult({ ...job, jobID: id }, url, params, output, map));
+
+    if (service === "WFS") {
+      layers.push(
+        _handleVectorResult({ ...job, jobID: id }, url, params, output, map)
+      );
+    } else if (service === "WCS") {
+      layers.push(
+        _handleRasterResult({ ...job, jobID: id }, url, params, output, map)
+      );
+    } else {
+      console.warn(`${service} results can not be displayed: ${output.key}`);
+    }
   }
   return layers;
 }
@@ -96,6 +105,43 @@ function _handleVectorResult(job, url, params, output, map) {
   }
 
   layer._initLayer();
+  return layer;
+}
+
+/**
+ * Creates a raster layer from WPS QGIS job result. The result is a layer of the
+ * job's own QGIS project: it is drawn from the QGIS server as WMS, through the
+ * app's proxy (the QGIS server is only reachable from inside the deployment).
+ */
+function _handleRasterResult(job, url, params, output, map) {
+  const layerId = params.get("layers");
+
+  const layer = new WMSLayer(
+    {
+      id: job.jobID,
+      label: output.title || layerId,
+      baseLayer: false,
+      selected: true,
+      added: true,
+      raster: true,
+      url: handleURL(url, true),
+      params: {
+        layers: layerId,
+        map: params.get("MAP"),
+        format: "image/png",
+        transparent: true,
+        version: "1.3.0",
+      },
+    },
+    [],
+    null
+  );
+
+  if (map && map.getLayer(job.jobID)) {
+    console.warn("layer id already in use... generating new id");
+    layer.options.id = getUniqueLayerId(map, job.jobID);
+  }
+
   return layer;
 }
 

@@ -30,7 +30,7 @@ class LayerFactory:
             "SHAPEFILE": self.init_shapefile,
             "WCS": self.init_wcs_layer,
             "WFS": self.init_vector_layer,
-            "WMS": self.init_wms_as_wfs,
+            "WMS": self.init_wms_layer,
             "POSTGRES": self.init_db_layer,
         }
 
@@ -40,7 +40,7 @@ class LayerFactory:
             return None
 
         layer = layer_creator(layer_options)
-        if not layer.isValid():
+        if layer is None or not layer.isValid():
             self.feedback.pushInfo(f"Failed to load {layer_type} layer")
             return None
 
@@ -149,6 +149,57 @@ class LayerFactory:
         )
 
         return QgsVectorLayer(db_source, layer_options["id"], "postgres")
+
+    def init_wms_layer(self, layer_options):
+        """
+        A WMS layer of the app's own GeoServer: a raster is fetched as a coverage,
+        anything else is a vector layer, fetched as WFS.
+        """
+        if layer_options.get("raster"):
+            return self.init_geoserver_coverage(layer_options)
+        return self.init_wms_as_wfs(layer_options)
+
+    def init_geoserver_coverage(self, layer_options):
+        """
+        Load a raster (GeoTIFF) published by GeoServer. Downloads it through WCS to
+        /projects/{map_id}/ (like the WFS layers, so it persists when the project is
+        reloaded for process execution) and opens the file, in its own CRS.
+        """
+        geoserver_url = os.getenv("QGSWPS_GEOSERVER_URL")
+        sublayers = layer_options.get("params", {}).get("layers", [])
+        if not geoserver_url or not sublayers:
+            self.feedback.pushInfo(
+                f"Cannot load raster {layer_options['id']}: no GeoServer URL or layer name"
+            )
+            return None
+
+        # "workspace:name" is the layer; WCS 2.0 calls that coverage "workspace__name"
+        coverage_id = sublayers[0].replace(":", "__", 1)
+        wcs_url = (
+            f"{geoserver_url}/wcs"
+            f"?service=WCS&version=2.0.1&request=GetCoverage"
+            f"&coverageId={coverage_id}&format=image/tiff"
+        )
+
+        map_id = layer_options.get("map", "tmp")
+        layer_dir = f"/projects/{map_id}"
+        os.makedirs(layer_dir, exist_ok=True)
+        layer_path = os.path.join(layer_dir, f"{layer_options['id']}.tif")
+
+        # An environment is built once and its files are reused
+        if not os.path.exists(layer_path):
+            self.feedback.pushInfo(f"Fetching WCS: {wcs_url}")
+            response = requests.get(wcs_url, stream=True, timeout=300)
+            if response.status_code != 200:
+                self.feedback.pushInfo(
+                    f"WCS request failed with status {response.status_code} for {sublayers[0]}"
+                )
+                return None
+            with open(layer_path, "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    f.write(chunk)
+
+        return QgsRasterLayer(layer_path, layer_options["id"], "gdal")
 
     def init_wms_as_wfs(self, layer_options):
         """

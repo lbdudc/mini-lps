@@ -28,7 +28,7 @@ services:
       timeout: 5s
       retries: 18
       start_period: 30s
-  /*% if (feature.DM_DI_DF_Shapefile) { %*/
+  /*% if (feature.DM_DI_DF_Shapefile || feature.DM_DI_DF_GeoTIFF) { %*/
   data-importer:
     build:
       context: ./importer
@@ -116,7 +116,7 @@ services:
       QGSWPS_LOGLEVEL: ${QGSWPS_LOGLEVEL}
       QGSWPS_PROCESSING_CRS: ${QGSWPS_PROCESSING_CRS:-EPSG:4326}
       QGSWPS_GEOSERVER_URL: ${QGSWPS_GEOSERVER_URL}
-      QGSWPS_SERVER_RESPONSE_EXPIRATION: 3600
+      QGSWPS_SERVER_RESPONSE_EXPIRATION: ${QGSWPS_SERVER_RESPONSE_EXPIRATION:-86400}
       QGSWPS_SERVER_RESULTS_MAP_URI: /results/
       QGSWPS_SERVER_OWS_SERVICE_URL: ${QGSWPS_SERVER_OWS_SERVICE_URL}
       QGSWPS_SERVER_RESTARTMON: /processing/models

@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -57,10 +58,13 @@ public class ProxyServiceImpl implements ProxyService {
           restTemplate.exchange(
               httpRequest.getUrl().toString(), httpRequest.getMethod(), entity, responseType);
 
-      // If expected binary response fails retry as string
+      // If expected binary response fails retry as string. What really is binary (an image, a
+      // tile) must not be retried: read as a string it would come back corrupted.
       MediaType contentType = response.getHeaders().getContentType();
       if (responseType == byte[].class
-          && !contentType.includes(MediaType.APPLICATION_OCTET_STREAM)) {
+          && contentType != null
+          && !contentType.includes(MediaType.APPLICATION_OCTET_STREAM)
+          && !"image".equals(contentType.getType())) {
         response =
             restTemplate.exchange(
                 httpRequest.getUrl().toString(), httpRequest.getMethod(), entity, String.class);
@@ -68,6 +72,15 @@ public class ProxyServiceImpl implements ProxyService {
 
       return new ResponseEntity<>(
           response.getBody(), prepareHeaders(response.getHeaders()), response.getStatusCode());
+    } catch (HttpStatusCodeException e) {
+      // The remote server answered with an error status (e.g. 404 for an expired job): hand it
+      // over as it is, so the client can tell it apart from a server that does not respond.
+      return new ResponseEntity<>(
+          e.getResponseBodyAsString(),
+          e.getResponseHeaders() != null
+              ? prepareHeaders(e.getResponseHeaders())
+              : new HttpHeaders(),
+          e.getStatusCode());
     } catch (RestClientException e) {
       throw new RequestNotSuccesfulException("El servidor remoto no responde");
     }

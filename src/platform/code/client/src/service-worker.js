@@ -7,6 +7,14 @@
 
 workbox.core.setCacheNameDetails({prefix: "/*%= normalize(data.basicData.name, true) %*/PWA"});
 
+/*
+  A new version (a regenerated app) takes over as soon as it is installed. Otherwise the
+  old worker keeps serving the old, precached app until every tab is closed, so a
+  redeployed app looked unchanged after a reload.
+*/
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
+
 /**
  * The workboxSW.precacheAndRoute() method efficiently caches and responds to
  * requests for URLs in the manifest.

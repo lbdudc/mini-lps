@@ -158,14 +158,19 @@
       ###< if (layer.availableStyles) { >###
       "availableStyles": ###<= JSON.stringify(layer.availableStyles) >###,
       ###< } >###
+      ###< if (layer.defaultStyle) { >###
       "defaultStyle": "###<= layer.defaultStyle >###",
+      ###< } >###
+      ###< if (layer.raster) { >###
+      "raster": true,
+      ###< } >###
       ###< if (layer.url) { >###
       "url": "###<= layer.url >###",
       ###< } >###
       "options": {
         "layers": [
           ###< layer.layers.forEach(function(subLayer, subindex) { >###
-          "###<= normalize(data.basicData.packageInfo.artifact) >###:t_###<= camelToSnakeCase(subLayer) >###" ###<= (subindex != layer.layers.length - 1) ? "," : "" >###
+          "###<= normalize(data.basicData.packageInfo.artifact) >###:###<= geoserverSubLayer(layer, subLayer) >###" ###<= (subindex != layer.layers.length - 1) ? "," : "" >###
           ###< }); >###
         ],
         "format": "image/png",
@@ -181,6 +186,9 @@
     {
       "layerType": "tilelayer",
       "name": "###<= layer.name >###",
+      ###< if (layer.options) { >###
+      "options": ###<= JSON.stringify(layer.options) >###,
+      ###< } >###
       "url": "###<= layer.url >###"
     }###< if (index != tileLayers.length - 1) { >###,###< } >###
       ###<

@@ -56,6 +56,8 @@ function createWMSLayer(json, layerParams, layerInMap = {}, /*% if (feature.MV_T
       /*% } %*/
       url: json.url/*% if (feature.MV_MS_GeoServer) { %*/ || properties.GEOSERVER_URL + "/wms"/*% } %*/,
       params: Object.assign({}, options, _getZoomLimits(layerInMap)),
+      opacity: layerInMap.opacity,
+      raster: json.raster === true,
       added: layerParams.added,
     },
     availableStyles,
@@ -335,5 +337,5 @@ function _incrementBBox(xmin, xmax, ymin, ymax) {
 }
 /*% } %*/
 
-export { createWMSLayer, createGeoJSONLayer /*% if (feature.MV_Processes) { %*/, createGeoJSONResultLayer, getUniqueLayerId/*% } %*/ /*% if (feature.MV_MS_GJ_Paginated) { %*/, updateLayer/*% } %*/ };
+export { createWMSLayer, createGeoJSONLayer, _getZoomLimits as getZoomLimits/*% if (feature.MV_Processes) { %*/, createGeoJSONResultLayer, getUniqueLayerId/*% } %*/ /*% if (feature.MV_MS_GJ_Paginated) { %*/, updateLayer/*% } %*/ };
 /*% } %*/

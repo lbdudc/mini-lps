@@ -1,9 +1,9 @@
 /*% if (feature.MV_Processes) { %*/
 <template>
-  <v-container fluid class="full-height d-flex flex-column">
-    <v-row class="mb-7 flex-grow-1" no-gutters align="start" justify="center">
+  <div class="process-form">
+    <v-row class="process-form__body" no-gutters>
       <!-- Process selector -->
-      <v-col cols="12" md="3">
+      <v-col class="process-form__tree" cols="12" md="3">
         <v-text-field
           ref="processSearch"
           dense
@@ -52,7 +52,7 @@
       </v-col>
 
       <!-- Process info -->
-      <v-col class="scroll-form pr-1 pl-md-5" cols="12" md="9">
+      <v-col class="process-form__detail pr-1 pl-md-5" cols="12" md="9">
         <loading-spinner v-if="loadingProcess"></loading-spinner>
 
         <v-row v-else-if="processDetail" no-gutters>
@@ -139,24 +139,18 @@
       </v-col>
     </v-row>
 
-    <v-row
-      no-gutters
-      align="center"
-      justify="center"
-      class="actions-row flex-grow-0"
-    >
-      <v-col class="text-right">
-        <v-btn
-          class="ml-2"
-          color="primary"
-          @click="executeProcess"
-          :disabled="!process"
-        >
-          <span>{{ $t("execute") }}</span>
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+    <!-- Pinned below the scrolling area, so it is always reachable -->
+    <div class="process-form__footer">
+      <v-btn
+        class="ml-2"
+        color="primary"
+        @click="executeProcess"
+        :disabled="!process"
+      >
+        <span>{{ $t("execute") }}</span>
+      </v-btn>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -272,7 +266,11 @@ export default {
             ),
             type: inputForm.type,
             default: inputData.schema.default || null,
-            values: inputData.schema?.enum || [],
+            /* a layer is offered by its label; what is sent is still its id */
+            values: (inputData.schema?.enum || []).map((value) => ({
+              value,
+              text: this.layerLabel(value),
+            })),
             mandatory: inputData.minOccurs > 0,
             form: inputForm,
             isSink: inputData.metadata.some((obj) => obj.href === "sink"),
@@ -356,13 +354,25 @@ export default {
 
         const newJob = {
           processID: data.processID,
+          processTitle: this.translateProcessData(
+            this.processDetail.id,
+            this.processDetail.title
+          ),
           jobID: data.jobID,
           jobRealm: response.headers.get("X-Job-Realm"),
-          created: data.created,
+          created: data.created || new Date().toISOString(),
         };
 
         this.$emit("show-jobs", newJob);
       }
+    },
+
+    /* the label of a map layer, or the value itself when it isn't one (an option of an enum) */
+    layerLabel(value) {
+      const layer = this.map.getLayer(value);
+      return layer && typeof layer.getLabel === "function"
+        ? layer.getLabel() || value
+        : value;
     },
 
     translateProcessData(processId, data) {
@@ -372,4 +382,48 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.process-form {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.process-form__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: flex-start;
+}
+
+/* on small screens the tree stacks above the form: keep it from pushing the form away */
+.process-form__tree {
+  max-height: 35vh;
+  overflow-y: auto;
+}
+
+.process-form__footer {
+  flex: 0 0 auto;
+  padding: 12px 8px 4px;
+  text-align: right;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* wide screens: tree and form sit side by side and scroll on their own */
+@media (min-width: 960px) {
+  .process-form__body {
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    align-content: stretch;
+  }
+
+  .process-form__tree,
+  .process-form__detail {
+    max-height: 100%;
+    overflow-y: auto;
+  }
+}
+</style>
 /*% } %*/
