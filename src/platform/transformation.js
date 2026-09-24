@@ -31,7 +31,25 @@ function modelTransformation(input) {
     // Hecho con la interfaz gráfica - spec GUI
     ret.data.dataModel = dataModel(input.dataModel);
   }
-  if (ret.features.indexOf("GUI_Forms") !== -1) {
+  // spl-js-engine's derivation-engine.js runs modelTransformation (this
+  // function) BEFORE featureModel.completeFeatureSelection(), so
+  // ret.features here is the raw spec.json feature list, not the completed
+  // one the templates themselves see as `feature.*`. GUI_Forms is almost
+  // never in the raw list directly -- it's pulled in by completion via
+  // model.xml's one constraint on it, `MV_DetailOnClick -> GUI_Forms` -- so
+  // checking ret.features alone left data.forms == [] even though every
+  // template saw feature.GUI_Forms === true, and every "view detail" link
+  // (InformationPopup.vue, WMSInformation.vue) pushed to a route that was
+  // never registered. Checking MV_DetailOnClick too mirrors that one
+  // constraint exactly; if model.xml ever grows another rule implying
+  // GUI_Forms, this needs revisiting (the real fix is completing the
+  // feature selection before calling modelTransformation, in spl-js-engine
+  // itself -- out of scope here since that engine is shared by every
+  // product built on this platform).
+  if (
+    ret.features.indexOf("GUI_Forms") !== -1 ||
+    ret.features.indexOf("MV_DetailOnClick") !== -1
+  ) {
     ret.data.forms = forms(ret.data.dataModel.entities, ret.features);
   } else {
     ret.data.forms = [];

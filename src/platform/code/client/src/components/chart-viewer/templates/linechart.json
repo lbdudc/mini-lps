@@ -13,7 +13,7 @@
   "data": [
     {
       "name": "dataset",
-      "url": "###<= data.basicData.extra?.server_deploy_url || (feature.D_C_Nginx ? 'http://localhost/backend' : 'http://localhost:9001/backend') >###/api/entities/__ENTITY__/export/tsv",
+      "url": "/backend/api/entities/__ENTITY__/export/tsv",
       "format": {
         "type": "tsv",
         "parse": "auto"
