@@ -1,4 +1,4 @@
-/*% if (feature.MV_Processes) { %*/
+/*% if (feature.MV_Processes && data.processModels.length === 0) { %*/
 <!DOCTYPE model>
 <Option type="Map">
   <Option name="children" type="Map">

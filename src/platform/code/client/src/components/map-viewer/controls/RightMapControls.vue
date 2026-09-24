@@ -34,6 +34,30 @@
       </div>
       /*% } %*/
 
+      <div v-if="bookmarks.length > 0" class="column">
+        <v-menu left offset-x>
+          <template v-slot:activator="{ on: menu, attrs }">
+            <v-tooltip left open-delay="200" color="var(--appColor)">
+              <template v-slot:activator="{ on: tooltip }">
+                <v-btn v-bind="attrs" v-on="{ ...tooltip, ...menu }" color="white">
+                  <v-icon>mdi-bookmark-multiple-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>{{ $t("mapViewer.bookmarks") }}</span>
+            </v-tooltip>
+          </template>
+          <v-list dense>
+            <v-list-item
+              v-for="(bookmark, index) in bookmarks"
+              :key="index"
+              @click="goToBookmark(bookmark)"
+            >
+              <v-list-item-title>{{ bookmark.name }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+
       /*% if (feature.MV_LM_ExternalLayer) { %*/
       <div class="column">
         <v-tooltip left open-delay="200" color="var(--appColor)">
@@ -194,7 +218,11 @@ export default {
     loadingMap: {
       type: Boolean,
       required: false,
-    }
+    },
+    bookmarks: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -207,6 +235,10 @@ export default {
   methods: {
     showButtons() {
       this.showBtns = !this.showBtns;
+    },
+
+    goToBookmark(bookmark) {
+      this.map.getLeafletMap().fitBounds(bookmark.bounds);
     },
 
     buildControl(args) {

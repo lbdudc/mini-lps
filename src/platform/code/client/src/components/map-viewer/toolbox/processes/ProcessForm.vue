@@ -253,9 +253,11 @@ export default {
 
         return Object.keys(this.processDetail.inputs).map((input) => {
           const inputData = this.processDetail.inputs[input];
-          const inputForm = PROCESS_INPUTS.find((processInput) =>
-            processInput.condition(inputData)
-          );
+          /* an input whose schema matches nothing renders as a plain string field */
+          const inputForm =
+            PROCESS_INPUTS.find((processInput) =>
+              processInput.condition(inputData)
+            ) || PROCESS_INPUTS.find((processInput) => processInput.type === "string");
 
           // populate input values
           this.inputValues[input] = inputData.schema?.default;

@@ -3,6 +3,7 @@
 {
   "mapViewer": {
     "mapViewer": "Visor de Mapa",
+    "bookmarks": "Marcadores",
     "cancel": "Cancelar",
     "close": "Pechar",
     "downloadFormat": "Formato de descarga",

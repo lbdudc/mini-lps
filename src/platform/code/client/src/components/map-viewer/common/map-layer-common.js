@@ -12,6 +12,16 @@ import layers from "../config-files/layers.json";
 import { getStyle } from "@/components/map-viewer/common/map-styles-common";
 import { GeoJSONLayer, WMSLayer } from "@lbdudc/map-viewer";
 /**
+ * Leaflet minZoom/maxZoom for a layer carrying QGIS's scale-based visibility
+ */
+function _getZoomLimits(layerInMap) {
+  const limits = {};
+  if (layerInMap.minZoom != null) limits.minZoom = layerInMap.minZoom;
+  if (layerInMap.maxZoom != null) limits.maxZoom = layerInMap.maxZoom;
+  return limits;
+}
+
+/**
  * Creates a WMS Layer.
  */
 function createWMSLayer(json, layerParams, layerInMap = {}, /*% if (feature.MV_T_F_BasicSearch) { %*/form = {}/*% } %*/) {
@@ -45,7 +55,7 @@ function createWMSLayer(json, layerParams, layerInMap = {}, /*% if (feature.MV_T
       list: layerInMap.list || json.list || null,
       /*% } %*/
       url: json.url/*% if (feature.MV_MS_GeoServer) { %*/ || properties.GEOSERVER_URL + "/wms"/*% } %*/,
-      params: options,
+      params: Object.assign({}, options, _getZoomLimits(layerInMap)),
       added: layerParams.added,
     },
     availableStyles,

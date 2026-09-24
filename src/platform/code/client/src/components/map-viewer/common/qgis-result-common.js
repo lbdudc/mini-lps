@@ -1,47 +1,73 @@
 /*% if (feature.MV_Processes) { %*/
 import { handleRequest, handleURL } from "@/common/proxy";
 import {
-  createGeoJSONLayer,
-  createGeoTIFFLayer,
   getUniqueLayerId,
   createGeoJSONResultLayer
 } from "@/components/map-viewer/common/map-layer-common";
 
-const HANDLE_LAYER_MAP = {
-  WFS: _handleVectorResult,
-  WCS: _handleRasterResult,
-};
-
 /**
- * Creates layer from results from WPS QGIS job result
+ * Creates the layers for a WPS QGIS job result. A job can have several layer
+ * outputs (a QGIS model with two sinks, for instance), so this returns an
+ * array with one layer per output — empty if there is nothing displayable.
  */
 async function handleResult(job, result, map) {
-  if (_resultHasLayer(result)) {
-    const service = result.SERVICE || (await _getResultSource(result));
-    return HANDLE_LAYER_MAP[service](job, result, map);
-  } else {
+  const outputs = _getLayerOutputs(result);
+  if (outputs.length === 0) {
     console.warn(
       "Only layer-based results are supported to be displayed for now"
     );
-    return null;
+    return [];
   }
+
+  const layers = [];
+  for (const output of outputs) {
+    const [url, params] = _splitOutputHref(output.href);
+    const service = result.SERVICE || (await _getResultSource(url, params));
+
+    if (service !== "WFS") {
+      console.warn(
+        `Raster (${service}) results can not be displayed yet: ${output.key}`
+      );
+      continue;
+    }
+
+    // A single output keeps the job id as its layer id, several get a suffix
+    const id = outputs.length === 1 ? job.jobID : `${job.jobID}-${output.key}`;
+    layers.push(_handleVectorResult({ ...job, jobID: id }, url, params, output, map));
+  }
+  return layers;
 }
 
 /**
- * Returns true if the job result corresponds to a layer to be displayed
+ * Returns the layer outputs of a job result as [{ key, title, href }]
  */
-function _resultHasLayer(result) {
-  const hasOgcOutput = Object.values(result).some(
-    (value) => typeof value === "object" && value?.type?.startsWith("application/x-ogc")
-  );
-  return !!result.OUTPUT || hasOgcOutput;
+function _getLayerOutputs(result) {
+  const outputs = Object.entries(result)
+    .filter(
+      ([, value]) =>
+        value &&
+        typeof value === "object" &&
+        value.href &&
+        value.type?.startsWith("application/x-ogc")
+    )
+    .map(([key, value]) => ({ key, title: value.title, href: value.href }));
+
+  // Default layer output to 'OUTPUT'
+  if (outputs.length === 0 && typeof result.OUTPUT === "string") {
+    outputs.push({ key: "OUTPUT", title: null, href: result.OUTPUT });
+  }
+  return outputs;
+}
+
+function _splitOutputHref(href) {
+  const outputUrl = new URL(href);
+  return [`${outputUrl.origin}${outputUrl.pathname}`, outputUrl.searchParams];
 }
 
 /**
  * Creates vector layer from WPS QGIS job result
  */
-function _handleVectorResult(job, result, map) {
-  const [url, params] = _getLayerOutput(result);
+function _handleVectorResult(job, url, params, output, map) {
   const layerId = params.get("layers");
 
   const getParams = {
@@ -49,21 +75,16 @@ function _handleVectorResult(job, result, map) {
     service: "WFS",
     typename: layerId,
     outputformat: "application/json",
+    srsname: "EPSG:4326", /* Leaflet needs lon/lat, whatever CRS the model ran in */
     map: params.get("MAP"),
   };
 
   const getUrl = unescape(url + L.Util.getParamString(getParams, url));
-  /*const layer = createGeoJSONLayer(handleURL(getUrl, true), {
-    name: job.jobID,
-    label: layerId,
-    added: true,
-    type: "GEOJSON",
-  });*/
 
   const layer = createGeoJSONResultLayer(
     { name: job.jobID, url: handleURL(getUrl, true) },
     {
-      label: layerId,
+      label: output.title || layerId,
       added: true,
       type: "GEOJSON",
     }
@@ -79,77 +100,9 @@ function _handleVectorResult(job, result, map) {
 }
 
 /**
- * Creates raster layer from WPS QGIS job result
- */
-async function _handleRasterResult(job, result, map) {
-  const [url, params] = _getLayerOutput(result);
-  const layerId = params.get("layers");
-
-  const rasterParams = await _describeRasterResult(url, params);
-  const getParams = {
-    request: "GetCoverage",
-    service: "WCS",
-    coverage: layerId,
-    crs: rasterParams.crs,
-    bbox: rasterParams.bbox,
-    width: rasterParams.grid[0],
-    height: rasterParams.grid[1],
-    format: "image/tiff",
-    map: params.get("MAP"),
-  };
-
-  const getUrl = unescape(url + L.Util.getParamString(getParams, url));
-  const layer = await createGeoTIFFLayer(
-    { name: job.jobID, url: handleURL(getUrl, true) },
-    {
-      label: layerId,
-      added: true,
-      type: "GEOTIFF",
-    }
-  );
-
-  if (map && map.getLayer(job.jobID)) {
-    console.warn("layer id already in use... generating new id");
-    layer.options.id = getUniqueLayerId(map, job.jobID);
-  }
-
-  return layer;
-}
-
-/**
- * Returns description of a raster layer (crs, bounding box and grid where [width, height])
- */
-async function _describeRasterResult(url, params) {
-  const describeParams = {
-    request: "DescribeCoverage",
-    service: "WCS",
-    coverage: params.get("layers"),
-    map: params.get("MAP"),
-  };
-
-  const xmlDoc = await handleRequest(
-    unescape(url + L.Util.getParamString(describeParams, url))
-  )
-    .then((response) => response.text())
-    .then((data) => {
-      return new DOMParser().parseFromString(data, "application/xml");
-    });
-
-  return {
-    crs: "EPSG:4326", // Default to EPSG:4326, GetCoverage does not work with the CRS in the describe response
-    bbox: Array.from(xmlDoc.querySelectorAll("lonLatEnvelope pos"))
-      .map((coord) => coord.textContent.split(" "))
-      .join(","),
-    grid: xmlDoc.querySelector("GridEnvelope high")?.textContent?.split(" "),
-  };
-}
-
-/**
  * Returns OGC service where layer result will be available (fix for working when processes from models)
  */
-async function _getResultSource(result) {
-  const [url, params] = _getLayerOutput(result);
-
+async function _getResultSource(url, params) {
   const capabilitiesParams = {
     request: "GetCapabilities",
     service: "WCS",
@@ -167,7 +120,7 @@ async function _getResultSource(result) {
   // Check if result layer is available as a coverage
   const contentMetadata = xmlDoc.querySelector("ContentMetadata");
   const layerAsCoverage = Array.from(
-    contentMetadata.querySelectorAll("CoverageOfferingBrief")
+    contentMetadata?.querySelectorAll("CoverageOfferingBrief") || []
   ).some(
     (coverage) =>
       coverage.querySelector("name")?.textContent.trim() ===
@@ -175,18 +128,6 @@ async function _getResultSource(result) {
   );
 
   return layerAsCoverage ? "WCS" : "WFS";
-}
-
-function _getLayerOutput(result) {
-  // Default layer output to 'OUTPUT'
-  const outputName =
-    Object.entries(result).find(
-      ([, value]) =>
-        typeof value === "object" && value.type?.startsWith("application/x-ogc")
-    )?.[1].href || result?.OUTPUT;
-  const outputUrl = new URL(outputName);
-
-  return [`${outputUrl.origin}${outputUrl.pathname}`, outputUrl.searchParams];
 }
 
 export default handleResult;

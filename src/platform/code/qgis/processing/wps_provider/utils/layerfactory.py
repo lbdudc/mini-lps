@@ -171,6 +171,7 @@ class LayerFactory:
             f"{geoserver_url}/wfs"
             f"?service=WFS&version=2.0.0&request=GetFeature"
             f"&typeNames={typename}&outputFormat=application/json"
+            f"&srsName={os.getenv('QGSWPS_PROCESSING_CRS') or 'EPSG:4326'}"
         )
 
         self.feedback.pushInfo(f"Fetching WFS: {wfs_url}")

@@ -41,7 +41,7 @@ const PROCESS_INPUTS = [
   },
   {
     type: "application/json",
-    component: "v-text-area",
+    component: "v-textarea",
     condition: (input) => {
       return input.schema.type === "application/json";
     },

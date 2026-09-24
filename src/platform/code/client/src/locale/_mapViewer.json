@@ -11,6 +11,7 @@
 {
   "mapViewer": {
     "mapViewer": "Map Viewer",
+    "bookmarks": "Bookmarks",
     "cancel": "Cancel",
     "close": "Close",
     "downloadFormat": "Download format",

@@ -229,7 +229,7 @@ export default {
     },
 
     deleteResult(item, validate = false) {
-      if (validate && this.map.getLayer(item.jobID)) {
+      if (validate && (item.layerIds || []).some((id) => this.map.getLayer(id))) {
         this.deleteDialog = true;
         this.selectedJob = item;
       } else {
@@ -249,15 +249,19 @@ export default {
       })
         .then((response) => response.json())
         .then(async (result) => {
-          const params = { jobID: result.JOB_ID };
-          const layer = await handleResult(params, result, this.map);
+          const layers = await handleResult(
+            { jobID: item.jobID },
+            result,
+            this.map
+          );
 
-          if (layer) {
-            this.loadingLayer = true;
+          this.loadingLayer = true;
+          item.layerIds = [];
+          layers.forEach((layer) => {
             this.map.addLayer(layer);
-
-            this.loadingLayer = false;
-          }
+            item.layerIds.push(layer.options.id);
+          });
+          this.loadingLayer = false;
         });
     },
 

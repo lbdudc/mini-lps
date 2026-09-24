@@ -68,6 +68,8 @@ function modelTransformation(input) {
   ret.data.menus = menus(ret, input);
   ret.data.mapViewer = mapViewer(input.mapViewer);
   ret.data.chartViewer = input.chartViewer;
+  /* names of the .model3 files the user staged: the bundled demo model is only shipped when there are none */
+  ret.data.processModels = input.processModels || [];
   ret.data.statics = statics(input.statics);
   return ret;
 }

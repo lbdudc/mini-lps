@@ -7,6 +7,7 @@
       "name": "###<= map.name >###",
       "sortable": "###<= map.sortable >###",
       "center": ###<= JSON.stringify(map.center) || JSON.stringify([[41.508742458803326, -4.087890625], [44.508742458803326, -12.08789063]]) >###,
+      "bookmarks": ###<= JSON.stringify(map.bookmarks || []) >###,
       "layers": ###<= JSON.stringify(map.layers) >### ###< if (map.mapOptions) { >###,
       "mapOptions": ###<= JSON.stringify(map.mapOptions) >###
       ###< } >###

@@ -25,6 +25,7 @@
         :overlays="viewOverlays"
         :map="map"
         :loadingMap="loadingMap"
+        :bookmarks="bookmarks"
         /*% if (feature.MV_T_InformationMode && feature.MV_T_F_BasicSearch) { %*/:form="form"/*% } %*/
         /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/:hasMultipleMaps="maps.length > 1"/*% } %*/
         @build-control="openDialog"
@@ -159,6 +160,14 @@ export default {
       /*% } %*/
     };
   },
+  computed: {
+    /* the QGIS bookmarks of the selected map, as [{ name, bounds }] */
+    bookmarks() {
+      return this.mapSelected != null
+        ? maps.maps[this.mapSelected].bookmarks || []
+        : [];
+    },
+  },
   watch: {
     $route() {
       const routeSelectedMap = this.maps.find(
@@ -194,8 +203,17 @@ export default {
         this.loadMap();
       }
     }
-    if (!mapFromRoute && this.maps.length === 1) {
-      this.mapSelected = this.maps[0].id;
+    if (!mapFromRoute) {
+      // No (valid) map in the URL: open the only map, or else the overview map
+      // (the one with the most layers) — with several maps and none selected
+      // nothing renders, and the map selector isn't there to pick one either.
+      let defaultMap = 0;
+      maps.maps.forEach((map, index) => {
+        if (map.layers.length > maps.maps[defaultMap].layers.length) {
+          defaultMap = index;
+        }
+      });
+      this.mapSelected = this.maps[defaultMap].id;
       this.changeRoute();
     } else if (this.$route.params.id) {
       this.changeRoute();

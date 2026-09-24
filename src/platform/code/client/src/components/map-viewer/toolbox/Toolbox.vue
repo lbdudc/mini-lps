@@ -44,6 +44,7 @@
           :jobs="jobs"
           :new-job="newJob"
           @show-jobs="viewJobs"
+          @delete-job="deleteJob"
           @close="close"
         />
 
@@ -131,6 +132,13 @@ export default {
       this.radios = "ProcessJobs";
     },
 
+    deleteJob(job) {
+      (job.layerIds || []).forEach((id) => {
+        if (this.map.getLayer(id)) this.map.removeLayer(id);
+      });
+      this.jobs = this.jobs.filter((j) => j.jobID !== job.jobID);
+    },
+
     importEnvironment() {
       if (!this.map || typeof this.map.exportState !== "function") {
         console.error("El objeto mapa no está listo o no tiene exportState");
@@ -141,6 +149,41 @@ export default {
       this.loading = true;
 
       const mapState = this.map.exportState();
+
+      /*
+       * Map.exportState() silently drops every layer whose export throws — and
+       * that is every GeoServer WMS layer here: its styles are plain wrappers
+       * without an exportState() (see _wrapWMSStyle). The processing service
+       * would then get a map with no layers at all and offer no inputs for a
+       * model. It only needs what identifies a layer, so describe the dropped
+       * ones directly, leaving the styles out.
+       */
+      const exportedIds = mapState.layers.map((l) => l.options.id);
+      this.map
+        .getLayers()
+        .filter((layer) => !exportedIds.includes(layer.getId()))
+        .forEach((layer) => {
+          mapState.layers.push({
+            options: {
+              id: layer.getId(),
+              type: layer.getType(),
+              opacity: layer.getOpacity(),
+              selected: layer.isSelected(),
+              baseLayer: layer.isBaseLayer(),
+              url: layer.options.url,
+              params: layer.options.params,
+              label: layer.getLabel(),
+            },
+          });
+        });
+
+      /* only the app's own GeoServer layers can be fetched by the service */
+      mapState.layers = mapState.layers.filter(
+        (layer) =>
+          layer.options.type !== "WMS" ||
+          !layer.options.url ||
+          layer.options.url.startsWith(properties.GEOSERVER_URL)
+      );
 
       // Update layers url
       mapState.layers = mapState.layers.map((layer) => ({

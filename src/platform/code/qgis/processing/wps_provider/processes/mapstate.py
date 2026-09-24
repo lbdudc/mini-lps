@@ -83,8 +83,17 @@ class ImportMapState(QgsProcessingAlgorithm):
             project = QgsProject.instance()
             project.clear()
 
-            # Set coordinate system
-            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            # Set coordinate system: the app stores everything in EPSG:4326, but
+            # a model authored for a metric CRS (a 2000-unit buffer, say) needs to
+            # run in that CRS, so the deploy env can name the one to process in.
+            crs = QgsCoordinateReferenceSystem(
+                os.getenv("QGSWPS_PROCESSING_CRS") or "EPSG:4326"
+            )
+            if not crs.isValid():
+                feedback.pushInfo(
+                    f"Invalid QGSWPS_PROCESSING_CRS {os.getenv('QGSWPS_PROCESSING_CRS')}, using EPSG:4326"
+                )
+                crs = QgsCoordinateReferenceSystem("EPSG:4326")
             project.setCrs(crs)
 
             id_ref = self.parameterAsInt(parameters, self.MAP_ID, context)

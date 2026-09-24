@@ -84,14 +84,14 @@ services:
   /*% if (feature.MV_Processes) { %*/
   qgis-wps-init:
     image: busybox
-    container_name: qgis-wps-init
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-qgis-wps-init
     command: chown -R ${QGSWPS_USER:-9001:9001} /projects
     volumes:
       - projects:/projects
 
   py-qgis-wps:
     image: 3liz/qgis-wps:3.28
-    container_name: qgis-wps
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-qgis-wps
     user: root
     depends_on:
       qgis-wps-init:
@@ -114,6 +114,7 @@ services:
       QGSWPS_SERVER_HTTP_PROXY: 'yes'
       QGSWPS_SERVER_PROXY_URL: ${QGSWPS_SERVER_PROXY_URL}
       QGSWPS_LOGLEVEL: ${QGSWPS_LOGLEVEL}
+      QGSWPS_PROCESSING_CRS: ${QGSWPS_PROCESSING_CRS:-EPSG:4326}
       QGSWPS_GEOSERVER_URL: ${QGSWPS_GEOSERVER_URL}
       QGSWPS_SERVER_RESPONSE_EXPIRATION: 3600
       QGSWPS_SERVER_RESULTS_MAP_URI: /results/
@@ -130,16 +131,21 @@ services:
       - ${QGSWPS_MODELS_PATH}:/processing/models
       - projects:/projects
       - results:/results
-      - ${CESGA_DIR}:/cesga
     networks:
       - local
     restart: unless-stopped
     ports:
       - "8888:8080"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/processes', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
 
   py-qgis-server:
     image: 3liz/qgis-map-server:3.40
-    container_name: qgis-server
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-qgis-server
     environment:
       QGSRV_SERVER_WORKERS: ${QGSRV_SERVER_WORKERS}
       QGSWPS_SERVER_HTTP_PROXY: 'yes'
@@ -149,7 +155,6 @@ services:
       QGSRV_CACHE_STRICT_CHECK: 'no'
     volumes:
       - results:/results
-      - ${CESGA_DIR}:/cesga
     networks:
       - local
     restart: unless-stopped
@@ -157,7 +162,7 @@ services:
       - "8082:8080"
 
   redis:
-    container_name: qgis-redis
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-qgis-redis
     image: redis:4
     networks:
       - local
@@ -228,8 +233,6 @@ volumes:
   results:
     external: false
   projects:
-    external: false
-  models:
     external: false
 /*% } %*/
 networks:
