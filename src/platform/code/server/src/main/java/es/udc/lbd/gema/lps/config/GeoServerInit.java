@@ -225,11 +225,19 @@ public class GeoServerInit {
     String fileName = Character.toUpperCase(name.charAt(0)) + name.substring(1);
     String stylePath = SLDS_FOLDER + fileName + ".sld";
     String sldBody = readFile(stylePath);
+    // A redeploy keeps GeoServer's data (only a "dev" run resets the workspace), so the style
+    // may already exist from an earlier deploy. Creating it then fails, and the look the
+    // layer had back then would stay for good however its QGIS style changes: the style is
+    // updated in place instead.
+    String workspace = gsProp.getWorkspace();
     if (sldBody.contains("xmlns:se=")) {
-      String url = gsProp.getUrl() + "/rest/workspaces/" + gsProp.getWorkspace() + "/styles?name=" + name;
-      HTTPUtils.post(url, sldBody, SE_CONTENT_TYPE, gsProp.getUser(), gsProp.getPassword());
-    } else {
-      publisher.publishStyleInWorkspace(gsProp.getWorkspace(), sldBody, name);
+      String stylesUrl = gsProp.getUrl() + "/rest/workspaces/" + workspace + "/styles";
+      String created = HTTPUtils.post(stylesUrl + "?name=" + name, sldBody, SE_CONTENT_TYPE, gsProp.getUser(), gsProp.getPassword());
+      if (created == null) {
+        HTTPUtils.put(stylesUrl + "/" + name, sldBody, SE_CONTENT_TYPE, gsProp.getUser(), gsProp.getPassword());
+      }
+    } else if (!publisher.publishStyleInWorkspace(workspace, sldBody, name)) {
+      publisher.updateStyleInWorkspace(workspace, sldBody, name);
     }
     return name;
   }
@@ -310,7 +318,25 @@ public class GeoServerInit {
       }
     }
 
-    publisher.publishDBLayer(gsProp.getWorkspace(), gsProp.getDatastore(), fte, fse);
+    boolean published = publisher.publishDBLayer(gsProp.getWorkspace(), gsProp.getDatastore(), fte, fse);
+    if (!published) {
+      // A deploy that failed half-way (a style GeoServer refused, say) can leave the feature
+      // type behind without its layer, and publishing again then fails for good with
+      // "already exists": the orphan is dropped and the layer published anew.
+      try {
+        GeoServerRESTReader reader = new GeoServerRESTReader(gsProp.getUrl(), gsProp.getUser(), gsProp.getPassword());
+        if (!reader.existsLayer(gsProp.getWorkspace(), layerName, true)) {
+          // unpublishFeatureType() starts by deleting the layer, which is what is missing here
+          HTTPUtils.delete(
+            gsProp.getUrl() + "/rest/workspaces/" + gsProp.getWorkspace() + "/datastores/" + gsProp.getDatastore()
+              + "/featuretypes/" + layerName + "?recurse=true",
+            gsProp.getUser(), gsProp.getPassword());
+          publisher.publishDBLayer(gsProp.getWorkspace(), gsProp.getDatastore(), fte, fse);
+        }
+      } catch (Exception e) {
+        logger.warn("Could not republish the GeoServer layer '" + layerName + "': " + e.getMessage());
+      }
+    }
   }
 
   /**
