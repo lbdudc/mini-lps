@@ -72,7 +72,7 @@
               v-if="itemSelected"
               class="mt-2"
               :item="itemSelected"
-              :order="orderedHeaders"
+              :entity="entity"
             />
             <v-data-table
               dense
@@ -81,7 +81,7 @@
               class="clickable"
               height="100%"
               :headers="tableHeaders"
-              :items="layerItems"
+              :items="tableItems"
               @click:row="onClickItem"
             >
               <template v-slot:[`header.name`]="{ header }">
@@ -108,7 +108,14 @@
 <script>
 import layers from "../config-files/layers.json";
 import WMSInformationDetail from "@/components/map-viewer/wms-information/WMSInformationDetail";
-import attributesOrder from "@/modules/entities-attributes.json";
+import {
+  parseFeatureId,
+  attributesOf,
+  visibleAttributes,
+  columnOf,
+  labelOf,
+  displayValue,
+} from "@/common/feature-format";
 
 export default {
   name: "WMSInformation",
@@ -118,7 +125,6 @@ export default {
     return {
       layerSelected: null,
       itemSelected: null,
-      orderedHeaders: [],
     };
   },
   computed: {
@@ -145,21 +151,43 @@ export default {
       return layers.layers.find((layer) => layer.name === this.layerSelected)
         ?.form;
     },
+    /* the entity of the layer selected, as in the model */
+    entity() {
+      return this.layerItems.length > 0
+        ? parseFeatureId(this.layerItems[0].id).entity
+        : "";
+    },
+    /* the columns QGIS shows, in the model's order, under the project's labels */
     tableHeaders() {
-      let headers =
-        this.layerItems.length > 0
-          ? [{ text: "id", value: "id" }].concat(
-            Object.keys(this.layerItems[0].properties)
-              .filter((p) => !p.startsWith("geometria"))
-              .map((prop) => {
-                return {
-                  text: prop,
-                  value: "properties." + prop,
-                };
-              })
-          )
-          : [];
-      return this.orderHeaders(headers);
+      if (this.layerItems.length === 0) return [];
+      const properties = this.layerItems[0].properties;
+      const known = visibleAttributes(this.entity).filter(
+        (a) => a.name !== "id" && columnOf(a) in properties
+      );
+      const columns =
+        attributesOf(this.entity).length > 0
+          ? known.map((a) => ({
+            text: labelOf(this.entity, a),
+            value: "properties." + columnOf(a),
+          }))
+          : Object.keys(properties)
+            .filter((p) => !p.startsWith("geometria"))
+            .map((p) => ({ text: p, value: "properties." + p }));
+      return [{ text: "id", value: "id" }].concat(columns);
+    },
+    /* the layer's features with their values as shown: a value map's texts for its codes */
+    tableItems() {
+      const byColumn = {};
+      attributesOf(this.entity).forEach((a) => (byColumn[columnOf(a)] = a));
+      return this.layerItems.map((feature) => ({
+        ...feature,
+        properties: Object.fromEntries(
+          Object.entries(feature.properties).map(([column, value]) => [
+            column,
+            byColumn[column] ? displayValue(byColumn[column], value) : value,
+          ])
+        ),
+      }));
     },
   },
   created() {
@@ -171,7 +199,8 @@ export default {
       this.itemSelected = null;
     },
     onClickItem(item) {
-      this.itemSelected = item;
+      /* the feature as it came, not the one with the shown values */
+      this.itemSelected = this.layerItems.find((f) => f.id === item.id) || item;
     },
     onClickBack() {
       this.itemSelected = null;
@@ -213,31 +242,6 @@ export default {
       return s.replace(/([-_][a-z])/gi, ($1) => {
         return $1.toUpperCase().replace("-", "").replace("_", "");
       });
-    },
-    ToSnakeCase(name) {
-      return name.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-    },
-
-    orderHeaders(headers) {
-      let entityName = this.layerItems[0].id.substring(2);
-      entityName = this.toCamelCase(
-        entityName.substring(0, entityName.indexOf("."))
-      );
-
-      const order = attributesOrder[entityName]
-        .map((att) => att.name)
-        .map((att) => this.ToSnakeCase(att));
-
-      let orderedHeaders = [];
-      order.forEach((att) => {
-        headers.forEach((header) => {
-          if (att == header.text) {
-            orderedHeaders.push(header);
-          }
-        });
-      });
-      this.orderedHeaders = orderedHeaders;
-      return orderedHeaders;
     },
   },
 };

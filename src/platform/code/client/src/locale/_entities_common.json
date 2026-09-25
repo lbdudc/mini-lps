@@ -17,6 +17,13 @@
   "edit": "Edit",
   "export": "Export",
   "new": "New",
+  ###< if (feature.DM_DataExport) { >###
+  "download": {
+    "button": "Download",
+    "csv": "CSV (spreadsheet)",
+    "geojson": "GeoJSON (map data)"
+  },
+  ###< } >###
   "permanentAction": "This action will be permanent",
   "remove": "Remove",
   "save": "Save",

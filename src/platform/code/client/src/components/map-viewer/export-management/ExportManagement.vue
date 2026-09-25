@@ -151,9 +151,31 @@ export default {
       includedControls.push("leaflet-control-mapcentercoord leaflet-control");
       /*% } %*/
 
+      /*% if (feature.MV_T_E_ShowLegend) { %*/
+      includedControls.push("gp-map-legend leaflet-control");
+      /*% } %*/
+
       this.excludeControls(mapControls, mapControls, includedControls);
 
+      /*% if (feature.MV_T_E_ShowLegend) { %*/
+      // The legend goes in the picture whole, even if it is collapsed or scrolls
+      const legendBody = map.querySelector(".gp-map-legend__body");
+      const legendStyle = legendBody ? legendBody.getAttribute("style") : null;
+      if (legendBody) {
+        legendBody.style.display = "block";
+        legendBody.style.maxHeight = "none";
+        legendBody.style.overflow = "visible";
+      }
+      const restoreLegend = () => {
+        if (!legendBody) return;
+        if (legendStyle === null) legendBody.removeAttribute("style");
+        else legendBody.setAttribute("style", legendStyle);
+      };
+      /*% } %*/
       this.$html2canvas(map, { useCORS: true, logging: false }).then(canvas => {
+        /*% if (feature.MV_T_E_ShowLegend) { %*/
+        restoreLegend();
+        /*% } %*/
         /*% if (feature.MV_T_E_F_PDF) { %*/
         if (this.pdf) {
           this.downloadAsPdf(canvas);

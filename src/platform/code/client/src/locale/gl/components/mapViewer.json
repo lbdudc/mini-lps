@@ -27,6 +27,8 @@
       "layer-item-detail": "Detalle do elemento",
       "no-data": "Non hai datos",
       "no-property-data": "Sen datos",
+      "show-all": "Amosar todos os campos",
+      "show-tip": "Amosar resumo",
       "form-tooltip": "Ir ó formulario de detalle do elemento"
     },
       ###< } >###
@@ -36,6 +38,49 @@
     "wmsLegend": {
       "title": "Lenda Capa WMS",
       "no-data": "Non hai datos dispoñibles"
+    },
+###< } >###
+###< if(feature.MV_T_Editing) { >###
+    "edit": {
+      "title": "Editar",
+      "toggle": "Editar elementos",
+      "add": "Engadir un elemento",
+      "hint-pick": "Fai clic nun elemento do mapa para editalo.",
+      "hint-draw": "Debuxa o novo elemento no mapa. Dobre clic, ou clic no último punto, para rematar.",
+      "hint-move": "Arrastra os puntos no mapa para cambiar a forma, e cambia os seus datos embaixo.",
+      "save": "Gardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "delete-title": "Eliminar este elemento?",
+      "delete-text": "Elimínase para todo o mundo. Non se pode desfacer.",
+      "saved": "Gardado.",
+      "deleted": "Eliminado.",
+      "nothing": "Non hai ningún elemento editable aí.",
+      "error": "Non se puido gardar. Revisa os datos e que entraras coa conta de edición."
+    },
+###< } >###
+###< if(feature.MV_T_TimeSlider) { >###
+    "timeSlider": {
+      "title": "Tempo",
+      "play": "Reproducir",
+      "pause": "Pausar",
+      "all": "Amosar todas as datas",
+      "none": "Sen data"
+    },
+###< } >###
+###< if(feature.MV_T_F_BasicSearch) { >###
+    "search": {
+      "empty": "Non se atopou nada",
+      "places": "Lugares",
+      "attribution": "Lugares de OpenStreetMap Nominatim"
+    },
+###< } >###
+###< if(feature.MV_T_E_ShowLegend) { >###
+    "legend": {
+      "title": "Lenda",
+      "empty": "Non hai capas visibles",
+      "show": "Amosar lenda",
+      "hide": "Agochar lenda"
     },
 ###< } >###
     "mustSelectAnExportOption": "Debe escoller polo menos un dos formatos de exportación",

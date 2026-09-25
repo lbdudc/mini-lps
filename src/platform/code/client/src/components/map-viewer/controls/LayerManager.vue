@@ -168,8 +168,17 @@
               </v-col>
               /*% } %*/
 
-              /*% if (feature.MV_LM_Order || feature.MV_LM_CenterViewOnLayer || feature.MV_LM_StylePreview || feature.MV_LM_ExternalLayer) { %*/
+              /*% if (feature.MV_LM_Order || feature.MV_LM_CenterViewOnLayer || feature.MV_LM_StylePreview || feature.MV_LM_ExternalLayer || feature.DM_DataExport) { %*/
               <v-col class="ma-0 pa-0 ml-4 text-center" cols="4">
+                /*% if (feature.DM_DataExport) { %*/
+                <data-export-menu
+                  v-if="layerEntity(layer)"
+                  compact
+                  :formats="['csv', 'geojson']"
+                  :file-name="layer.id"
+                  :fetch-data="(format) => downloadLayer(layer, format)"
+                ></data-export-menu>
+                /*% } %*/
                 /*% if (feature.MV_LM_CenterViewOnLayer) { %*/
                 <v-btn small icon @click="setCenterOnLayer(layer)">
                   <v-icon :color="layer.centered ? 'primary' : ''">
@@ -292,11 +301,17 @@
 import { createWMSStyle } from "@/components/map-viewer/common/map-styles-common";
 import WMSNewStyle from "./WMSNewStyle.vue";
 /*% } %*/
+/*% if (feature.DM_DataExport) { %*/
+import DataExportMenu from "@/components/data-export/DataExportMenu.vue";
+import RepositoryFactory from "@/repositories/RepositoryFactory";
+import layersConfig from "../config-files/layers.json";
+/*% } %*/
 
 export default {
-  /*% if (feature.MV_LM_Style) { %*/
-  components: { "wms-new-style": WMSNewStyle },
-  /*% } %*/
+  components: {
+    /*% if (feature.MV_LM_Style) { %*/"wms-new-style": WMSNewStyle,/*% } %*/
+    /*% if (feature.DM_DataExport) { %*/"data-export-menu": DataExportMenu,/*% } %*/
+  },
   props: {
     value: {
       type: String,
@@ -524,6 +539,17 @@ export default {
       const findLayer = this.getLayer(layerSelected);
 
       return !!findLayer.options.added;
+    },
+    /*% } %*/
+    /*% if (feature.DM_DataExport) { %*/
+    /* the entity a layer of the map is made from (layers.json), or null for a tile/added layer */
+    layerEntity(layer) {
+      const config = layersConfig.layers.find((l) => l.name === layer.id);
+      return config && config.entity ? config.entity : null;
+    },
+    downloadLayer(layer, format) {
+      const repository = RepositoryFactory.get(this.layerEntity(layer) + "EntityRepository");
+      return repository.download(format, { params: {} });
     },
     /*% } %*/
     /*% if (feature.MV_LM_StylePreview) { %*/

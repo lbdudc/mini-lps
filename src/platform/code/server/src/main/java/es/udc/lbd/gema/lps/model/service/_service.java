@@ -41,6 +41,9 @@ import es.udc.lbd.gema.lps.model.service.exceptions.NotFoundException;
 import es.udc.lbd.gema.lps.model.service.util.GeoServerUtil;
 /*% } %*/
 import java.io.IOException;
+/*% if (feature.MV_T_F_BasicSearch && geographicPropertyNames.length > 0) { %*/
+import es.udc.lbd.gema.lps.web.rest.custom.SearchHitDTO;
+/*% } %*/
 /*% if (feature.MV_T_ViewMapAsList) { %*/
 
 import es.udc.lbd.gema.lps.model.domain./*%= normalize(context.name, true) %*/;
@@ -54,6 +57,15 @@ public interface /*%= normalize(context.name, true) %*/Service {
   /*% }); %*/
   Page</*%= normalize(context.name, true) %*/DTO> getAll(Pageable pageable, List<String> filters, String search/*% if (feature.MV_T_ViewMapAsList) { %*/, Specification</*%= normalize(context.name, true) %*/> idsSpec /*% } %*/);
   String getAllAsTSV(List<String> filters, String search, Specification</*%= normalize(context.name, true) %*/> idsSpec);
+  /*% if (feature.MV_T_F_BasicSearch && geographicPropertyNames.length > 0) { %*/
+  List<SearchHitDTO> searchHits(String search, int limit);
+  /*% } %*/
+  /*% if (feature.DM_DataExport) { %*/
+  String getAllAsCsv(List<String> filters, String search, Boolean labels);
+  /*% if (geographicPropertyNames.length > 0) { %*/
+  FeatureCollectionJSON exportGeoJson(List<String> filters, String search);
+  /*% } %*/
+  /*% } %*/
   /*% geographicPropertyNames.forEach(function(geoPropertyName) {
         geoPropertyName = normalize(geoPropertyName);
     %*/

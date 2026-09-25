@@ -266,11 +266,8 @@ export default {
     },
 
     wmsCallback(features) {
-      let filteredFeatures =
-        /*% if (feature.MV_T_F_BasicSearch) { %*/
-        (this.form.query != null && this.form.query !== "")
-          ? features.filter(f => f.id.endsWith(this.form.query))
-          : /*% } %*/ features;
+      /* what the search text hides is not drawn: the layers are filtered by it (CQL) */
+      let filteredFeatures = features;
       if (filteredFeatures.length > 0) {
         this.buildControl({
           component: "wms-information",

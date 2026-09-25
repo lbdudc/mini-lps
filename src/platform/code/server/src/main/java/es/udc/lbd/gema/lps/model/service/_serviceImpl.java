@@ -44,6 +44,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import es.udc.lbd.gema.lps.web.rest.util.specification_utils.*;
+/*% if (feature.DM_DataExport) { %*/
+import es.udc.lbd.gema.lps.web.rest.util.CsvUtil;
+/*% } %*/
 import es.udc.lbd.gema.lps.web.rest.specifications./*%= normalize(context.name, true) %*/Specification;
 
 import es.udc.lbd.gema.lps.model.service.exceptions.OperationNotAllowedException;
@@ -52,6 +55,13 @@ import es.udc.lbd.gema.lps.model.service.exceptions.NotFoundException;
 import es.udc.lbd.gema.lps.model.service.util.GeoServerUtil;
 /*% } %*/
 import java.io.IOException;
+/*% if (feature.MV_T_F_BasicSearch && geographicPropertyNames.length > 0) { %*/
+import es.udc.lbd.gema.lps.web.rest.custom.SearchHitDTO;
+import java.util.ArrayList;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.springframework.data.domain.PageRequest;
+/*% } %*/
 
 /*% if (feature.MV_T_ViewMapAsList) { %*/
 
@@ -106,6 +116,75 @@ public class /*%= normalize(context.name, true) %*/ServiceImpl implements /*%= n
 
     return convertToTSV(list);
   }
+
+  /*% if (feature.MV_T_F_BasicSearch && geographicPropertyNames.length > 0) { %*/
+  /** The first `limit` features matching `search` (the same search as the entity's list), with where they are. */
+  public List<SearchHitDTO> searchHits(String search, int limit) {
+    if (search == null || search.trim().isEmpty()) {
+      return new ArrayList<>();
+    }
+    return /*%= normalize(context.name) %*/Repository
+        .findAll(/*%= normalize(context.name, true) %*/Specification.searchAll(search.trim()), PageRequest.of(0, Math.max(1, Math.min(limit, 50))))
+        .getContent().stream()
+        .map(
+            e -> {
+              Geometry geometry = e.get/*%= normalize(normalize(geographicPropertyNames[0]), true) %*/();
+              double[] bbox = null;
+              if (geometry != null && !geometry.isEmpty()) {
+                Envelope envelope = geometry.getEnvelopeInternal();
+                bbox = new double[] {envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
+              }
+              return new SearchHitDTO(e.get/*%= normalize(getEntityProperty(context, 'id').name, true) %*/(), /*%= getDisplayStringJava(context, 'e') %*/, bbox);
+            })
+        .collect(Collectors.toList());
+  }
+  /*% } %*/
+
+  /*% if (feature.DM_DataExport) {
+    var exportEntityNames = data.dataModel.entities.map(function(en) { return en.name; });
+    var exportProps = context.properties.filter(function(p) {
+      var cls = String(p.class).split(' ')[0];
+      return !isGeographicProperty(cls) && exportEntityNames.indexOf(cls) === -1 && !p.multiple;
+    });
+  %*/
+  private List</*%= normalize(context.name, true) %*/> findForExport(List<String> filters, String search) {
+    if (search != null && !search.isEmpty()) {
+      return /*%= normalize(context.name) %*/Repository.findAll(/*%= normalize(context.name, true) %*/Specification.searchAll(search));
+    }
+    return /*%= normalize(context.name) %*/Repository.findAll(SpecificationUtil.getSpecificationFromFilters(filters, false));
+  }
+
+  /** CSV of what the list shows (same filters/search), one column per plain property; the header is the field labels unless labels is false. */
+  public String getAllAsCsv(List<String> filters, String search, Boolean labels) {
+    StringBuilder csv = new StringBuilder().append((char) 0xFEFF); /* the BOM makes spreadsheets read the file as UTF-8 */
+    csv.append(
+        Boolean.FALSE.equals(labels)
+            ? CsvUtil.row(/*%= exportProps.map(function(p) { return javaString(normalize(p.name)); }).join(", ") %*/)
+            : CsvUtil.row(/*%= exportProps.map(function(p) { return javaString(p.label || normalize(p.name)); }).join(", ") %*/));
+    for (/*%= normalize(context.name, true) %*/ e : findForExport(filters, search)) {
+      csv.append(CsvUtil.row(/*%= exportProps.map(function(p) { return 'e.get' + normalize(p.name, true) + '()'; }).join(", ") %*/));
+    }
+    return csv.toString();
+  }
+  /*% if (geographicPropertyNames.length > 0) { %*/
+
+  /** The list's features as GeoJSON, with their properties, by the first geographic property. */
+  public FeatureCollectionJSON exportGeoJson(List<String> filters, String search) {
+    List<FeatureJSON> features =
+        findForExport(filters, search).stream()
+            .map(
+                e -> {
+                  FeatureJSON feature = new FeatureJSON(/*%= normalize(context.name, true) %*/.class, e);
+                  feature.setId(e.get/*%= normalize(getEntityProperty(context, 'id').name, true) %*/());
+                  feature.setGeometry(e.get/*%= normalize(normalize(geographicPropertyNames[0]), true) %*/());
+                  return feature;
+                })
+            .filter(feature -> feature.getGeometry() != null)
+            .collect(Collectors.toList());
+    return new FeatureCollectionJSON(features);
+  }
+  /*% } %*/
+  /*% } %*/
 
   private String convertToTSV(List</*%= normalize(context.name, true) %*/> list) {
     StringBuilder tsv = new StringBuilder();

@@ -15,6 +15,7 @@
             <feature mandatory="true" name="DM_DI_DF_GeoTIFF"/>
           </or>
         </or>
+        <feature name="DM_DataExport"/>
       </and>
       <and mandatory="true" name="GraphicalUserInterface">
         <and name="GUI_Forms">
@@ -44,7 +45,7 @@
           </and>
           <and name="MV_T_Export">
             <feature name="MV_T_E_SetScale"/>
-            <feature disabled="true" name="MV_T_E_ShowLegend"/>
+            <feature name="MV_T_E_ShowLegend"/>
             <feature disabled="true" name="MV_T_E_DRM"/>
             <or mandatory="true" name="MV_T_E_Type">
               <feature mandatory="true" name="MV_T_E_F_PNG"/>
@@ -52,11 +53,14 @@
               <feature mandatory="true" name="MV_T_E_F_URL"/>
             </or>
           </and>
-          <or disabled="true" name="MV_T_Filterable">
+          <or name="MV_T_Filterable">
             <and mandatory="true" name="MV_T_F_BasicSearch">
               <feature disabled="true" name="MV_T_F_BS_ByUserGeolocation"/>
             </and>
+            <feature name="MV_T_F_Geocoder"/>
           </or>
+          <feature name="MV_T_TimeSlider"/>
+          <feature name="MV_T_Editing"/>
           <feature name="MV_T_UserGeolocation"/>
           <feature name="MV_T_InformationMode"/>
           <feature name="MV_T_ViewMapAsList"/>

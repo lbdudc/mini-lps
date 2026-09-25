@@ -23,6 +23,47 @@ export default {
     }
   },
 
+  /*% if (feature.MV_T_Editing && feature.MV_MS_GeoServer && checkEntityContainsGeographicProperties(context)) { %*/
+  /** GeoServer recalculates the extent of the layer (after features were added, moved or removed). */
+  async restartGeom() {
+    try {
+      return (await HTTP.put(`${RESOURCE_NAME}/geom/restart`)).data;
+    } catch (err) {
+      logger.error("Error recalculating the layer extent");
+      throw err;
+    }
+  },
+
+  /*% } %*/
+  /*% if (feature.MV_T_F_BasicSearch && checkEntityContainsGeographicProperties(context)) { %*/
+  /** A few features matching `query` (already URL-encoded), with where they are: the map's search suggestions. */
+  async searchHits(query, limit = 8) {
+    try {
+      return (await HTTP.get(`${RESOURCE_NAME}/search`, { params: { q: query, limit } })).data;
+    } catch (err) {
+      logger.error("Error searching " + query);
+      throw err;
+    }
+  },
+
+  /*% } %*/
+  /*% if (feature.DM_DataExport) { %*/
+  /** A download of what the list shows: `format` is csv or geojson, `options.params` the list's search/filters. */
+  async download(format, options = {}) {
+    try {
+      return (
+        await HTTP.get(`${RESOURCE_NAME}/export/${format}`, {
+          ...options,
+          responseType: "blob",
+        })
+      ).data;
+    } catch (err) {
+      logger.error("Error downloading " + format, options);
+      throw err;
+    }
+  },
+
+  /*% } %*/
   async getAllWithout(entityName) {
     try {
       return (await HTTP.get(`${RESOURCE_NAME}/without/${entityName}`)).data;

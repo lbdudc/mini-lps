@@ -2,23 +2,38 @@
 <template>
   <v-container fluid id="map-container" class="pa-0">
     /*% if (feature.MV_T_F_BasicSearch) { %*/
-    <v-toolbar dense flat color="grey lighten-4" class="map-toolbar" elevation="1">
-      <v-text-field
-        dense
-        v-model="form.query"
-        prepend-inner-icon="mdi-magnify"
-        @click:append="searchInMap"
-        :label="$t('mapViewer.searchInMap')"
-        @keydown.enter="searchInMap"
-        single-line
-        hide-details
-        outlined
-        rounded
-        class="map-toolbar-select mr-2"
-      ></v-text-field>
-    </v-toolbar>
+    <div class="map-search-bar">
+      <v-toolbar dense flat color="grey lighten-4" class="map-toolbar" elevation="1">
+        <v-text-field
+          dense
+          v-model="form.query"
+          prepend-inner-icon="mdi-magnify"
+          :label="$t('mapViewer.searchInMap')"
+          @keydown.enter="searchInMap"
+          @click:clear="clearSearch"
+          single-line
+          hide-details
+          outlined
+          rounded
+          clearable
+          data-test="map-search-input"
+          class="map-toolbar-select mr-2"
+        ></v-text-field>
+      </v-toolbar>
+      <search-results
+        :query="form.query"
+        :map="map"
+        :overlays="viewOverlays"
+      ></search-results>
+    </div>
     /*% } %*/
 
+    /*% if (feature.MV_T_TimeSlider) { %*/
+    <time-slider v-if="map" :map="map" :overlays="viewOverlays"></time-slider>
+    /*% } %*/
+    /*% if (feature.MV_T_Editing) { %*/
+    <feature-editor v-if="map" :map="map" :overlays="viewOverlays"></feature-editor>
+    /*% } %*/
     <div ref="map" id="map">
     /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
       <right-map-controls
@@ -72,6 +87,15 @@ import layers from "./config-files/layers.json";
 /*% if (feature.MV_DetailOnClick) { %*/
 import InformationPopup from "@/components/map-viewer/InformationPopup";
 /*% } %*/
+/*% if (feature.MV_T_F_BasicSearch) { %*/
+import SearchResults from "./search/SearchResults.vue";
+/*% } %*/
+/*% if (feature.MV_T_TimeSlider) { %*/
+import TimeSlider from "./time-slider/TimeSlider.vue";
+/*% } %*/
+/*% if (feature.MV_T_Editing) { %*/
+import FeatureEditor from "./edit/FeatureEditor.vue";
+/*% } %*/
 import properties from "@/properties";
 /*% if (feature.MV_CI_Map || feature.MV_T_ZoomWindow) { %*/
 import devCheck from "@/common/device-check";
@@ -110,6 +134,9 @@ const MVExportManagementRepository = RepositoryFactory.get("MVExportManagementRe
 import { updateLayer } from "./common/map-layer-common";
 /*% } %*/
 import { createMap, loadBaseLayers, loadOverlaysLayers } from "./common/map-common";
+/*% if (feature.MV_T_E_ShowLegend) { %*/
+import { buildLegendControl } from "./common/legend-common";
+/*% } %*/
 
 import { /*% if (feature.MV_CI_Scale) { %*/buildMapScaleControl,/*% } %*/
   /*% if (feature.MV_CI_CenterCoordinates) { %*/ buildMapCoordinatesControl,/*% } %*/
@@ -121,8 +148,11 @@ import { /*% if (feature.MV_CI_Scale) { %*/buildMapScaleControl,/*% } %*/
 
 export default {
   name: "Map",
-  /*% if (feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
+  /*% if (feature.MV_T_Editing || feature.MV_T_TimeSlider || feature.MV_T_F_BasicSearch || feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
   components: {
+    /*% if (feature.MV_T_F_BasicSearch) { %*/"search-results": SearchResults,/*% } %*/
+    /*% if (feature.MV_T_TimeSlider) { %*/"time-slider": TimeSlider,/*% } %*/
+    /*% if (feature.MV_T_Editing) { %*/"feature-editor": FeatureEditor,/*% } %*/
     /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
     RightMapControls,
     /*% } %*/
@@ -351,6 +381,14 @@ export default {
       /*% if (feature.MV_T_UserGeolocation) { %*/
       this.map.addControl(buildLocateControl());
       /*% } %*/
+      /*% if (feature.MV_T_E_ShowLegend) { %*/
+      this.map.addControl(
+        buildLegendControl(this.map, {
+          t: (key) => this.$t(key),
+          locale: this.$i18n.locale,
+        })
+      );
+      /*% } %*/
 
       // Loading base layers
       loadBaseLayers(this.map, this.mapSelected);
@@ -414,6 +452,10 @@ export default {
     },
     /*% } %*/
     /*% if (feature.MV_T_F_BasicSearch) { %*/
+    clearSearch() {
+      this.form.query = null;
+      this.searchInMap();
+    },
     searchInMap() {
       if (this.form.query !== this.$route.query.query) {
         localStorage.setItem("state", JSON.stringify(this.map.exportState()));
@@ -446,6 +488,13 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.map-search-bar {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 1100;
 }
 
 .map-toolbar {
@@ -528,6 +577,52 @@ export default {
   width: 10px;
 }
 
+/*% if (feature.MV_T_E_ShowLegend) { %*/
+::v-deep .gp-map-legend {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  max-width: 260px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+::v-deep .gp-map-legend__toggle {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  border: 0;
+  background: transparent;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+::v-deep .gp-map-legend__body {
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 0 10px 8px;
+}
+::v-deep .gp-map-legend__item {
+  margin-top: 6px;
+}
+::v-deep .gp-map-legend__title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+::v-deep .gp-map-legend__image {
+  display: block;
+  max-width: 100%;
+}
+::v-deep .gp-map-legend__swatch {
+  display: inline-block;
+  width: 22px;
+  height: 14px;
+  border: 2px solid #666;
+}
+::v-deep .gp-map-legend__empty {
+  color: #666;
+  padding-top: 4px;
+}
+/*% } %*/
 /*% if (feature.MV_T_InformationMode) { %*/
 ::v-deep .disabled {
   color: red !important;

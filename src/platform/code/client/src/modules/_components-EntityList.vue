@@ -92,6 +92,13 @@
           </v-col>
           /*% } %*/
           <v-col order="1" order-md="2" class="text-right">
+            /*% if (feature.DM_DataExport) { %*/
+            <data-export-menu
+              :formats="/*%= hasGeographicProperties ? "['csv', 'geojson']" : "['csv']" %*/"
+              file-name="/*%= pluralize(normalize(context.entity)) %*/"
+              :fetch-data="downloadData"
+            ></data-export-menu>
+            /*% } %*/
             /*% if (context.form && theForm.creatable) { %*/
             <v-btn
               color="success ml-2"
@@ -330,6 +337,9 @@ import NumberField from "@/components/number-field/NumberField.vue";
 /*% if (hasDateFilter || hasDateTimeFilter) { %*/
 import DateAndHourPicker from "@/components/calendar/DateAndHourPicker.vue";
 /*% } %*/
+/*% if (feature.DM_DataExport) { %*/
+import DataExportMenu from "@/components/data-export/DataExportMenu.vue";
+/*% } %*/
 
 import defaultPaginationSettings from "@/common/default-pagination-settings";
 /*% if (context.sorting) { %*/
@@ -366,6 +376,9 @@ const /*%= normalize(prop.entityProperty.name, true) %*/EntityRepository = Repos
 export default {
   name: "/*%= normalize(context.id) %*/List",
   components: {
+    /*% if (feature.DM_DataExport) { %*/
+    DataExportMenu,
+    /*% } %*/
     /*% if (hasDateFilter || hasDateTimeFilter) { %*/
     DateAndHourPicker,
     /*% } %*/
@@ -568,6 +581,20 @@ export default {
          this.getItems();
   },
   methods: {
+    /*% if (feature.DM_DataExport) { %*/
+    downloadData(format) {
+      return /*%= normalize(context.entity, true) %*/EntityRepository.download(format, {
+        params: {
+          /*% if (context.searching) { %*/
+          search: this.search,
+          /*% } %*/
+          /*% if (context.filtering) { %*/
+          filters: this.filters,
+          /*% } %*/
+        },
+      });
+    },
+    /*% } %*/
     getItems() {
       this.loading = true;
       const options = {

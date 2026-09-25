@@ -27,6 +27,8 @@
       "layer-item-detail": "Detalle del elemento",
       "no-data": "No hay datos",
       "no-property-data": "Sin datos",
+      "show-all": "Mostrar todos los campos",
+      "show-tip": "Mostrar resumen",
       "form-tooltip": "Ir al formulario de detalle del elemento"
     },
     ###< } >###
@@ -36,6 +38,49 @@
     "wmsLegend": {
       "title": "Leyenda Capa WMS",
       "no-data": "No hay datos disponibles"
+    },
+    ###< } >###
+    ###< if(feature.MV_T_Editing) { >###
+    "edit": {
+      "title": "Editar",
+      "toggle": "Editar elementos",
+      "add": "Añadir un elemento",
+      "hint-pick": "Haz clic en un elemento del mapa para editarlo.",
+      "hint-draw": "Dibuja el nuevo elemento en el mapa. Doble clic, o clic en el último punto, para terminar.",
+      "hint-move": "Arrastra los puntos en el mapa para cambiar la forma, y cambia sus datos abajo.",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "delete-title": "¿Eliminar este elemento?",
+      "delete-text": "Se elimina para todo el mundo. No se puede deshacer.",
+      "saved": "Guardado.",
+      "deleted": "Eliminado.",
+      "nothing": "No hay ningún elemento editable ahí.",
+      "error": "No se ha podido guardar. Revisa los datos y que hayas entrado con la cuenta de edición."
+    },
+    ###< } >###
+    ###< if(feature.MV_T_TimeSlider) { >###
+    "timeSlider": {
+      "title": "Tiempo",
+      "play": "Reproducir",
+      "pause": "Pausar",
+      "all": "Mostrar todas las fechas",
+      "none": "Sin fecha"
+    },
+    ###< } >###
+    ###< if(feature.MV_T_F_BasicSearch) { >###
+    "search": {
+      "empty": "No se ha encontrado nada",
+      "places": "Lugares",
+      "attribution": "Lugares de OpenStreetMap Nominatim"
+    },
+    ###< } >###
+    ###< if(feature.MV_T_E_ShowLegend) { >###
+    "legend": {
+      "title": "Leyenda",
+      "empty": "No hay capas visibles",
+      "show": "Mostrar leyenda",
+      "hide": "Ocultar leyenda"
     },
     ###< } >###
     "mustSelectAnExportOption": "Debe escoger al menos uno de los formatos de exportación",

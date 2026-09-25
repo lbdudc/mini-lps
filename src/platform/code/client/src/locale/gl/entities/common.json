@@ -8,6 +8,13 @@
   "edit": "Editar",
   "export": "Exportar",
   "new": "Novo",
+  ###< if (feature.DM_DataExport) { >###
+  "download": {
+    "button": "Descargar",
+    "csv": "CSV (folla de cálculo)",
+    "geojson": "GeoJSON (datos do mapa)"
+  },
+  ###< } >###
   "permanentAction": "Esta acción será permanente",
   "remove": "Borrar",
   "save": "Gardar",

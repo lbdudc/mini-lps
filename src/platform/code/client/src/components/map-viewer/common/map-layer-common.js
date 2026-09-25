@@ -10,7 +10,10 @@ import RepositoryFactory from "@/repositories/RepositoryFactory";
 import layers from "../config-files/layers.json";
 /*% } %*/
 import { getStyle } from "@/components/map-viewer/common/map-styles-common";
-import { GeoJSONLayer, WMSLayer } from "@lbdudc/map-viewer";
+/*% if (feature.MV_T_F_BasicSearch) { %*/
+import { searchCqlFilter } from "./search-common";
+/*% } %*/
+import { GeoJSONLayer, WMSLayer, WMSLayerStyle } from "@lbdudc/map-viewer";
 /**
  * Leaflet minZoom/maxZoom for a layer carrying QGIS's scale-based visibility
  */
@@ -27,15 +30,11 @@ function _getZoomLimits(layerInMap) {
 function createWMSLayer(json, layerParams, layerInMap = {}, /*% if (feature.MV_T_F_BasicSearch) { %*/form = {}/*% } %*/) {
   const options =
     /*% if (feature.MV_T_F_BasicSearch) { %*/
-    (form.query == null || form.query === "")
+    /* the text keeps the features having it in a text field; a layer without any stays whole */
+    searchCqlFilter(json.searchFields, form.query) == null
       ? json.options
       : Object.assign(
-        {
-          cql_filter:
-            "in (" +
-            form.query +
-            ")"
-        },
+        { cql_filter: searchCqlFilter(json.searchFields, form.query) },
         json.options
       );
   /*% } else { %*/
@@ -45,7 +44,7 @@ function createWMSLayer(json, layerParams, layerInMap = {}, /*% if (feature.MV_T
   const availableStyles = _getAvailableStyles(json);
   const defaultStyle = _getDefaultStyle(json, availableStyles, layerInMap);
 
-  return new WMSLayer(
+  const layer = new WMSLayer(
     {
       id: json.name,
       label: layerParams.label,
@@ -63,6 +62,11 @@ function createWMSLayer(json, layerParams, layerInMap = {}, /*% if (feature.MV_T
     availableStyles,
     defaultStyle
   );
+  // The layer's extent comes from the service's capabilities, and some services (a raster, a
+  // remote WMS) give none: that must not surface as an error on the page. Whoever asks for
+  // the extent (zoom to layer) still gets the failure.
+  Promise.resolve(layer.getBounds()).catch(() => {});
+  return layer;
 }
 
 /**
@@ -228,12 +232,11 @@ function _updateLayerData(layer, data) {
 }
 /*% } %*/
 
+/* A style that already exists in GeoServer. A real WMSLayerStyle, not a stand-in object:
+   the map's state export (searching, leaving the map, sharing its URL) asks every style for
+   its own exportState. */
 function _wrapWMSStyle(styleName) {
-  return {
-    id: styleName,
-    isCached: () => true,
-    sld: () => null,
-  };
+  return new WMSLayerStyle(styleName, true);
 }
 
 /*% if (feature.MV_Processes) { %*/

@@ -2,7 +2,8 @@
   <v-app>
     <v-app-bar app color="primary" dark dense>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>/*%= data.basicData.name %*/</v-toolbar-title>
+      <img v-if="logo" :src="logo" alt="" class="app-logo" />
+      <v-toolbar-title>{{ appName }}</v-toolbar-title>
     </v-app-bar>
 
     <v-navigation-drawer v-model="drawer" app temporary>
@@ -42,12 +43,25 @@
 // map), not from global nav, so they're deliberately excluded here.
 const NAV_ROUTE_NAME_PATTERN = /^(MapViewer|chartViewer|about|Shapefile)$| List$/;
 
+import properties from "@/properties";
+
 export default {
   name: "App",
   data() {
     return {
       drawer: false,
+      appName: properties.APP_NAME,
+      logo: properties.LOGO,
     };
+  },
+  mounted() {
+    /* The tooltips and controls that use --appColor follow the branding colour */
+    if (properties.PRIMARY_COLOR) {
+      document.documentElement.style.setProperty(
+        "--appColor",
+        properties.PRIMARY_COLOR
+      );
+    }
   },
   computed: {
     navItems() {
@@ -63,3 +77,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.app-logo {
+  height: 28px;
+  max-width: 140px;
+  object-fit: contain;
+  margin-right: 12px;
+}
+</style>

@@ -801,6 +801,58 @@ function getExtraConfigFromSpec(data, name, defaultValue) {
   return defaultValue;
 }
 
+/* The name the app shows people: the branding title when the project has one,
+   else the product name (which is also an identifier, so it stays plain). */
+function appTitle(data) {
+  return getExtraConfigFromSpec(data, "app_title", data.basicData.name);
+}
+
+/* Database column names of the entity's text fields: what the map's search looks
+   into for a layer GeoServer draws (a plain, lowercase SQL name each). */
+function searchableColumns(entity) {
+  return (entity.properties || [])
+    .filter(function(p) {
+      return String(p.class).split(" ")[0] == "String" && !p.hidden;
+    })
+    .map(function(p) {
+      return camelToSnake(normalize(p.name));
+    });
+}
+
+/* The time fields of a layer (spec layer.temporal: property names) as the JSON the map's time
+   slider reads: each field as its property name and its database column. */
+function temporalConfig(temporal) {
+  var field = function(name) {
+    return { property: normalize(name), column: camelToSnake(normalize(name)) };
+  };
+  var config = { start: field(temporal.start) };
+  if (temporal.end) config.end = field(temporal.end);
+  return JSON.stringify(config);
+}
+
+/* A Java string literal for any text: quotes/backslashes escaped, line breaks flattened,
+   and everything outside printable ASCII written as a unicode escape. */
+function javaString(text) {
+  return (
+    '"' +
+    String(text)
+      .replace(/[\r\n\t]+/g, " ")
+      .replace(/[\\"]/g, "\\$&")
+      .replace(/[^\x20-\x7e]/g, function(c) {
+        return "\\u" + ("0000" + c.charCodeAt(0).toString(16)).slice(-4);
+      }) +
+    '"'
+  );
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 /* This file is inlined into every generated product file's compiled template
    function with all newlines stripped first (see spl-js-engine's
    Processor.process), so a `//` line comment here swallows every line of

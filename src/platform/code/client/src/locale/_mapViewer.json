@@ -35,6 +35,8 @@
       "layer-item-detail": "Item detail",
       "no-data": "There is no data",
       "no-property-data": "No data",
+      "show-all": "Show all fields",
+      "show-tip": "Show summary",
       "form-tooltip": "Go to the item's detail form"
     },
     ###< } >###
@@ -44,6 +46,49 @@
     "wmsLegend": {
       "title": "WMS Layer Legend",
       "no-data": "There is no data available"
+    },
+    ###< } >###
+    ###< if(feature.MV_T_Editing) { >###
+    "edit": {
+      "title": "Edit",
+      "toggle": "Edit features",
+      "add": "Add a feature",
+      "hint-pick": "Click a feature on the map to edit it.",
+      "hint-draw": "Draw the new feature on the map. Double click, or click the last point again, to finish.",
+      "hint-move": "Drag the points on the map to change the shape, and change its data below.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "delete-title": "Delete this feature?",
+      "delete-text": "It is removed for everyone. This cannot be undone.",
+      "saved": "Saved.",
+      "deleted": "Deleted.",
+      "nothing": "There is no editable feature there.",
+      "error": "It could not be saved. Check the data, and that you signed in with the editing account."
+    },
+    ###< } >###
+    ###< if(feature.MV_T_TimeSlider) { >###
+    "timeSlider": {
+      "title": "Time",
+      "play": "Play",
+      "pause": "Pause",
+      "all": "Show all dates",
+      "none": "No date"
+    },
+    ###< } >###
+    ###< if(feature.MV_T_F_BasicSearch) { >###
+    "search": {
+      "empty": "Nothing found",
+      "places": "Places",
+      "attribution": "Places by OpenStreetMap Nominatim"
+    },
+    ###< } >###
+    ###< if(feature.MV_T_E_ShowLegend) { >###
+    "legend": {
+      "title": "Legend",
+      "empty": "No visible layers",
+      "show": "Show legend",
+      "hide": "Hide legend"
     },
     ###< } >###
     "mustSelectAnExportOption": "You must choose at least one of the export formats",

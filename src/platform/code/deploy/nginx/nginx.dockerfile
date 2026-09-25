@@ -7,6 +7,10 @@ RUN rm /etc/nginx/conf.d/default.conf
 # Copy the custom Nginx configuration
 COPY ./config/etc/nginx.conf /etc/nginx/conf.d/
 COPY ./config/nginx.conf /etc/nginx/
+/*% if (feature.MV_T_Editing) { %*/
+# The editing account (only its hash): who may change data
+RUN printf '%s\n' '/*%= getExtraConfigFromSpec(data, "edit_htpasswd", "") %*/' > /etc/nginx/edit.htpasswd
+/*% } %*/
 
 # Expose port 80
 EXPOSE 80

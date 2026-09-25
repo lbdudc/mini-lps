@@ -79,6 +79,9 @@
           ###< if (feature.MV_DetailOnClick) { >###
           "form": "###<= theForm.id >###",
           ###< } >###
+          ###< if (feature.MV_T_F_BasicSearch || feature.DM_DataExport) { >###
+          "entity": "###<= normalize(entity.name, true) >###",
+          ###< } >###
           "availableStyles": [],
           "url": "entities/###<= normalize(entity.name) >###s/geom/###<= normalize(geoPropertyName) >###"
         }
@@ -103,6 +106,12 @@
           "name": "###<= normalize(entity.name) + "-" + normalize(geoPropertyName) >###",
           ###< if (feature.MV_T_ViewMapAsList) { >###
           "list": "###<= theList.id >###",
+          ###< } >###
+          ###< if (feature.MV_T_F_BasicSearch || feature.DM_DataExport) { >###
+          "entity": "###<= normalize(entity.name, true) >###",
+          ###< } >###
+          ###< if (feature.MV_T_F_BasicSearch) { >###
+          "searchFields": ###<= JSON.stringify(searchableColumns(entity)) >###,
           ###< } >###
           "options": {
             "layers": [
@@ -137,6 +146,12 @@
       "form": "###<= layer.form >###",
       ###< } >###
       "entityName": "###<= layer.entityName >###",
+      ###< if (feature.MV_T_F_BasicSearch || feature.DM_DataExport || feature.MV_T_Editing) { >###
+      "entity": "###<= normalize(entity.name, true) >###",
+      ###< } >###
+      ###< if (layer.popup) { >###
+      "popup": ###<= JSON.stringify(layer.popup) >###,
+      ###< } >###
       "url": "entities/###<= normalize(entity.name) >###s/geom/###<= normalize(geoPropertyName) >###",
       "defaultStyle": "###<= layer.defaultStyle >###",
       "availableStyles": ###<= JSON.stringify(layer.availableStyles) >###
@@ -163,6 +178,26 @@
       ###< } >###
       ###< if (layer.raster) { >###
       "raster": true,
+      ###< } >###
+      ###<
+        var layerEntity = ((feature.MV_T_F_BasicSearch || feature.DM_DataExport || feature.MV_T_Editing) && !layer.external && !layer.raster && layer.layers)
+          ? data.dataModel.entities.find(function(en) { return en.name == layer.layers[0]; })
+          : null;
+      >###
+      ###< if (layerEntity) { >###
+      "entity": "###<= normalize(layerEntity.name, true) >###",
+      ###< if (feature.MV_T_F_BasicSearch) { >###
+      "searchFields": ###<= JSON.stringify(searchableColumns(layerEntity)) >###,
+      ###< } >###
+      ###< } >###
+      ###< if (layer.popup) { >###
+      "popup": ###<= JSON.stringify(layer.popup) >###,
+      ###< } >###
+      ###< if (feature.MV_T_Editing && layer.editable) { >###
+      "editable": true,
+      ###< } >###
+      ###< if (feature.MV_T_TimeSlider && layer.temporal) { >###
+      "temporal": ###<= temporalConfig(layer.temporal) >###,
       ###< } >###
       ###< if (layer.url) { >###
       "url": "###<= layer.url >###",

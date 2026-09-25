@@ -164,6 +164,17 @@ abstract class StandardDataImportService {
 
                     Object value = values[i];
 
+                    // A date column of a shapefile arrives as a date already (not as text to
+                    // parse with a pattern): it goes to the field as it is
+                    if (value instanceof java.util.Date
+                            && (localDateType.equals(column.getType()) || localDateTimeType.equals(column.getType()))) {
+                        java.time.LocalDateTime moment = ((java.util.Date) value).toInstant()
+                                .atZone(java.time.ZoneOffset.UTC).toLocalDateTime();
+                        setValueInField(instanceObject, column.getName(), column.getType(),
+                                localDateType.equals(column.getType()) ? (Object) moment.toLocalDate() : (Object) moment);
+                        continue;
+                    }
+
                     String entityPackage = _entityDomain.class.getPackage().getName();
                     boolean isEnumerated = Enum.class.isAssignableFrom(Class.forName(column.getType()));
 

@@ -65,6 +65,12 @@ import jakarta.annotation.Resource;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import java.net.URI;
+/*% if (feature.MV_T_F_BasicSearch && geographicPropertyNames.length > 0) { %*/
+import es.udc.lbd.gema.lps.web.rest.custom.SearchHitDTO;
+/*% } %*/
+/*% if (feature.DM_DataExport) { %*/
+import java.nio.charset.StandardCharsets;
+/*% } %*/
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +134,46 @@ public class /*%= normalize(context.name, true) %*/Resource {
             .header("Content-Disposition", "attachment; filename=\"/*%= pluralize(normalize(context.name)) %*/.tsv\"")
             .body(tsvData);
     }
+
+    /*% if (feature.MV_T_F_BasicSearch && geographicPropertyNames.length > 0) { %*/
+    /** The map's search box: a few matches with where they are, so the map can zoom to one. */
+    @GetMapping("/search")
+    public ResponseEntity<List<SearchHitDTO>> searchHits(
+        @RequestParam("q") String q,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit
+    ) {
+        return ResponseEntity.ok(/*%= normalize(context.name) %*/Service.searchHits(q, limit));
+    }
+
+    /*% } %*/
+    /*% if (feature.DM_DataExport) { %*/
+    /** Downloads of what the list shows: the same filters and search as getAll. */
+    @GetMapping("/export/csv")
+    public ResponseEntity<byte[]> exportCsv(
+        @RequestParam(value = "filters", required = false) List<String> filters,
+        @RequestParam(value = "search", required = false) String search,
+        @RequestParam(value = "labels", defaultValue = "true") Boolean labels
+    ) {
+        byte[] csv = /*%= normalize(context.name) %*/Service.getAllAsCsv(filters, search, labels).getBytes(StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+            .header("Content-Disposition", "attachment; filename=\"/*%= pluralize(normalize(context.name)) %*/.csv\"")
+            .body(csv);
+    }
+    /*% if (geographicPropertyNames.length > 0) { %*/
+
+    @GetMapping("/export/geojson")
+    public ResponseEntity<FeatureCollectionJSON> exportGeoJson(
+        @RequestParam(value = "filters", required = false) List<String> filters,
+        @RequestParam(value = "search", required = false) String search
+    ) {
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType("application/geo+json"))
+            .header("Content-Disposition", "attachment; filename=\"/*%= pluralize(normalize(context.name)) %*/.geojson\"")
+            .body(/*%= normalize(context.name) %*/Service.exportGeoJson(filters, search));
+    }
+    /*% } %*/
+    /*% } %*/
 
     /*% if (!feature.MV_MS_GJ_Cached) { %*/
     /*% geographicPropertyNames.forEach(function(geoPropertyName) {
