@@ -1,4 +1,4 @@
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_T_F_BasicSearch) { %*/
 <template>
   <div v-if="map" class="map-controls">
     <div class="column">
@@ -21,6 +21,51 @@
     </div>
 
     <div v-show="showBtns || !$vuetify.breakpoint.smAndDown">
+      /*% if (feature.MV_T_F_BasicSearch) { %*/
+      <div class="column search-column">
+        <v-tooltip left open-delay="200" color="var(--appColor)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="white"
+              :class="{ 'btn-selected': searchOpen }"
+              data-test="map-search-toggle"
+              @click.stop="toggleSearch"
+            >
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("mapViewer.searchInMap") }}</span>
+        </v-tooltip>
+
+        <div v-if="searchOpen" class="search-panel">
+          <v-text-field
+            ref="searchInput"
+            dense
+            :value="form.query"
+            @input="$emit('update-query', $event)"
+            prepend-inner-icon="mdi-magnify"
+            :label="$t('mapViewer.searchInMap')"
+            @keydown.enter="$emit('search')"
+            @click:clear="$emit('clear-search')"
+            single-line
+            hide-details
+            outlined
+            rounded
+            clearable
+            background-color="white"
+            data-test="map-search-input"
+          ></v-text-field>
+          <search-results
+            :query="form.query"
+            :map="map"
+            :overlays="overlays"
+          ></search-results>
+        </div>
+      </div>
+      /*% } %*/
+
       /*% if (feature.MV_LayerManagement) { %*/
       <div class="column">
         <layer-manager
@@ -176,22 +221,36 @@
 /*% if (feature.MV_LayerManagement) { %*/
 import LayerManager from "./LayerManager.vue";
 /*% } %*/
+/*% if (feature.MV_T_F_BasicSearch) { %*/
+import SearchResults from "../search/SearchResults.vue";
+/*% } %*/
 
 export default {
   name: "RightMapControls",
-  /*% if (feature.MV_T_InformationMode) { %*/
+  /*% if (feature.MV_T_InformationMode || feature.MV_T_F_BasicSearch) { %*/
   watch: {
+    /*% if (feature.MV_T_F_BasicSearch) { %*/
+    /* a search that arrives after this is created (from a shared link) opens the field */
+    "form.query"(query) {
+      if (query) this.searchOpen = true;
+    },
+    /*% } %*/
+    /*% if (feature.MV_T_InformationMode) { %*/
     $route() {
       // Deactivate info control if it is active
       if (!this.WMSInfoControlBtn) {
         this.buildWMSInfoControl();
       }
     },
+    /*% } %*/
   },
   /*% } %*/
   components: {
     /*% if (feature.MV_LayerManagement) { %*/
     LayerManager,
+    /*% } %*/
+    /*% if (feature.MV_T_F_BasicSearch) { %*/
+    "search-results": SearchResults,
     /*% } %*/
   },
   props: {
@@ -203,10 +262,10 @@ export default {
       type: Object,
       default: () => {},
     },
-    /*% if (feature.MV_T_InformationMode) { %*/
+    /*% if (feature.MV_T_F_BasicSearch) { %*/
     form: {
       type: Object,
-      default: () => {},
+      default: () => ({ query: null }),
     },
     /*% } %*/
     /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/
@@ -227,6 +286,10 @@ export default {
   data() {
     return {
       showBtns: false,
+      /*% if (feature.MV_T_F_BasicSearch) { %*/
+      /* a search already in the URL (a shared link) keeps the field open */
+      searchOpen: !!(this.form && this.form.query),
+      /*% } %*/
       /*% if (feature.MV_T_InformationMode) { %*/
       WMSInfoControlBtn: true,
       /*% } %*/
@@ -236,6 +299,15 @@ export default {
     showButtons() {
       this.showBtns = !this.showBtns;
     },
+
+    /*% if (feature.MV_T_F_BasicSearch) { %*/
+    toggleSearch() {
+      this.searchOpen = !this.searchOpen;
+      if (this.searchOpen) {
+        this.$nextTick(() => this.$refs.searchInput && this.$refs.searchInput.focus());
+      }
+    },
+    /*% } %*/
 
     goToBookmark(bookmark) {
       this.map.getLeafletMap().fitBounds(bookmark.bounds);
@@ -292,6 +364,20 @@ export default {
 .column {
   margin-top: 0.6em;
   padding-right: 0;
+}
+
+/* The search field opens to the left of the buttons, level with its own button; the
+   suggestions (SearchResults) hang under it. */
+.search-column {
+  position: relative;
+}
+
+.search-panel {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 10px;
+  width: min(340px, calc(100vw - 96px));
 }
 
 /* Every floating control button (wrench toggle, layer manager, add layer,

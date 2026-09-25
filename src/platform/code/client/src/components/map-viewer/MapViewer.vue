@@ -1,33 +1,6 @@
 /*% if (feature.MapViewer) { %*/
 <template>
   <v-container fluid id="map-container" class="pa-0">
-    /*% if (feature.MV_T_F_BasicSearch) { %*/
-    <div class="map-search-bar">
-      <v-toolbar dense flat color="grey lighten-4" class="map-toolbar" elevation="1">
-        <v-text-field
-          dense
-          v-model="form.query"
-          prepend-inner-icon="mdi-magnify"
-          :label="$t('mapViewer.searchInMap')"
-          @keydown.enter="searchInMap"
-          @click:clear="clearSearch"
-          single-line
-          hide-details
-          outlined
-          rounded
-          clearable
-          data-test="map-search-input"
-          class="map-toolbar-select mr-2"
-        ></v-text-field>
-      </v-toolbar>
-      <search-results
-        :query="form.query"
-        :map="map"
-        :overlays="viewOverlays"
-      ></search-results>
-    </div>
-    /*% } %*/
-
     /*% if (feature.MV_T_TimeSlider) { %*/
     <time-slider v-if="map" :map="map" :overlays="viewOverlays"></time-slider>
     /*% } %*/
@@ -35,13 +8,16 @@
     <feature-editor v-if="map" :map="map" :overlays="viewOverlays"></feature-editor>
     /*% } %*/
     <div ref="map" id="map">
-    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch) { %*/
       <right-map-controls
         :overlays="viewOverlays"
         :map="map"
         :loadingMap="loadingMap"
         :bookmarks="bookmarks"
-        /*% if (feature.MV_T_InformationMode && feature.MV_T_F_BasicSearch) { %*/:form="form"/*% } %*/
+        /*% if (feature.MV_T_F_BasicSearch) { %*/:form="form"
+        @update-query="form.query = $event"
+        @search="searchInMap"
+        @clear-search="clearSearch"/*% } %*/
         /*% if (feature.MV_MM_MMV_MapSelectorInMapViewer) { %*/:hasMultipleMaps="maps.length > 1"/*% } %*/
         @build-control="openDialog"
       ></right-map-controls>
@@ -87,9 +63,6 @@ import layers from "./config-files/layers.json";
 /*% if (feature.MV_DetailOnClick) { %*/
 import InformationPopup from "@/components/map-viewer/InformationPopup";
 /*% } %*/
-/*% if (feature.MV_T_F_BasicSearch) { %*/
-import SearchResults from "./search/SearchResults.vue";
-/*% } %*/
 /*% if (feature.MV_T_TimeSlider) { %*/
 import TimeSlider from "./time-slider/TimeSlider.vue";
 /*% } %*/
@@ -103,7 +76,7 @@ import devCheck from "@/common/device-check";
 /*% if (feature.MV_T_Export) { %*/
 import ExportManagement from "./export-management/ExportManagement";
 /*% } %*/
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch) { %*/
 import RightMapControls from "./controls/RightMapControls.vue";
 /*% } %*/
 /*% if (feature.MV_Processes) { %*/
@@ -150,10 +123,9 @@ export default {
   name: "Map",
   /*% if (feature.MV_T_Editing || feature.MV_T_TimeSlider || feature.MV_T_F_BasicSearch || feature.MV_T_Export || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_DetailOnClick || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_Processes) { %*/
   components: {
-    /*% if (feature.MV_T_F_BasicSearch) { %*/"search-results": SearchResults,/*% } %*/
     /*% if (feature.MV_T_TimeSlider) { %*/"time-slider": TimeSlider,/*% } %*/
     /*% if (feature.MV_T_Editing) { %*/"feature-editor": FeatureEditor,/*% } %*/
-    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch) { %*/
     RightMapControls,
     /*% } %*/
     /*% if (feature.MV_Processes) { %*/Toolbox, /*% } %*/
@@ -489,25 +461,6 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
-}
-
-.map-search-bar {
-  position: relative;
-  flex: 0 0 auto;
-  z-index: 1100;
-}
-
-.map-toolbar {
-  flex: 0 0 auto;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-::v-deep .map-toolbar .v-toolbar__content {
-  flex-wrap: wrap;
-  height: auto !important;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  gap: 4px;
 }
 
 #map {

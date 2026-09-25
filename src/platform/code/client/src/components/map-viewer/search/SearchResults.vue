@@ -210,9 +210,9 @@ export default {
 <style scoped>
 .search-results {
   position: absolute;
-  top: 100%;
-  left: 8px;
-  width: min(420px, calc(100% - 16px));
+  top: calc(100% + 4px);
+  right: 0;
+  width: 100%;
   max-height: 60vh;
   overflow-y: auto;
   z-index: 1100;

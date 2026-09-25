@@ -119,6 +119,7 @@
 <script>
 import embed from "vega-embed";
 import layers from "../map-viewer/config-files/layers.json";
+import attributes from "@/modules/entities-attributes.json";
 
 let context = null;
 let charts = [];
@@ -242,13 +243,17 @@ export default {
       try {
         const baseSpec = context(this.selectedChart);
 
-        // Only for saved charts: Add extra "s" to entity in URL to handle user-added JSONs that don't include it
+        // Only for saved charts: user-added JSONs may name the entity without the plural "s".
+        // The REST route of an entity is its name plus "s", so a route is kept as it is when
+        // it is one, and only completed with an "s" when that makes it one (a name that
+        // already ends in "s", like "landuses", must not become "landusess").
         if (baseSpec.data && baseSpec.data[0] && baseSpec.data[0].url) {
           const match = baseSpec.data[0].url.match(/\/api\/entities\/([^/]+)\//);
           if (match) {
             const entityFromUrl = match[1];
-            let correctedEntity = entityFromUrl.endsWith("ss") 
-              ? entityFromUrl 
+            const routes = Object.keys(attributes).map(name => name + "s");
+            const correctedEntity = routes.includes(entityFromUrl) || !routes.includes(entityFromUrl + "s")
+              ? entityFromUrl
               : entityFromUrl + "s";
             baseSpec.data[0].url = baseSpec.data[0].url.replace(
               `/api/entities/${entityFromUrl}/`,

@@ -63,6 +63,7 @@
     "vuetify": "2.7.1",
     ###< if (feature.ChartViewer) { >###
     "vega": "5.22.1",
+    "vega-scale": "7.4.3",
     "vega-lite": "5.2.0",
     "vega-embed": "6.20.8"
     ###< } >###
