@@ -7,5 +7,6 @@ WORKDIR /app
 # statement outside a module" and this container exits 1 immediately, leaving
 # the generated app's database empty.
 COPY import.mjs .
-COPY data/ ./data/
+# ./data is not copied: docker-compose.yml mounts it at /app/data, so the (large) data
+# never enters the image or the build context's cache key.
 CMD ["node", "import.mjs"]

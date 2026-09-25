@@ -9,6 +9,15 @@ public class FormatGis extends FormatCommon {
     private String temporaryFileName;
     private String encoding;
     private String entityClazz;
+    private boolean replace;
+
+    public boolean isReplace() {
+        return replace;
+    }
+
+    public void setReplace(boolean replace) {
+        this.replace = replace;
+    }
 
     public String getEntityClazz() {
         return entityClazz;

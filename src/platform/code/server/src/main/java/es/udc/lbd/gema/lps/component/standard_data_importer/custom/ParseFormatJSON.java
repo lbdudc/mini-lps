@@ -14,6 +14,8 @@ public class ParseFormatJSON {
     private String type;
     private int ncolumns;
     private Boolean storedFile;
+    // Shapefile imports: delete the entity's existing rows before loading the file
+    private boolean replace;
 
     // CSV properties
     private char separator;
@@ -109,6 +111,14 @@ public class ParseFormatJSON {
 
     public void setStoredFile(Boolean storedFile) {
       this.storedFile = storedFile;
+    }
+
+    public boolean isReplace() {
+      return replace;
+    }
+
+    public void setReplace(boolean replace) {
+      this.replace = replace;
     }
 
     /**

@@ -2,6 +2,22 @@
 FROM node:16.20-bullseye-slim AS build-stage
 
 RUN mkdir -p /app/client
+WORKDIR /app/client
+
+# Installing git and exiftool package to remove EXIF data from pictures
+# bullseye is EOL and deb.debian.org 404s on its old package set; pin to the
+# snapshot.debian.org mirror (already referenced, commented out, in the base image)
+# This comes before any COPY so a source change never re-runs it.
+RUN printf 'deb http://snapshot.debian.org/archive/debian/20230904T000000Z bullseye main\ndeb http://snapshot.debian.org/archive/debian-security/20230904T000000Z bullseye-security main\ndeb http://snapshot.debian.org/archive/debian/20230904T000000Z bullseye-updates main\n' > /etc/apt/sources.list \
+    && apt -o Acquire::Check-Valid-Until=false update && apt -y install git exiftool
+
+# Dependencies first: this layer (and the npm cache mount) is reused for as long
+# as package.json does not change, so a redeploy that only touches src/ skips
+# `npm install` entirely.
+COPY package.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --no-audit --no-fund --prefer-offline
+
 # `.` (not `..`): the build context is already the client/ directory itself
 # (docker-compose.yml's `context: ../client`), and `..` tries to reach
 # outside it. Docker/BuildKit silently clamps that to the context root
@@ -14,15 +30,6 @@ RUN mkdir -p /app/client
 # still serves the old code -- only `docker compose build --no-cache`
 # worked around it. `COPY .` fixes the cache key at the source.
 COPY . /app/client
-WORKDIR /app/client
-
-# Installing git and exiftool package to remove EXIF data from pictures
-# bullseye is EOL and deb.debian.org 404s on its old package set; pin to the
-# snapshot.debian.org mirror (already referenced, commented out, in the base image)
-RUN printf 'deb http://snapshot.debian.org/archive/debian/20230904T000000Z bullseye main\ndeb http://snapshot.debian.org/archive/debian-security/20230904T000000Z bullseye-security main\ndeb http://snapshot.debian.org/archive/debian/20230904T000000Z bullseye-updates main\n' > /etc/apt/sources.list \
-    && apt -o Acquire::Check-Valid-Until=false update && apt -y install git exiftool
-
-RUN npm install
 RUN npm run build
 
 # removing pictures' EXIF data

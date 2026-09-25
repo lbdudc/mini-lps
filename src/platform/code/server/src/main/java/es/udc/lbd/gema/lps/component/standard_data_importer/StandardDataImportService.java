@@ -114,6 +114,25 @@ abstract class StandardDataImportService {
         importCustomTypes.add(localDateTimeType);
     }
 
+    private volatile Validator validator;
+
+    /**
+     * The validator is thread-safe and expensive to build (a whole ValidatorFactory), so it is
+     * created once: building it for every imported row used to dominate the import time.
+     */
+    private Validator getValidator() {
+        Validator v = validator;
+        if (v == null) {
+            v = Validation.byDefaultProvider()
+                .configure()
+                .messageInterpolator(new LocaleMessageInterpolator())
+                .buildValidatorFactory()
+                .getValidator();
+            validator = v;
+        }
+        return v;
+    }
+
     abstract ImportFileJSON uploadAndProcessHeader(MultipartHttpServletRequest request) throws ImportException, FileNotSupportedException, TypeNotSupportedException;
 
     abstract File processFile(ParseFormatJSON format) throws ImportException, FileNotSupportedException, TypeNotSupportedException;
@@ -214,12 +233,7 @@ abstract class StandardDataImportService {
 
         // Validate object using java validator
         // https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=6.0#section-validator-factory-message-interpolator
-        Validator validator = Validation.byDefaultProvider()
-            .configure()
-            .messageInterpolator(new LocaleMessageInterpolator())
-            .buildValidatorFactory()
-            .getValidator();
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(instanceObject);
+        Set<ConstraintViolation<Object>> constraintViolations = getValidator().validate(instanceObject);
         for (ConstraintViolation<Object> cv : constraintViolations) {
             String message = "Property '" + cv.getPropertyPath() + "'. Found: '" + cv.getMessage() + "'.";
             logger.error(message);
@@ -416,7 +430,7 @@ abstract class StandardDataImportService {
      * Obtains primary id field. <br>
      * No composite keys are supported
      */
-    private Field getPrimaryKeyField(Class<?> entityClass) {
+    Field getPrimaryKeyField(Class<?> entityClass) {
         // Obtains id field type
         List<Field> idFieldsNames = FieldUtils.getFieldsListWithAnnotation(entityClass, Id.class);
         if (idFieldsNames.size() == 0) {

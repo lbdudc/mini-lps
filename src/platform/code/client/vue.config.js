@@ -34,6 +34,7 @@ module.exports = {
   },
   /*% } %*/
   parallel: false,
+  productionSourceMap: false,
   transpileDependencies: [
     /*% if (feature.ChartViewer) { %*/
     'vega',

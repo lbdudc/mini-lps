@@ -5,7 +5,8 @@ spring:
     database: /*%= getDatabaseConfigFromSpec(data, 'database', 'gema') %*/
     username: postgres
     password: postgres
-    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}
+    # reWriteBatchedInserts: the driver folds a JDBC batch of inserts into multi-row INSERTs
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.database}?reWriteBatchedInserts=true
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
@@ -32,6 +33,12 @@ spring:
     properties:
       hibernate.jdbc.lob.non_contextual_creation: true
       hibernate.temp.use_jdbc_metadata_defaults: true
+      # Bulk imports (shapefiles): batched inserts, grouped per table
+      hibernate.jdbc.batch_size: 500
+      hibernate.order_inserts: true
+      # The database now outlives a redeploy: sequences created by an older version have
+      # increment 1 while the entities ask for 50. Use the database's increment instead of failing.
+      hibernate.id.sequence.increment_size_mismatch_strategy: FIX
   servlet:
     multipart:
       max-file-size: 250MB     # Set MAX_UPLOAD_FILE_SIZE in gulpfile.js

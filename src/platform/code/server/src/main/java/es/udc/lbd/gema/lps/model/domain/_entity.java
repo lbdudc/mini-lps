@@ -106,7 +106,7 @@ public /*% if (context.abstract) { %*/abstract /*% } %*/class /*%= normalize(con
         /*% if (propertyIsAutoinc) { %*/
           /*% if (feature.DM_GT_Sequence) { %*/
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "/*%= (normalize(context.name)) %*//*%= normalize(prop.name) %*/")
-    @SequenceGenerator(name = "/*%= (normalize(context.name)) %*//*%= normalize(prop.name) %*/", sequenceName = "t_/*%= camelToSnake(normalize(context.name)) %*/_/*%= camelToSnake(normalize(prop.name)) %*/_seq", initialValue = 1, allocationSize = 1)
+    @SequenceGenerator(name = "/*%= (normalize(context.name)) %*//*%= normalize(prop.name) %*/", sequenceName = "t_/*%= camelToSnake(normalize(context.name)) %*/_/*%= camelToSnake(normalize(prop.name)) %*/_seq", initialValue = 1, allocationSize = 50)
           /*% } %*/
         /*% } %*/
         /*% if (propertyIsEnum) { %*/

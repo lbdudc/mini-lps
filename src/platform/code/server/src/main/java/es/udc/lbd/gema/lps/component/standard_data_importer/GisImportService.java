@@ -41,7 +41,11 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import jakarta.inject.Inject;
@@ -49,6 +53,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -68,6 +73,12 @@ public class GisImportService extends StandardDataImportService {
 
     @Inject
     private Properties properties;
+
+    @Inject
+    private PlatformTransactionManager transactionManager;
+
+    /** Features saved per transaction (see saveBatch); matches hibernate.jdbc.batch_size scale */
+    private static final int IMPORT_BATCH_SIZE = 1000;
 
     private final String IMPORT_TYPE = "shapefile";
     private final String ZIP = "zip";
@@ -342,6 +353,7 @@ public class GisImportService extends StandardDataImportService {
         // Get rest of parameters
         p.setEntityClazz(format.getEntityName());
         p.setFormat(format.getColumns());
+        p.setReplace(format.isReplace());
 
         // Check if encoding is provided
         if (StringUtils.isBlank(format.getEncoding())) {
@@ -407,8 +419,23 @@ public class GisImportService extends StandardDataImportService {
         } catch (FactoryException e) {
             throw new AppRuntimeException("Unable to obtain EPSG ", e);
         }
+        // Same CRS as the target (the plugin already exports EPSG:4326): nothing to reproject
+        boolean reproject = !transformer.isIdentity();
+
+        @SuppressWarnings("unchecked")
+        JpaRepository<Object, Object> repository =
+                (JpaRepository<Object, Object>) beanFactory.getBean(StringUtils.uncapitalize(clazzRepositoryName));
+        TransactionTemplate transaction = new TransactionTemplate(transactionManager);
+
+        // The caller asked for the file to replace what the entity already holds
+        if (p.isReplace()) {
+            logger.debug("Replacing the existing rows of " + clazzObject.getSimpleName());
+            repository.deleteAllInBatch();
+        }
+
         FeatureIterator<SimpleFeature> features = collection.features();
         try {
+            List<Object> batch = new ArrayList<Object>(IMPORT_BATCH_SIZE);
 
             // For each entry we read all values (Geom and attributes)
             while (features.hasNext()) {
@@ -420,8 +447,10 @@ public class GisImportService extends StandardDataImportService {
                         Object value = attribute.getValue();
                         if (value instanceof Geometry) {
                             // FIXME: Try to set SRID in a different place
-                            ((Geometry) value).setSRID(epsg);
-                            value = JTS.transform((Geometry) value, transformer);
+                            if (reproject) {
+                                ((Geometry) value).setSRID(epsg);
+                                value = JTS.transform((Geometry) value, transformer);
+                            }
                             ((Geometry) value).setSRID(targetEpsg);
 
                         }
@@ -432,10 +461,12 @@ public class GisImportService extends StandardDataImportService {
                 }
 
                 // Populate entity fields
-                Object instanceObject = fillObjectWithData(p.getFormat(), values.toArray(new Object[0]), clazzObject);
-                // Save entity
-                saveEntity(clazzRepositoryName, saveMethod, instanceObject);
+                batch.add(fillObjectWithData(p.getFormat(), values.toArray(new Object[0]), clazzObject));
+                if (batch.size() >= IMPORT_BATCH_SIZE) {
+                    saveBatch(repository, transaction, batch, clazzObject, clazzRepositoryName, saveMethod);
+                }
             }
+            saveBatch(repository, transaction, batch, clazzObject, clazzRepositoryName, saveMethod);
 
         } finally {
             // GeoTools closes its readers by itself once the last feature is read, and for some
@@ -447,6 +478,43 @@ public class GisImportService extends StandardDataImportService {
                 logger.debug("Ignoring a second close of the shapefile reader: " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Saves the rows collected so far in one transaction (one commit and batched inserts instead of a
+     * commit per feature) and empties the batch.
+     * <br>
+     * A row that breaks a constraint used to be logged and skipped on its own. To keep that, a batch that
+     * fails is rolled back and its rows are saved one at a time, so only the offending rows are lost.
+     */
+    private void saveBatch(JpaRepository<Object, Object> repository, TransactionTemplate transaction,
+            List<Object> batch, Class<?> clazzObject, String clazzRepositoryName, Method saveMethod) {
+        if (batch.isEmpty()) {
+            return;
+        }
+        try {
+            transaction.executeWithoutResult(status -> {
+                repository.saveAll(batch);
+                // Flush inside the transaction so a violation surfaces here, not at commit
+                repository.flush();
+            });
+        } catch (DataIntegrityViolationException e) {
+            logger.error("A batch of " + batch.size() + " rows violates data integrity, saving its rows one by one...");
+            Field idField = getPrimaryKeyField(clazzObject);
+            idField.setAccessible(true);
+            for (Object instanceObject : batch) {
+                try {
+                    // The failed attempt already generated ids: without this save() would merge, not insert
+                    if (!idField.getType().isPrimitive()) {
+                        idField.set(instanceObject, null);
+                    }
+                } catch (IllegalAccessException ex) {
+                    throw new AppRuntimeException("Unable to reset the id of an entity", ex);
+                }
+                saveEntity(clazzRepositoryName, saveMethod, instanceObject);
+            }
+        }
+        batch.clear();
     }
 
     /**
