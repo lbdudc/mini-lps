@@ -2,18 +2,36 @@
 <template>
   <v-container fluid id="map-container" class="pa-0">
     /*% if (feature.MV_T_TimeSlider) { %*/
-    <time-slider v-if="map" :map="map" :overlays="viewOverlays"></time-slider>
+    <time-slider
+      v-if="map"
+      :map="map"
+      :overlays="viewOverlays"
+      :open.sync="timeOpen"
+      @available="timeAvailable = $event"
+    ></time-slider>
     /*% } %*/
     /*% if (feature.MV_T_Editing) { %*/
-    <feature-editor v-if="map" :map="map" :overlays="viewOverlays"></feature-editor>
+    <feature-editor
+      ref="editor"
+      v-if="map"
+      :map="map"
+      :overlays="viewOverlays"
+      @state="editState = $event"
+    ></feature-editor>
     /*% } %*/
     <div ref="map" id="map">
-    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_LM_BaseLayerSelector || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch || feature.MV_T_Editing || feature.MV_T_TimeSlider) { %*/
       <right-map-controls
         :overlays="viewOverlays"
         :map="map"
         :loadingMap="loadingMap"
         :bookmarks="bookmarks"
+        /*% if (feature.MV_T_Editing) { %*/:editAvailable="editState.available"
+        :editActive="editState.active"
+        @toggle-edit="toggleEditor"/*% } %*/
+        /*% if (feature.MV_T_TimeSlider) { %*/:timeAvailable="timeAvailable"
+        :timeOpen="timeOpen"
+        @toggle-time="timeOpen = !timeOpen"/*% } %*/
         /*% if (feature.MV_T_F_BasicSearch) { %*/:form="form"
         @update-query="form.query = $event"
         @search="searchInMap"
@@ -76,7 +94,7 @@ import devCheck from "@/common/device-check";
 /*% if (feature.MV_T_Export) { %*/
 import ExportManagement from "./export-management/ExportManagement";
 /*% } %*/
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch || feature.MV_T_Editing || feature.MV_T_TimeSlider) { %*/
 import RightMapControls from "./controls/RightMapControls.vue";
 /*% } %*/
 /*% if (feature.MV_Processes) { %*/
@@ -125,7 +143,7 @@ export default {
   components: {
     /*% if (feature.MV_T_TimeSlider) { %*/"time-slider": TimeSlider,/*% } %*/
     /*% if (feature.MV_T_Editing) { %*/"feature-editor": FeatureEditor,/*% } %*/
-    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch) { %*/
+    /*% if (feature.MV_LayerManagement || feature.MV_T_ViewMapAsList || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_Processes || feature.MV_T_F_BasicSearch || feature.MV_T_Editing || feature.MV_T_TimeSlider) { %*/
     RightMapControls,
     /*% } %*/
     /*% if (feature.MV_Processes) { %*/Toolbox, /*% } %*/
@@ -149,6 +167,16 @@ export default {
       /*% if (feature.MV_T_InformationMode) { %*/
       wmsFeatures: null,
       /*% } %*/
+      /*% } %*/
+      /*% if (feature.MV_T_TimeSlider) { %*/
+      /* the time slider: shown or hidden (its own close button, or the button on the right) and
+         whether there is anything to show */
+      timeOpen: true,
+      timeAvailable: false,
+      /*% } %*/
+      /*% if (feature.MV_T_Editing) { %*/
+      /* reported by the editor: {available, active} */
+      editState: { available: false, active: false },
       /*% } %*/
       mapSelected: null,
       map: null,
@@ -433,6 +461,11 @@ export default {
         localStorage.setItem("state", JSON.stringify(this.map.exportState()));
         this.changeRoute()
       }
+    },
+    /*% } %*/
+    /*% if (feature.MV_T_Editing) { %*/
+    toggleEditor() {
+      if (this.$refs.editor) this.$refs.editor.toggle();
     },
     /*% } %*/
     refreshLayerManager(/*% if (feature.MV_DetailOnClick) { %*/id/*% } %*/) {

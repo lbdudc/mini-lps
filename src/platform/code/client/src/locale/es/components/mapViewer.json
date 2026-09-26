@@ -65,6 +65,8 @@
       "play": "Reproducir",
       "pause": "Pausar",
       "all": "Mostrar todas las fechas",
+      "show": "Mostrar el control de tiempo",
+      "hide": "Ocultar el control de tiempo",
       "none": "Sin fecha"
     },
     ###< } >###

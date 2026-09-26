@@ -1,7 +1,7 @@
 /*% if (feature.MV_T_TimeSlider) { %*/
 <template>
   <v-card
-    v-if="range"
+    v-if="range && open"
     class="time-slider"
     elevation="6"
     data-test="time-slider"
@@ -26,6 +26,15 @@
         :title="$t('mapViewer.timeSlider.all')"
         data-test="time-slider-reset"
         @click="reset"
+      >
+        <v-icon>mdi-backup-restore</v-icon>
+      </v-btn>
+      <v-btn
+        icon
+        small
+        :title="$t('mapViewer.timeSlider.hide')"
+        data-test="time-slider-close"
+        @click="$emit('update:open', false)"
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -62,6 +71,9 @@ export default {
     map: { type: Object, default: null },
     /* the layers of the map shown: layers.json entries */
     overlays: { type: Array, default: () => [] },
+    /* whether the slider is shown (`.sync`): the map's right-hand button and the slider's own
+       close button both change it. Hidden, it stops filtering: the layers show all their dates. */
+    open: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -86,6 +98,13 @@ export default {
     overlays() {
       this.refresh();
     },
+    /* the map's button needs to know whether there is anything to show */
+    range(value) {
+      this.$emit("available", value !== null);
+    },
+    open(shown) {
+      if (!shown) this.reset();
+    },
     map() {
       this.bindMap();
     },
@@ -97,6 +116,7 @@ export default {
     this.bindMap();
   },
   beforeDestroy() {
+    this.$emit("available", false);
     clearTimeout(this.applyTimer);
     clearInterval(this.playTimer);
     this.unbindMap();
@@ -195,7 +215,11 @@ export default {
         if (filter) params.cql_filter = filter;
         else delete params.cql_filter;
         Promise.resolve(layer.getLayer()).then((leafletLayer) => {
-          if (leafletLayer && leafletLayer.setParams) leafletLayer.setParams(params);
+          if (!leafletLayer) return;
+          /* Leaflet's setParams only adds and overwrites keys: a filter that is no longer
+             wanted has to be removed from the layer's own parameters, or it is drawn again */
+          if (!filter && leafletLayer.wmsParams) delete leafletLayer.wmsParams.cql_filter;
+          if (leafletLayer.setParams) leafletLayer.setParams(params);
         });
       }
     },

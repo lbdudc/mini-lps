@@ -73,6 +73,8 @@
       "play": "Play",
       "pause": "Pause",
       "all": "Show all dates",
+      "show": "Show the time slider",
+      "hide": "Hide the time slider",
       "none": "No date"
     },
     ###< } >###

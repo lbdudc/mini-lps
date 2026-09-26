@@ -1,3 +1,13 @@
+# A deployment to another machine publishes no port of its own services (only nginx, or the
+# HTTPS front, is reachable): they answer inside the compose network, and this also keeps
+# them from clashing with whatever already listens on the server's 5432, 8080...
+/*% const publicDeploy = getExtraConfigFromSpec(data, 'public_deploy', '') === 'true'; %*/
+# With a domain, Caddy is the only service on 80/443: it gets the HTTPS certificate and hands
+# the requests to nginx.
+/*% const portable = getExtraConfigFromSpec(data, 'portable', '') === 'true'; %*/
+/*% const hasLiveLayers = ((data.mapViewer && data.mapViewer.layers) || []).some(function(l) { return l.live; }); %*/
+/*% const isolatedGeoserver = getExtraConfigFromSpec(data, 'isolated_geoserver', '') === 'true'; %*/
+/*% const domain = feature.D_C_Nginx ? getExtraConfigFromSpec(data, 'domain', '') : ''; %*/
 services:
   server:
     build:
@@ -20,8 +30,10 @@ services:
     networks:
       - local
     restart: unless-stopped
+    /*% if (!publicDeploy) { %*/
     ports:
       - '/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/:/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/'
+    /*% } %*/
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:/*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*//actuator/health"]
       interval: 5s
@@ -86,8 +98,10 @@ services:
       - postgres:/data/postgres
     networks:
       - local
+    /*% if (!publicDeploy) { %*/
     ports:
       - "5432:5432"
+    /*% } %*/
     restart: on-failure
     # Without an interval Docker checks every 30s, so `server` (which waits for this) started up
     # to 30s after Postgres was actually ready.
@@ -153,8 +167,10 @@ services:
     networks:
       - local
     restart: unless-stopped
+    /*% if (!publicDeploy) { %*/
     ports:
       - "8888:8080"
+    /*% } %*/
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/processes', timeout=4)"]
       interval: 5s
@@ -177,8 +193,10 @@ services:
     networks:
       - local
     restart: unless-stopped
+    /*% if (!publicDeploy) { %*/
     ports:
       - "8082:8080"
+    /*% } %*/
 
   redis:
     container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-qgis-redis
@@ -191,7 +209,13 @@ services:
   /*% if (feature.D_C_Geoserver) { %*/
   geoserver:
     container_name: ${GEOSERVER_CONTAINER_NAME}
-    image: docker.osgeo.org/geoserver:2.24.1
+    image: docker.osgeo.org/geoserver:2.26.2
+    /*% if (hasLiveLayers) { %*/
+    # A live layer's source on the machine running this stack is reached as host.docker.internal
+    # (the name Docker Desktop gives the host: Linux needs it declared)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    /*% } %*/
     environment:
       - CORS_ENABLED=${GEOSERVER_CORS_ENABLED}
       - INSTALL_EXTENSIONS=${GEOSERVER_INSTALL_EXTENSIONS}
@@ -200,12 +224,22 @@ services:
       - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
       - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
     volumes:
+      /*% if (isolatedGeoserver) { %*/
+      # The app's own data folder: it goes with the database on `down -v` (so the two never
+      # disagree), and the admin password above is the one only this app knows.
+      - geoserver-data:/opt/geoserver_data
+      /*% } else { %*/
       - /opt/ci/deployments/geoserver/data/:/opt/geoserver_data:Z
+      /*% } %*/
+      /*% if (!portable) { %*/
       - /opt/ci/deployments/geoserver/additional_libs:/opt/additional_libs:Z # by mounting this we can install libs from host on startup
+      /*% } %*/
     networks:
       - local
+    /*% if (!publicDeploy) { %*/
     ports:
       - "8080:8080"
+    /*% } %*/
     restart: unless-stopped
     # Without this, `server`'s `depends_on: geoserver` (see above) only waits for
     # this container to start, not for GeoServer's own webapp deployment -- which
@@ -232,8 +266,17 @@ services:
       - local
     volumes:
       - ../client/:/app/client/
+    /*% if (domain) { %*/
+    expose:
+      - "80"
+    /*% } else if (portable) { %*/
+    # NGINX_BIND moves it out of the way of the HTTPS front (start.sh/start.ps1 --domain do it)
+    ports:
+      - "${NGINX_BIND:-80}:80"
+    /*% } else { %*/
     ports:
       - "80:80"
+    /*% } %*/
     depends_on:
       - server
       - client
@@ -242,10 +285,63 @@ services:
       /*% } %*/
     restart: unless-stopped
 
+  /*% if (portable && feature.D_C_Nginx) { %*/
+  # Only with `--profile https` (start.sh/start.ps1 --domain <name>): Caddy gets the HTTPS
+  # certificate of DOMAIN from Let's Encrypt and hands the requests to nginx.
+  https:
+    profiles: ["https"]
+    image: caddy:2-alpine
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-https
+    networks:
+      - local
+    environment:
+      DOMAIN: ${DOMAIN:-}
+      CADDY_TLS: ${CADDY_TLS:-auto}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile.conf:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      - nginx
+    restart: unless-stopped
+
+  /*% } %*/
+  /*% if (domain) { %*/
+  https:
+    image: caddy:2-alpine
+    container_name: /*%= normalizeKebabCase(data.basicData.name) %*/-https
+    networks:
+      - local
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile.conf:/etc/caddy/Caddyfile:ro
+      # The certificates are kept outside the deployment folder and outside the named
+      # volumes: a redeploy replaces the folder and `down -v` removes the volumes, and
+      # asking for a new certificate each time would hit Let's Encrypt's rate limits.
+      - /var/lib/gispublisher//*%= normalizeKebabCase(data.basicData.name) %*//caddy:/data
+    depends_on:
+      - nginx
+    restart: unless-stopped
+
+  /*% } %*/
   /*% } %*/
 volumes:
 /*% if (feature.D_C_Postgres) { %*/
   postgres:
+    external: false
+/*% } %*/
+/*% if (feature.D_C_Geoserver && isolatedGeoserver) { %*/
+  geoserver-data:
+    external: false
+/*% } %*/
+/*% if (portable && feature.D_C_Nginx) { %*/
+  caddy-data:
     external: false
 /*% } %*/
 /*% if (feature.DM_DI_DF_Shapefile || feature.DM_DI_DF_GeoTIFF) { %*/

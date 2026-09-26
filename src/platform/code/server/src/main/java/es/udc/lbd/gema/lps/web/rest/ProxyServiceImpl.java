@@ -3,6 +3,8 @@ package es.udc.lbd.gema.lps.web.rest;
 
 import es.udc.lbd.gema.lps.model.service.exceptions.RequestNotSuccesfulException;
 import es.udc.lbd.gema.lps.web.rest.custom.HTTPRequestDTO;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
@@ -20,6 +23,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ProxyServiceImpl implements ProxyService {
+
+  private static final int CONNECT_TIMEOUT_MS = 10_000;
+  private static final int READ_TIMEOUT_MS = 120_000;
 
   private static List<String> HOP_BY_HOP_HEADERS =
       Arrays.asList("Connection", "Keep-Alive", "Access-Control-Allow-Origin", "Transfer-Encoding");
@@ -41,8 +47,23 @@ public class ProxyServiceImpl implements ProxyService {
           RequestNotSuccesfulException,
           MalformedURLException {
 
-    // Create the RestTemplate
-    RestTemplate restTemplate = new RestTemplate();
+    // Only the QGIS services of this stack and public servers (see ProxyGuard)
+    ProxyGuard.check(httpRequest.getUrl());
+
+    // Create the RestTemplate. A redirect is handed back, not followed: it could lead to an address
+    // the guard refuses. Timeouts: a slow server must not hold the proxy for ever.
+    SimpleClientHttpRequestFactory factory =
+        new SimpleClientHttpRequestFactory() {
+          @Override
+          protected void prepareConnection(HttpURLConnection connection, String httpMethod)
+              throws IOException {
+            super.prepareConnection(connection, httpMethod);
+            connection.setInstanceFollowRedirects(false);
+          }
+        };
+    factory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+    factory.setReadTimeout(READ_TIMEOUT_MS);
+    RestTemplate restTemplate = new RestTemplate(factory);
 
     HttpEntity<String> entity = prepareEntity(httpRequest);
     try {
@@ -106,6 +127,10 @@ public class ProxyServiceImpl implements ProxyService {
     HttpHeaders headers = new HttpHeaders();
     if (httpRequest.getHeaders() != null) {
       for (Map.Entry<String, String> header : httpRequest.getHeaders().entrySet()) {
+        // never the browser's say on credentials or cookies
+        if (!ProxyGuard.FORWARDED_HEADERS.contains(header.getKey().toLowerCase())) {
+          continue;
+        }
         if (header.getKey() == "Content-Type") {
           headers.setAccept(Arrays.asList(MediaType.parseMediaType(header.getValue())));
         }

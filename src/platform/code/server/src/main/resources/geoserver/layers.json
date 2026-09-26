@@ -164,6 +164,9 @@
       ###< if (layer.raster) { >###
       "raster": true,
       ###< } >###
+      ###< if (layer.live) { >###
+      "live": ###<= JSON.stringify(layer.live) >###,
+      ###< } >###
       ###< if (layer.url) { >###
       "url": "###<= layer.url >###",
       ###< } >###

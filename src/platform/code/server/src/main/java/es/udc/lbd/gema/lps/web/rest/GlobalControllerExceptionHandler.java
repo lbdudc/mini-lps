@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
@@ -57,6 +58,13 @@ public class GlobalControllerExceptionHandler {
     	  .build();
     else return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
   }
+  /* an answer with its own status (the proxy refusing an address: 403), not a server error */
+  @ExceptionHandler(ResponseStatusException.class)
+  public @ResponseBody ResponseEntity<String> responseStatusExceptionHandler(
+      ResponseStatusException e) {
+    return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+  }
+
   @ExceptionHandler(Exception.class)
   public @ResponseBody ResponseEntity<Void> exceptionHandler(Exception e) {
     logger.error(e.getMessage(), e);

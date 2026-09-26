@@ -351,6 +351,7 @@ function _getPropertiesLists(e, forms) {
     .filter(
       (p) =>
         (p.owner === undefined || p.owner) &&
+        !p.internal &&
         geographicClasses.indexOf(p.class) === -1
     )
     .map((p) => {
@@ -364,6 +365,7 @@ function _getPropertiesLists(e, forms) {
 
 function _getPropertiesForms(e) {
   const sortedProperties = e.properties
+    .filter((p) => !p.internal)
     .filter((p) => !geographicClasses.includes(p.class))
     .concat(e.properties.filter((p) => geographicClasses.includes(p.class)));
 

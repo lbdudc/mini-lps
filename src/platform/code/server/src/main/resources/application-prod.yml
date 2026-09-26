@@ -17,6 +17,10 @@ server:
   #Default internal page size (Used for some high database usage methods)
   pageSize: 3
   port: /*%= getExtraConfigFromSpec(data, 'server_deploy_port', '9001') %*/
+  # Behind nginx (and the HTTPS front) the request is plain http on an internal name: take the
+  # protocol and host the visitor used from X-Forwarded-*, so a browser at https://<domain> is
+  # the same origin as the backend (no CORS check) whatever the domain is.
+  forward-headers-strategy: framework
 logging:
   level:
     root: INFO

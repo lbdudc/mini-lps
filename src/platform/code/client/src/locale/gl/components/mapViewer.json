@@ -65,6 +65,8 @@
       "play": "Reproducir",
       "pause": "Pausar",
       "all": "Amosar todas as datas",
+      "show": "Amosar o control de tempo",
+      "hide": "Agochar o control de tempo",
       "none": "Sen data"
     },
 ###< } >###

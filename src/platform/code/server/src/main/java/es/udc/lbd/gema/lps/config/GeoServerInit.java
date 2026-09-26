@@ -257,6 +257,12 @@ public class GeoServerInit {
 
       for (Object layerObject : layers) {
         JSONObject layer = (JSONObject) layerObject;
+        // A live layer reads a PostGIS table or a WFS layer somewhere else: GeoServer gets a store
+        // of its own for it (nothing of it is in the app's database)
+        if (layer.containsKey("live")) {
+          publishLiveLayer(publisher, layer, layersWithStyles);
+          continue;
+        }
         // A raster is not a database table: its coverage is created when its file is uploaded
         if ("wms".equals((String) layer.get("layerType")) && !isRaster(layer)) {
           JSONObject options = (JSONObject) layer.get("options");
@@ -340,6 +346,116 @@ public class GeoServerInit {
   }
 
   /**
+   * Publishes a live layer: a store for its source (a PostGIS database or a WFS service), the feature
+   * type, and the QGIS style. One failing source must not stop the others or the server.
+   */
+  private void publishLiveLayer(
+    GeoServerRESTPublisher publisher, JSONObject layer, HashMap<String, HashSet> layersWithStyles) {
+    JSONObject live = (JSONObject) layer.get("live");
+    String layerName = String.valueOf(live.get("layerName")).toLowerCase();
+    try {
+      String kind = String.valueOf(live.get("kind"));
+      String workspace = gsProp.getWorkspace();
+      String storeUrl = gsProp.getUrl() + "/rest/workspaces/" + workspace + "/datastores";
+      String store = layerName;
+
+      String storeXml;
+      String nativeName;
+      if ("postgis".equals(kind)) {
+        storeXml = liveStoreXml(store, "PostGIS", new String[][] {
+          {"dbtype", "postgis"},
+          {"host", String.valueOf(live.get("host"))},
+          {"port", String.valueOf(live.get("port"))},
+          {"database", String.valueOf(live.get("database"))},
+          {"schema", String.valueOf(live.get("schema"))},
+          {"user", String.valueOf(live.get("user"))},
+          {"passwd", String.valueOf(live.get("password"))},
+          {"Expose primary keys", "true"},
+          {"validate connections", "true"},
+        });
+        nativeName = String.valueOf(live.get("table"));
+      } else if ("wfs".equals(kind)) {
+        String user = String.valueOf(live.get("user"));
+        java.util.List<String[]> params = new ArrayList<String[]>();
+        params.add(new String[] {"WFSDataStoreFactory:GET_CAPABILITIES_URL", String.valueOf(live.get("url"))});
+        if (!user.isEmpty()) {
+          params.add(new String[] {"WFSDataStoreFactory:USERNAME", user});
+          params.add(new String[] {"WFSDataStoreFactory:PASSWORD", String.valueOf(live.get("password"))});
+        }
+        params.add(new String[] {"WFSDataStoreFactory:TIMEOUT", "30000"});
+        storeXml = liveStoreXml(store, "Web Feature Server (NG)", params.toArray(new String[0][]));
+        // GeoServer names the types of a WFS store prefix_name
+        nativeName = String.valueOf(live.get("typeName")).replace(':', '_');
+      } else {
+        logger.error("Live layer '" + layerName + "': unknown source kind '" + kind + "'");
+        return;
+      }
+
+      // A redeploy keeps GeoServer's data: the store may be there already, then it is updated
+      String created = HTTPUtils.post(storeUrl, storeXml, "text/xml", gsProp.getUser(), gsProp.getPassword());
+      if (created == null) {
+        HTTPUtils.put(storeUrl + "/" + store, storeXml, "text/xml", gsProp.getUser(), gsProp.getPassword());
+      }
+
+      long srid = live.get("srid") instanceof Number ? ((Number) live.get("srid")).longValue() : 4326L;
+      final GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
+      final GSLayerEncoder fse = new GSLayerEncoder();
+      fte.setProjectionPolicy(ProjectionPolicy.FORCE_DECLARED);
+      fte.setTitle(layerName);
+      fte.setName(layerName);
+      fte.setNativeName(nativeName);
+      fte.setSRS("EPSG:" + srid);
+      fte.setNativeCRS("EPSG:" + srid);
+
+      String defaultStyle = (String) layer.get("defaultStyle");
+      JSONArray subLayers = (JSONArray) ((JSONObject) layer.get("options")).get("layers");
+      HashSet<String> styles = layersWithStyles.get((String) subLayers.get(0));
+      if (styles != null) {
+        for (String style : styles) {
+          fse.addStyle(style);
+          if (style.equals(defaultStyle)) {
+            fse.setDefaultStyle(style);
+          }
+        }
+      }
+
+      boolean published = publisher.publishDBLayer(workspace, store, fte, fse);
+      if (!published) {
+        // Left behind by an earlier deploy: dropped and published anew
+        HTTPUtils.delete(storeUrl + "/" + store + "/featuretypes/" + layerName + "?recurse=true",
+          gsProp.getUser(), gsProp.getPassword());
+        published = publisher.publishDBLayer(workspace, store, fte, fse);
+      }
+      if (!published) {
+        logger.error("Could not publish the live layer '" + layerName + "' from " + kind + " (check its address and credentials)");
+        return;
+      }
+      HTTPUtils.put(
+        storeUrl + "/" + store + "/featuretypes/" + layerName + "?recalculate=nativebbox,latlonbbox",
+        "<featureType><enabled>true</enabled></featureType>",
+        "application/xml", gsProp.getUser(), gsProp.getPassword());
+      logger.info("Live layer published: " + workspace + ":" + layerName + " (" + kind + ")");
+    } catch (Exception e) {
+      logger.error("Could not publish the live layer '" + layerName + "': " + e.getMessage(), e);
+    }
+  }
+
+  private static String liveStoreXml(String name, String type, String[][] entries) {
+    StringBuilder xml = new StringBuilder("<dataStore><name>")
+      .append(xmlText(name)).append("</name><type>").append(xmlText(type))
+      .append("</type><enabled>true</enabled><connectionParameters>");
+    for (String[] entry : entries) {
+      xml.append("<entry key=\"").append(xmlText(entry[0])).append("\">")
+        .append(xmlText(entry[1])).append("</entry>");
+    }
+    return xml.append("</connectionParameters></dataStore>").toString();
+  }
+
+  private static String xmlText(String text) {
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+  }
+
+  /**
    * It goes through the whole array of layers and associates, to each subLayer, all the styles that will be available.
    * Returns a map whose key is the name of the subLayer and value is a set of available styles of this one.
    * @param layers: array of layers from the config file "layers.json"
@@ -390,7 +506,7 @@ public class GeoServerInit {
 
       for (Object layerObject : layers) {
         JSONObject layer = (JSONObject) layerObject;
-        if ("wms".equals((String) layer.get("layerType")) && !isRaster(layer)) {
+        if ("wms".equals((String) layer.get("layerType")) && !isRaster(layer) && !layer.containsKey("live")) {
           JSONObject options = (JSONObject) layer.get("options");
           JSONArray subLayers = (JSONArray) options.get("layers");
 

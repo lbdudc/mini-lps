@@ -193,6 +193,13 @@ export default {
     },
   },
   watch: {
+    /* the map's right-hand button shows whether there is anything to edit, and whether editing is on */
+    mode() {
+      this.reportState();
+    },
+    editableLayers() {
+      this.reportState();
+    },
     confirmDelete(open) {
       if (!open) this._dialogClosedAt = Date.now();
     },
@@ -200,6 +207,9 @@ export default {
     map() {
       this.leave();
     },
+  },
+  mounted() {
+    this.reportState();
   },
   created() {
     this._dialogClosedAt = 0;
@@ -219,6 +229,9 @@ export default {
     },
     repositoryOf(layer) {
       return RepositoryFactory.get(layer.entity + "EntityRepository");
+    },
+    reportState() {
+      this.$emit("state", { available: this.editableLayers.length > 0, active: this.mode !== "off" });
     },
     toggle() {
       if (this.mode === "off") this.enterPick();

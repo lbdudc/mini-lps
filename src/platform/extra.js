@@ -642,7 +642,8 @@ function camelToSnakeCase(str) {
  * (see raster-util.js there), so it is not derived from anything here.
  */
 function geoserverSubLayer(layer, subLayer) {
-  return layer.raster ? subLayer : "t_" + camelToSnakeCase(subLayer);
+  /* a raster or a live layer already is the GeoServer layer's name */
+  return layer.raster || layer.live ? subLayer : "t_" + camelToSnakeCase(subLayer);
 }
 
 /**

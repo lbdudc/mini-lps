@@ -144,7 +144,7 @@ public class /*%= normalize(context.name, true) %*/ServiceImpl implements /*%= n
     var exportEntityNames = data.dataModel.entities.map(function(en) { return en.name; });
     var exportProps = context.properties.filter(function(p) {
       var cls = String(p.class).split(' ')[0];
-      return !isGeographicProperty(cls) && exportEntityNames.indexOf(cls) === -1 && !p.multiple;
+      return !isGeographicProperty(cls) && exportEntityNames.indexOf(cls) === -1 && !p.multiple && !p.internal;
     });
   %*/
   private List</*%= normalize(context.name, true) %*/> findForExport(List<String> filters, String search) {
@@ -190,14 +190,14 @@ public class /*%= normalize(context.name, true) %*/ServiceImpl implements /*%= n
     StringBuilder tsv = new StringBuilder();
 
     tsv.append("/*%= context.properties
-                 .filter(function(p){ return ["geometry"].indexOf(normalize(p.name)) === -1; })
+                 .filter(function(p){ return ["geometry"].indexOf(normalize(p.name)) === -1 && !p.internal; })
                  .map(function(p){ return normalize(p.name); })
                  .join("\\t") %*/\n");
 
     for (/*%= normalize(context.name, true) %*/ e : list) {
         tsv.append(e.getId())
         /*%= context.properties
-             .filter(function(p){ return ["id", "geometry"].indexOf(normalize(p.name)) === -1; })
+             .filter(function(p){ return ["id", "geometry"].indexOf(normalize(p.name)) === -1 && !p.internal; })
              .map(function(p){
                  return '.append("\\t").append(e.get' + normalize(p.name, true) + '() != null ? e.get' + normalize(p.name, true) + '() : "")';
              }).join("\n") %*/

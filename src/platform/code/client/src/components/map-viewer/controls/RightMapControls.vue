@@ -1,4 +1,4 @@
-/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_T_F_BasicSearch) { %*/
+/*% if (feature.MV_LayerManagement || feature.MV_LM_ExternalLayer || feature.MV_T_InformationMode || feature.MV_MM_MMV_MapSelectorInMapViewer || feature.MV_T_Export || feature.MV_T_F_BasicSearch || feature.MV_T_Editing || feature.MV_T_TimeSlider) { %*/
 <template>
   <div v-if="map" class="map-controls">
     <div class="column">
@@ -213,6 +213,46 @@
         </v-tooltip>
       </div>
       /*% } %*/
+
+      /*% if (feature.MV_T_Editing) { %*/
+      <div v-if="editAvailable" class="column">
+        <v-tooltip left open-delay="200" color="var(--appColor)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="white"
+              :class="{ 'btn-selected': editActive }"
+              data-test="map-edit-toggle"
+              @click.stop="$emit('toggle-edit')"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t("mapViewer.edit.toggle") }}</span>
+        </v-tooltip>
+      </div>
+      /*% } %*/
+
+      /*% if (feature.MV_T_TimeSlider) { %*/
+      <div v-if="timeAvailable" class="column">
+        <v-tooltip left open-delay="200" color="var(--appColor)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="white"
+              :class="{ 'btn-selected': timeOpen }"
+              data-test="map-time-toggle"
+              @click.stop="$emit('toggle-time')"
+            >
+              <v-icon>mdi-calendar-clock</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ timeOpen ? $t("mapViewer.timeSlider.hide") : $t("mapViewer.timeSlider.show") }}</span>
+        </v-tooltip>
+      </div>
+      /*% } %*/
     </div>
   </div>
 </template>
@@ -282,6 +322,11 @@ export default {
       type: Array,
       default: () => [],
     },
+    /* the editor (FeatureEditor) has layers to edit / is on; the time slider has dates to show / is shown */
+    editAvailable: { type: Boolean, default: false },
+    editActive: { type: Boolean, default: false },
+    timeAvailable: { type: Boolean, default: false },
+    timeOpen: { type: Boolean, default: true },
   },
   data() {
     return {
